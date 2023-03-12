@@ -25,5 +25,5 @@ class FakeShipServices extends ShipServices {
 }
 
 int rndToCoordinate(double value) {
-  return ((value * 100) % 100).round();
+  return ((value * 99) % 99).round();
 }

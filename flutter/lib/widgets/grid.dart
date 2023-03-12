@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/tile.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -36,6 +38,7 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
     // get context with listen off, so it's not notified
     ChunkManager chunkM = Provider.of<ChunkManager>(context, listen: false);
     ShipServices services = Provider.of<ShipServices>(context, listen: false);
+    TileManager tileManager= Provider.of<TileManager>(context, listen: false);
 
     return Consumer<Camera>(
         builder: (_, camera, child) =>
@@ -65,9 +68,10 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
                     children: List.generate(
                         chunkManager.visibleChunks.length,
                             (index) => ChunkWidget(
-                          chunk: chunkManager.visibleChunks[index],
-                          controller: controller,
-                          tileSize: tileSize,
+                              chunk: chunkManager.visibleChunks[index],
+                              controller: controller,
+                              tileSize: tileSize,
+                              tileManager: tileManager,
                         )
                     )
                 )
@@ -81,7 +85,8 @@ class TileWrapper extends StatelessWidget {
   final int y;
   final int z;
   final AnimationController controller;
-  TileWrapper ({super.key, required this.x, required this.y, required this.z, required this.controller});
+  final Uint8List image;
+  TileWrapper ({super.key, required this.x, required this.y, required this.z, required this.controller, required this.image});
 
   //late final animation = Tween(begin: 0, end: 2 * pi).animate(controller);
 
@@ -91,7 +96,7 @@ class TileWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tile(x: xCoords, y: yCoords, z: z.toDouble());
+    return Tile(x: xCoords, y: yCoords, z: z, image: image);
 
     /*AnimatedBuilder(
         animation: animation,
