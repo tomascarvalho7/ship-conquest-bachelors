@@ -1,8 +1,7 @@
-import 'package:vector_math/vector_math.dart';
+import 'coordinate.dart';
 
 class Tile {
-  final Vector3 position;
-  //leave space for other tile parameters etc
+  final Coordinate coordinate;
 
-  Tile({required this.position});
+  Tile({required this.coordinate});
 }

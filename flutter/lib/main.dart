@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/colorGradient.dart';
 import 'package:ship_conquest/domain/colorMark.dart';
 import 'package:ship_conquest/domain/position.dart';
 import 'package:ship_conquest/providers/camera.dart';
 import 'package:ship_conquest/providers/chunk_manager.dart';
-import 'package:ship_conquest/providers/image_gradient.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/fake_ship_services.dart';
-import 'package:ship_conquest/services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/grid.dart';
 
@@ -25,7 +22,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    int chunkSize = 7;
+    int chunkSize = 21;
     ColorGradient colorGradient = ColorGradient(colors: [
       ColorMark(factor: Factor(0.0), color: Colors.blueGrey),
       ColorMark(factor: Factor(1.0), color: Colors.blueAccent)

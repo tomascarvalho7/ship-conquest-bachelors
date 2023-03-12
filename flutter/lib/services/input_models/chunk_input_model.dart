@@ -8,19 +8,19 @@ class ChunkInputModel {
 
   ChunkInputModel({required this.tiles});
 
-  factory ChunkInputModel.fromJson(
-      Map<String, dynamic> json) {
-    return ChunkInputModel(tiles: List<CoordinateInputModel>.from(json['tiles'] ?? []));
-  }
+  ChunkInputModel.fromJson(Map<String, dynamic> json)
+    : tiles = List<dynamic>.from(json['tiles'])
+      .map((e) => CoordinateInputModel.fromJson(e))
+      .toList();
 }
 
 extension Convert on ChunkInputModel {
-  Chunk toChunk(int size, Coordinate coordinates) {
+  Chunk toChunk(int chunkSize, Coordinate coordinates) {
     return Chunk(
-        size: size,
+        size: chunkSize,
         coordinates: coordinates,
-        tiles: tiles.map((value) {
-          return Coordinate(x: value.x, y: value.y, z: value.z);
-        }).toList());
+        tiles: tiles
+            .map((value) => Coordinate(x: value.x, y: value.y, z: value.z))
+            .toList());
   }
 }
