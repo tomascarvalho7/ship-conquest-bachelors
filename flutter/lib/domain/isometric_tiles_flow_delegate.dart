@@ -16,7 +16,7 @@ class IsometricTilesFlowDelegate extends FlowDelegate {
   IsometricTilesFlowDelegate({required this.animation, required this.tiles, required this.tileSize}): super(repaint: animation) {
     tilePositions = tiles.map((tile) => Position(
         x: (tile.x - tile.y) * tileSizeWidthHalf,
-        y: (tile.x + tile.y - (tile.z % 2).round()) * tileSizeHeightHalf,
+        y: (tile.x + tile.y - (tile.z / 10)) * tileSizeHeightHalf,
       )
     ).toList(growable: false);
 

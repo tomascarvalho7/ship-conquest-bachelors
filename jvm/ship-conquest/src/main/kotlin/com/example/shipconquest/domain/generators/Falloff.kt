@@ -1,11 +1,12 @@
 package com.example.shipconquest.domain.generators
 
+import kotlin.math.floor
 import kotlin.math.pow
 
 object Falloff {
     fun generateFalloffMap(size: Int): Grid<Float> {
         val falloffMap = Grid<Float>(data = mutableListOf(), size = size)
-        val halfSize = size / 2f
+        val halfSize = floor(size / 2f)
         val edgeSize = (halfSize.pow(2) * 2).pow(.5f)
 
         for (y in 0 until size) {
@@ -19,8 +20,8 @@ object Falloff {
     }
 
     private fun evaluate(value: Float): Float {
-        val a = 3f;
-        val b = 2.2f;
+        val a = 3f
+        val b = 1.2f
 
         return value.pow(a) / (value.pow(a) + (b - b * value).pow(a))
     }

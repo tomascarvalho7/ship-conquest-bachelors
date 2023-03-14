@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/coord_2d.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 
 import '../domain/chunk.dart';
@@ -19,7 +20,7 @@ class ChunkManager with ChangeNotifier {
   final List<Chunk> visibleChunks = List.empty(growable: true);
   final List<Coordinate> tiles = List.empty(growable: true);
 
-  final HashMap<String, int> tilesHM = HashMap();
+  final HashMap<Coord2D, int> tilesHM = HashMap();
 
   Offset _lastCoords = const Offset(double.infinity, double.infinity);
 
@@ -27,15 +28,15 @@ class ChunkManager with ChangeNotifier {
   double distance(Offset x, Offset y) => sqrt(pow(y.dx - x.dx, 2) + pow(y.dy - x.dy, 2));
 
   bool manageChunks(Offset coordinates, ShipServices services) {
-    if (distance(_lastCoords, coordinates) < chunkSize * tileSize / 2) return false;
+    if (distance(_lastCoords, coordinates) < tileSize / 2) return false;
     _lastCoords = coordinates;
     updateChunks(coordinates, services);
     return true;
   }
 
   Coordinate screenToIsometricChunk(Position position) {
-    late final double widthHalf = chunkSize * tileSize / 2;
-    late final double heightHalf = chunkSize * tileSize / 4;
+    late final double widthHalf = tileSize / 2;
+    late final double heightHalf = tileSize / 4;
     return Coordinate(
         x: -((position.y / heightHalf + (position.x / widthHalf)) / 2).floor(),
         y: -((position.y / heightHalf - (position.x / widthHalf)) / 2).floor(),
@@ -43,64 +44,40 @@ class ChunkManager with ChangeNotifier {
     );
   }
 
-  void generateInitialSquare(Offset coordinates) {
-    Coordinate coord = screenToIsometricChunk(Position(x: coordinates.dx, y: coordinates.dy));
-      Coordinate currentCoord = Coordinate(
-          x: coord.x,
-          y: coord.y,
-          z: coord.z + coord.y
-      );
-
+  void generateInitialSquare(Coordinate coord) {
       for (int index = 0; index < chunkSize * chunkSize; index++) {
-        int offsetX = currentCoord.x * chunkSize;
-        int offsetY = currentCoord.y * chunkSize;
+        int offsetX = coord.x;
+        int offsetY = coord.y;
         int x = index % chunkSize;
         int y = (index / chunkSize).floor();
-
-        tilesHM.putIfAbsent("$x:$y", () => tiles.length);
-
+        tilesHM.putIfAbsent(Coord2D(x: x + offsetX, y: y + offsetY), () => tiles.length);
         tiles.add(Coordinate(x: x + offsetX, y: y + offsetY, z: 0));
       }
   }
 
-  Future<Chunk> generateChunk(Offset coordinates, ShipServices services) async {
-      generateInitialSquare(coordinates);
+  Future<void> generateChunk(Coordinate coordinate, ShipServices services) async {
+      generateInitialSquare(coordinate);
 
-      Coordinate coords = Coordinate(x: coordinates.dx.round(), y: coordinates.dy.round(), z: 0);
-      Chunk newChunk = await services.getNewChunk(chunkSize, coords);
+      Chunk newChunk = await services.getNewChunk(chunkSize, coordinate);
       for(var tile in newChunk.tiles) {
-        int? index = tilesHM["${tile.x}:${tile.y}"];
+        //print("tile ${tile.x} : ${tile.y}");
+        int? index = tilesHM[Coord2D(x: tile.x, y: tile.y)];
         if(index != null) {
           tiles[index] = tile;
         }
       }
-      return newChunk;
   }
 
   // update visible chunks
-  Future<void> updateChunks(Offset coordinates, ShipServices services) async {
+  void updateChunks(Offset coordinates, ShipServices services) {
     // clear visible chunks
     visibleChunks.clear();
     tiles.clear();
+    tilesHM.clear();
     Coordinate coord = screenToIsometricChunk(Position(x: coordinates.dx, y: coordinates.dy));
-      Coordinate currentCoord = Coordinate(
-          x: coord.x,
-          y: coord.y,
-          z: coord.z + coord.y
-      );
 
-      // get chunk from cache or if null create new chunk
-      Chunk chunk = chunks[currentCoord] ?? await generateChunk(coordinates, services);
-      // add chunk
-      visibleChunks.add(chunk);
-
-      // build list of tiles
-      for(int i = 0; i < chunk.tiles.length; i++) {
-        final tile = chunk.tiles[i];
-        tiles.add(tile);
-      }
-
-    // notify consumers to rebuild widgets !
-    notifyListeners();
+    generateChunk(coord, services).then(
+            (value) => notifyListeners() // notify consumers to rebuild widgets !
+    );
   }
 }

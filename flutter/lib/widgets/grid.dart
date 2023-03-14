@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/providers/tile_manager.dart';
+import 'package:ship_conquest/domain/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/tile.dart';
 import 'package:ship_conquest/widgets/water_tile.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+import '../domain/coordinate.dart';
 import '../domain/isometric_tiles_flow_delegate.dart';
 import '../main.dart';
 import '../providers/chunk_manager.dart';
@@ -14,7 +15,8 @@ import '../providers/camera.dart';
 
 class Grid extends StatefulWidget {
   final Color background;
-  const Grid({super.key, required this.background});
+  final TileManager tileManager;
+  const Grid({super.key, required this.background, required this.tileManager});
 
   @override
   State<Grid> createState() => _GridState();
@@ -39,7 +41,6 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
     // get context with listen off, so it's not notified
     ChunkManager chunkM = Provider.of<ChunkManager>(context, listen: false);
     ShipServices services = Provider.of<ShipServices>(context, listen: false);
-    TileManager tileManager= Provider.of<TileManager>(context, listen: false);
     Camera cameraM = Provider.of<Camera>(context, listen: false);
     chunkM.manageChunks(cameraM.centerCoordinates, services);
 
@@ -67,25 +68,34 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
             ),
         child: Consumer<ChunkManager>(
             builder: (_, chunkManager, __) =>
-                Flow(
-                    delegate: IsometricTilesFlowDelegate(
-                        animation: animation,
-                        tiles: chunkManager.tiles,
-                        tileSize: tileSize
-                    ),
-                    clipBehavior: Clip.none,
-                    children: List.generate(
-                        chunkManager.tiles.length,
-                            (index) {
-                          int z = chunkManager.tiles[index].z;
-                          if(z != 0) {
-                            return Tile(image: tileManager.pngList[z]);
-                          } else {
-                            return const WaterTile();
-                          }
-                        }
-                    )
+                Chunk(animation: animation, tiles: chunkManager.tiles, tileManager: widget.tileManager)
+        )
+    );
+  }
+}
+
+class Chunk extends StatelessWidget {
+  final Animation<num> animation;
+  final List<Coordinate> tiles;
+  final TileManager tileManager;
+  const Chunk({super.key, required this.animation, required this.tiles, required this.tileManager});
+
+  @override
+  Widget build(BuildContext context) {
+    return Flow(
+        delegate: IsometricTilesFlowDelegate(
+            animation: animation,
+            tiles: tiles,
+            tileSize: tileSize
+        ),
+        clipBehavior: Clip.none,
+        children: List.generate(
+            tiles.length,
+                (index) => Tile(
+                svg: tileManager.getSvg(
+                    tiles[index].z
                 )
+            )
         )
     );
   }

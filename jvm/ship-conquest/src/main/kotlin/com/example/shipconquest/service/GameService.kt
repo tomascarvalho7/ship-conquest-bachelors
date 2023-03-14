@@ -26,8 +26,27 @@ class GameService(
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag)
             // return
-            if (game != null)   right(game.map.pulse(origin = position, radius = 10))
+            if (game != null)   right(game.map.pulse(origin = position, radius = 40))
             else                left(GetChunksError.GameNotFound)
+        }
+    }
+
+    fun printMap(tag: String) {
+        return transactionManager.run { transaction ->
+            val game = transaction.gameRepo.get(tag = tag) ?: return@run
+
+            for(y in 0 until game.map.size) {
+                for (x in 0 until game.map.size) {
+                    val pos = Position(x = x, y = y)
+                    val tile = game.map.data[pos]?.div(10)
+
+                    if (tile == null)
+                        print("---")
+                    else
+                        print(tile.toString().padStart(2, '0') + '-')
+                }
+                println()
+            }
         }
     }
 }

@@ -10,10 +10,10 @@ import com.example.shipconquest.domain.plus
 import kotlin.math.roundToInt
 
 const val islandSize = 30
-const val frequency = .25f
+const val frequency = .1f
 
 class WorldGenerator(val worldSize: Int) {
-    private val falloffGrid = Falloff.generateFalloffMap(worldSize)
+    private val falloffGrid = Falloff.generateFalloffMap(islandSize)
 
     fun generate(islandDensity: Factor): HeightMap {
         val islandOrigins = generateIslandCoordinates(islandDensity)
@@ -35,6 +35,7 @@ class WorldGenerator(val worldSize: Int) {
         val offset = gridSize / 2
 
         return buildList {
+            this.add(Position(x = 10, y = 10))
             for (y in 0 until numIslands) {
                 for (x in 0 until numIslands) {
                     val position = Position(x = offset + x * gridSize, y = offset + y * gridSize)
@@ -55,8 +56,8 @@ class WorldGenerator(val worldSize: Int) {
         for (y in 0 until islandSize) {
             for (x in 0 until islandSize) {
                 val noiseValue = noiseMap.get(x = x, y = y)
-                val falloffValue = falloffGrid.get(x = x, y = y)
-                val value = remapNoiseValue(value = noiseValue * falloffValue)
+                val falloffValue = 1 - falloffGrid.get(x = x, y = y)
+                val value = remapNoiseValue(value =  noiseValue * falloffValue)
 
                 if (value > 0)
                     builder.add(x = offset.x + x, y = offset.y + y, height = value)

@@ -31,6 +31,11 @@ class GameController(val service: GameService) {
         }
     }
 
+    @GetMapping("{tag}/print")
+    fun print(@PathVariable tag: String) {
+        service.printMap(tag)
+    }
+
     private fun <T> response(content: T) = ResponseEntity
         .status(200)
         .header("Content-Type", "application/json")

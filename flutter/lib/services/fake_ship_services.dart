@@ -9,8 +9,8 @@ class FakeShipServices extends ShipServices {
   @override
   Future<Chunk> getNewChunk(int chunkSize, Coordinate coordinates) {
     Random rnd = Random();
-    int offsetX = coordinates.x * chunkSize;
-    int offsetY = coordinates.y * chunkSize;
+    int offsetX = coordinates.x;
+    int offsetY = coordinates.y;
 
     return Future(() => Chunk(
         size: chunkSize,

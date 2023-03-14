@@ -12,20 +12,22 @@ data class HeightMap(val data: Map<Position, Int>, val size: Int)
  */
 fun HeightMap.pulse(origin: Position, radius: Int): List<Vector3>  {
     return buildList {
-        // 0 < i < radius * 2
-        for (i in 1 until radius * 2) {
-            val y = abs(radius - i)
-            val j = radius - y
-            // -j < x < j
-            for (x in (-j + 1) until j) {
-                val pos = origin + Position(x, y)
-                val z = data[pos]
+        for(y in -radius..radius) {
+            val yF = y.toFloat()
+           for(x in -radius..radius) {
+               val xF = x.toFloat()
+               val distance = sqrt((xF).pow(2) + (yF).pow(2))
 
-                if (z != null) {
-                    // add vector3 containing height coordinates to list
-                    add(element = Vector3(x = pos.x, y = pos.y, z = z))
-                }
-            }
+               if (distance <= radius) {
+                   val pos = origin + Position(x, y)
+                   val z = data[pos]
+
+                   if (z != null) {
+                       // add vector3 containing height coordinates to list
+                       add(element = Vector3(x = pos.x, y = pos.y, z = z))
+                   }
+               }
+           }
         }
     }
 }
