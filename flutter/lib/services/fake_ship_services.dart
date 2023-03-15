@@ -1,20 +1,18 @@
 import 'dart:math';
 
-import 'package:ship_conquest/domain/chunk.dart';
+import 'package:ship_conquest/domain/tile_list.dart';
 import 'package:ship_conquest/domain/coordinate.dart';
 
 import 'ship_services.dart';
 
 class FakeShipServices extends ShipServices {
   @override
-  Future<Chunk> getNewChunk(int chunkSize, Coordinate coordinates) {
+  Future<TileList> getNewChunk(int chunkSize, Coordinate coordinates) {
     Random rnd = Random();
     int offsetX = coordinates.x;
     int offsetY = coordinates.y;
 
-    return Future(() => Chunk(
-        size: chunkSize,
-        coordinates: coordinates,
+    return Future(() => TileList(
         tiles: List.generate(chunkSize * chunkSize, (index) {
           int x = index % chunkSize;
           int y = (index / chunkSize).floor();
@@ -25,5 +23,5 @@ class FakeShipServices extends ShipServices {
 }
 
 int rndToCoordinate(double value) {
-  return ((value * 99) % 99).round();
+  return ((value * 20) % 20).round();
 }

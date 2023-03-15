@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/colorGradient.dart';
-import 'package:ship_conquest/domain/colorMark.dart';
+import 'package:ship_conquest/domain/color_gradient.dart';
+import 'package:ship_conquest/domain/color_mark.dart';
 import 'package:ship_conquest/domain/position.dart';
-import 'package:ship_conquest/domain/tile.dart';
+import 'package:ship_conquest/domain/tile_gradient.dart';
 import 'package:ship_conquest/providers/camera.dart';
-import 'package:ship_conquest/providers/chunk_manager.dart';
-import 'package:ship_conquest/domain/tile_manager.dart';
+import 'package:ship_conquest/providers/tile_manager.dart';
+import 'package:ship_conquest/services/fake_ship_services.dart';
 import 'package:ship_conquest/services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/grid.dart';
@@ -24,9 +24,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    int chunkSize = 40;
+    int chunkSize = 35;
     ColorGradient colorGradient = ColorGradient(colors: [
-      ColorMark(factor: Factor(0.0), color: const Color.fromRGBO(196, 195, 175, 255)),
+      ColorMark(factor: Factor(0.0), color: Colors.blue),
+      ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 255)),
       ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(179, 181, 122, 255)),
       ColorMark(factor: Factor(0.2), color: const Color.fromRGBO(116, 153, 72, 255)),
       ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 255)),
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
     ]);
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Ship Conquest',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: MultiProvider(
         providers: [
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
               )
           ),
           ChangeNotifierProvider(
-              create: (_) => ChunkManager(chunkSize: chunkSize, tileSize: tileSize)
+              create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)
           ),
           Provider<ShipServices>(create: (_) => RealShipServices())
         ],
@@ -60,10 +61,10 @@ class MyApp extends StatelessWidget {
               ),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  TileManager tileManager = TileManager(svg: snapshot.data!, colorGradient: colorGradient, step: Factor(0.01));
-                  return Grid(background: Colors.blueAccent, tileManager: tileManager);
+                  TileGradient tileGradient = TileGradient(svg: snapshot.data!, colorGradient: colorGradient, step: Factor(0.01));
+                  return Grid(background: Colors.blueAccent, tileGradient: tileGradient);
                 } else {
-                  return const Text("Loading...");
+                  return Container(color: Colors.blueAccent);
                 }
               }
         ),

@@ -12,7 +12,7 @@ class Tile extends StatelessWidget {
     return SvgPicture.string(
       svg,
       width: tileSize,
-      height: tileSize * 2,
+      height: tileSize * 2
     );
   }
 }

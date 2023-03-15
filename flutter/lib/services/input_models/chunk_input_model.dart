@@ -1,7 +1,7 @@
 import 'package:ship_conquest/domain/coordinate.dart';
 import 'package:ship_conquest/services/input_models/coordinate_input_model.dart';
 
-import '../../domain/chunk.dart';
+import '../../domain/tile_list.dart';
 
 class ChunkInputModel {
   final List<CoordinateInputModel> tiles;
@@ -15,10 +15,8 @@ class ChunkInputModel {
 }
 
 extension Convert on ChunkInputModel {
-  Chunk toChunk(int chunkSize, Coordinate coordinates) {
-    return Chunk(
-        size: chunkSize,
-        coordinates: coordinates,
+  TileList toTileList() {
+    return TileList(
         tiles: tiles
             .map((value) => Coordinate(x: value.x, y: value.y, z: value.z))
             .toList());

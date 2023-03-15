@@ -1,22 +1,21 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/tile.dart';
-import 'package:ship_conquest/widgets/water_tile.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import '../domain/coordinate.dart';
 import '../domain/isometric_tiles_flow_delegate.dart';
+import '../domain/tile_gradient.dart';
 import '../main.dart';
-import '../providers/chunk_manager.dart';
+import '../providers/tile_manager.dart';
 import '../providers/camera.dart';
 
 class Grid extends StatefulWidget {
   final Color background;
-  final TileManager tileManager;
-  const Grid({super.key, required this.background, required this.tileManager});
+  final TileGradient tileGradient;
+  const Grid({super.key, required this.background, required this.tileGradient});
 
   @override
   State<Grid> createState() => _GridState();
@@ -39,7 +38,7 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // get context with listen off, so it's not notified
-    ChunkManager chunkM = Provider.of<ChunkManager>(context, listen: false);
+    TileManager chunkM = Provider.of<TileManager>(context, listen: false);
     ShipServices services = Provider.of<ShipServices>(context, listen: false);
     Camera cameraM = Provider.of<Camera>(context, listen: false);
     chunkM.manageChunks(cameraM.centerCoordinates, services);
@@ -66,19 +65,19 @@ class _GridState extends State<Grid> with TickerProviderStateMixin {
                     )
                 )
             ),
-        child: Consumer<ChunkManager>(
+        child: Consumer<TileManager>(
             builder: (_, chunkManager, __) =>
-                Chunk(animation: animation, tiles: chunkManager.tiles, tileManager: widget.tileManager)
+                TilesView(animation: animation, tiles: chunkManager.tiles, tileGradient: widget.tileGradient)
         )
     );
   }
 }
 
-class Chunk extends StatelessWidget {
+class TilesView extends StatelessWidget {
   final Animation<num> animation;
   final List<Coordinate> tiles;
-  final TileManager tileManager;
-  const Chunk({super.key, required this.animation, required this.tiles, required this.tileManager});
+  final TileGradient tileGradient;
+  const TilesView({super.key, required this.animation, required this.tiles, required this.tileGradient});
 
   @override
   Widget build(BuildContext context) {
@@ -91,11 +90,7 @@ class Chunk extends StatelessWidget {
         clipBehavior: Clip.none,
         children: List.generate(
             tiles.length,
-                (index) => Tile(
-                svg: tileManager.getSvg(
-                    tiles[index].z
-                )
-            )
+                (index) => tileGradient.getSvg(tiles[index].z)
         )
     );
   }

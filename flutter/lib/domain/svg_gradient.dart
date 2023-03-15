@@ -1,27 +1,33 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/HexColor.dart';
-import 'package:ship_conquest/domain/colorGradient.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:ship_conquest/domain/hex_color.dart';
+import 'package:ship_conquest/domain/color_gradient.dart';
+import 'package:ship_conquest/main.dart';
 
-import '../domain/factor.dart';
+import 'factor.dart';
 
 /// Build a set of svg strings based on a transformation with a colorGradient instance
 class SVGGradient {
   final String svg;
   final ColorGradient colorGradient;
   final Factor step;
-  late final List<String> buildSVGList;
+  late final List<Widget> widgetList;
 
   SVGGradient({
     required this.svg,
     required this.colorGradient,
     required this.step
   }) {
-    buildSVGList = List.generate(
+    widgetList = List.generate(
         (1 / step.value).round(),
             (index) {
               Factor factor = Factor(index * step.value);
               Color color = colorGradient.getColor(factor);
-              return editSVG(color);
+              return SvgPicture.string(
+                  editSVG(color),
+                  width: tileSize,
+                  height: tileSize * 2,
+              );
             }
     );
   }
