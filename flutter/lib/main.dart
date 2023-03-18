@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color_gradient.dart';
+import 'package:ship_conquest/domain/color_ramp.dart';
 import 'package:ship_conquest/domain/color_mark.dart';
 import 'package:ship_conquest/domain/position.dart';
-import 'package:ship_conquest/domain/tile_gradient.dart';
 import 'package:ship_conquest/providers/camera.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/fake_ship_services.dart';
 import 'package:ship_conquest/services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/grid.dart';
+import 'package:ship_conquest/widgets/painter_preview.dart';
 
 import 'domain/factor.dart';
 
 void main() {
   runApp(const MyApp());
+  //runApp(const PainterPreview());
 }
 
 class MyApp extends StatelessWidget {
@@ -25,16 +27,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int chunkSize = 35;
-    ColorGradient colorGradient = ColorGradient(colors: [
+    ColorRamp colorRamp = ColorRamp(colors: [
       ColorMark(factor: Factor(0.0), color: Colors.blue),
-      ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 255)),
-      ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(179, 181, 122, 255)),
-      ColorMark(factor: Factor(0.2), color: const Color.fromRGBO(116, 153, 72, 255)),
-      ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 255)),
-      ColorMark(factor: Factor(0.7), color: const Color.fromRGBO(177, 211, 114, 255)),
-      ColorMark(factor: Factor(0.71), color: const Color.fromRGBO(170, 145, 107, 255)),
-      ColorMark(factor: Factor(0.85), color: const Color.fromRGBO(174, 154, 127, 255)),
-      ColorMark(factor: Factor(1.0), color: const Color.fromRGBO(255, 255, 255, 255)),
+      ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 1.0)),
+      ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(210, 202, 151, 1.0)),
+      ColorMark(factor: Factor(0.2), color: const Color.fromRGBO(116, 153, 72, 1.0)),
+      ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 1.0)),
+      ColorMark(factor: Factor(0.7), color: const Color.fromRGBO(177, 211, 114, 1.0)),
+      ColorMark(factor: Factor(0.71), color: const Color.fromRGBO(170, 145, 107, 1.0)),
+      ColorMark(factor: Factor(0.85), color: const Color.fromRGBO(157, 117, 64, 1.0)),
+      ColorMark(factor: Factor(1.0), color: const Color.fromRGBO(255, 255, 255, 1.0)),
     ]);
 
     return MaterialApp(
@@ -55,22 +57,12 @@ class MyApp extends StatelessWidget {
           ),
           Provider<ShipServices>(create: (_) => RealShipServices())
         ],
-          child: FutureBuilder(
-              future: rootBundle.loadString('assets/svg/cube.svg').then(
-                      (value) => value
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  TileGradient tileGradient = TileGradient(svg: snapshot.data!, colorGradient: colorGradient, step: Factor(0.01));
-                  return Grid(background: Colors.blueAccent, tileGradient: tileGradient);
-                } else {
-                  return Container(color: Colors.blueAccent);
-                }
-              }
-        ),
+          child: Grid(
+              background: Colors.blueAccent,
+              colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01))),
       ),
     );
   }
 }
 
-const tileSize = 64.0;
+const tileSize = 16.0;

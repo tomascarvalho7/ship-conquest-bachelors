@@ -5,7 +5,7 @@ import 'package:ship_conquest/services/input_models/chunk_input_model.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "fc41-194-210-199-249.eu.ngrok.io";
+const baseUri = "6d06-194-117-18-99.eu.ngrok.io";
 const lobbyId = "A9BMdK";
 
 class RealShipServices extends ShipServices {

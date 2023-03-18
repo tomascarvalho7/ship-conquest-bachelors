@@ -1,33 +1,26 @@
-import 'dart:ui';
-import 'package:ship_conquest/domain/color_mark.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/color_ramp.dart';
+
 import 'factor.dart';
 
-/// Replicate the colorRamp node from blender
+/// Build a set of colors based on a transformation with a colorRamp instance
 class ColorGradient {
-  final List<ColorMark> colors;
+  final ColorRamp colorRamp;
+  final Factor step;
+  late final List<Color> colors;
 
-  ColorGradient({required this.colors});
-
-  Color getColor(Factor factor) {
-    int n = 0;
-    while(n < colors.length - 1) {
-      ColorMark start = colors[n];
-      ColorMark end = colors[n + 1];
-
-      Factor scopedFactor = Factor(
-          (factor.value - start.factor.value) / (end.factor.value - start.factor.value)
-      );
-
-      if (factor.value <= end.factor.value) {
-        Color? col = Color.lerp(start.color, end.color, scopedFactor.value);
-
-        if (col != null) { return col; }
-      }
-
-      n++;
-    }
-
-    // return white
-    return const Color(0x00000000);
+  ColorGradient({
+    required this.colorRamp,
+    required this.step
+  }) {
+    colors = List.generate(
+        (1 / step.value).round(),
+            (index) {
+              Factor factor = Factor(index * step.value);
+              return colorRamp.getColor(factor);
+            }
+    );
   }
+
+  Color get(int height) => colors[height];
 }
