@@ -27,6 +27,16 @@ data class Problem(val title: String, val detail: String) {
             title = "Game not found",
             detail = "The game resource identified was not found."
         )
+
+        fun invalidIdToken() = Problem(
+            title = "ID Token is invalid",
+            detail = "The ID Token you presented as invalid and authentication failed."
+        )
+
+        fun tokenCreationFailed() = Problem(
+            title = "Failed to create a token",
+            detail = "Failed to create a token, please try again."
+        )
     }
 }
 

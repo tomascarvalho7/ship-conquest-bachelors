@@ -2,10 +2,18 @@ create schema dbo;
 
 CREATE TABLE dbo.user
 (
-  username VARCHAR(24) NOT NULL,
-  id INT NOT NULL,
-  PRIMARY KEY (id)
+    gid INT NOT NULL,
+    name VARCHAR(24) NOT NULL,
+    email varchar(60) CHECK(email LIKE '%@%') NOT null UNIQUE,
+    PRIMARY KEY (id)
 );
+
+CREATE TABLE dbo.Token
+(
+    token varchar(256) not null primary key,
+    uid int not null,
+    FOREIGN KEY (uid) REFERENCES dbo.user(gid)
+)
 
 CREATE TABLE dbo.Lobby
 (
