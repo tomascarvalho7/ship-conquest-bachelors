@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/position.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
-import '../domain/color_gradient.dart';
-import '../domain/isometric_tile.dart';
+import '../../domain/color_gradient.dart';
+import '../../domain/isometric_tile.dart';
 
 class IsometricPainter extends CustomPainter {
   final double tileSize;

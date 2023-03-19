@@ -4,13 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color_gradient.dart';
 import 'package:ship_conquest/main.dart';
 import 'package:ship_conquest/services/ship_services.dart';
-import 'package:ship_conquest/widgets/isometric_painter.dart';
+import 'package:ship_conquest/widgets/canvas/isometric_painter.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../domain/coordinate.dart';
-import '../domain/isometric_tile.dart';
-import '../providers/tile_manager.dart';
-import '../providers/camera.dart';
+import '../../domain/coordinate.dart';
+import '../../domain/isometric_tile.dart';
+import '../../providers/tile_manager.dart';
+import '../../providers/camera.dart';
 
 class Grid extends StatefulWidget {
   final Color background;

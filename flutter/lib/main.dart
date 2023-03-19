@@ -10,8 +10,9 @@ import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/fake_ship_services.dart';
 import 'package:ship_conquest/services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services.dart';
-import 'package:ship_conquest/widgets/grid.dart';
-import 'package:ship_conquest/widgets/painter_preview.dart';
+import 'package:ship_conquest/widgets/authentication/authentication_screen.dart';
+import 'package:ship_conquest/widgets/screens/game.dart';
+import 'package:ship_conquest/widgets/canvas/painter_preview.dart';
 
 import 'domain/factor.dart';
 
@@ -57,10 +58,10 @@ class MyApp extends StatelessWidget {
           ),
           Provider<ShipServices>(create: (_) => RealShipServices())
         ],
-          child: Grid(
+          child: const AuthenticationScreen(), /*Grid(
               background: Colors.blueAccent,
               colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01))),
-      ),
+      */),
     );
   }
 }

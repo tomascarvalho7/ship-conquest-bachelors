@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/widgets/test_painter.dart';
+import 'package:ship_conquest/widgets/canvas/test_painter.dart';
 
 class PainterPreview extends StatefulWidget {
   const PainterPreview({super.key});

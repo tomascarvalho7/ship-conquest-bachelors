@@ -5,7 +5,7 @@ import 'package:ship_conquest/domain/isometric_tile_paint.dart';
 import 'package:ship_conquest/main.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
 
-import '../domain/position.dart';
+import '../../domain/position.dart';
 
 class TestPainter extends CustomPainter {
   final Animation<int> animation;
