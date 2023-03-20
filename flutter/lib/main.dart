@@ -13,6 +13,7 @@ import 'package:ship_conquest/services/ship_services.dart';
 import 'package:ship_conquest/widgets/authentication/authentication_screen.dart';
 import 'package:ship_conquest/widgets/screens/game.dart';
 import 'package:ship_conquest/widgets/canvas/painter_preview.dart';
+import 'package:ship_conquest/widgets/screens/game_screen.dart';
 
 import 'domain/factor.dart';
 
@@ -28,17 +29,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int chunkSize = 35;
-    ColorRamp colorRamp = ColorRamp(colors: [
-      ColorMark(factor: Factor(0.0), color: Colors.blue),
-      ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 1.0)),
-      ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(210, 202, 151, 1.0)),
-      ColorMark(factor: Factor(0.2), color: const Color.fromRGBO(116, 153, 72, 1.0)),
-      ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 1.0)),
-      ColorMark(factor: Factor(0.7), color: const Color.fromRGBO(177, 211, 114, 1.0)),
-      ColorMark(factor: Factor(0.71), color: const Color.fromRGBO(170, 145, 107, 1.0)),
-      ColorMark(factor: Factor(0.85), color: const Color.fromRGBO(157, 117, 64, 1.0)),
-      ColorMark(factor: Factor(1.0), color: const Color.fromRGBO(255, 255, 255, 1.0)),
-    ]);
 
     return MaterialApp(
       title: 'Ship Conquest',
@@ -58,10 +48,8 @@ class MyApp extends StatelessWidget {
           ),
           Provider<ShipServices>(create: (_) => RealShipServices())
         ],
-          child: const AuthenticationScreen(), /*Grid(
-              background: Colors.blueAccent,
-              colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01))),
-      */),
+          child: const AuthenticationScreen()
+      ),
     );
   }
 }

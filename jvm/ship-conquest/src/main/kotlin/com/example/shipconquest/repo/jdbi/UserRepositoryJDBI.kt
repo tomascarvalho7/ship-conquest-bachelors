@@ -12,7 +12,7 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
 
     override fun checkUserExists(googleId: String): Boolean {
         logger.info("Checking if user with id = {} exists", googleId)
-        val userCount = handle.createQuery("SELECT count(*) for dbo.user where gid = :googleId;")
+        val userCount = handle.createQuery("SELECT count(*) from dbo.user where id = :googleId;")
             .bind("googleId", googleId)
             .mapTo<Int>()
             .single()
@@ -31,7 +31,7 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
 
     override fun updateUserToken(googleId: String, token: Token) {
         logger.info("Creating a new token for user with id = {}", googleId)
-        handle.createUpdate("INSERT into dbo.token values(:gid, :token);")
+        handle.createUpdate("INSERT into dbo.token values(:token, :gid);")
             .bind("gid", googleId)
             .bind("token", token.value)
             .execute()
@@ -39,7 +39,7 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
 
     override fun doesTokenExist(token: Token): Boolean {
         logger.info("Checking if token exists")
-        val tokenCount = handle.createQuery("SELECT count(*) for dbo.token where token = :token;")
+        val tokenCount = handle.createQuery("SELECT count(*) from dbo.token where token = :token;")
             .bind("token", token.value)
             .mapTo<Int>()
             .single()

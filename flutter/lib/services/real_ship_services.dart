@@ -7,8 +7,8 @@ import 'package:ship_conquest/services/input_models/token_input_model.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "6d06-194-117-18-99.eu.ngrok.io";
-const lobbyId = "A9BMdK";
+const baseUri = "9d67-2001-8a0-6e0e-d200-d8c6-7010-870f-7caa.eu.ngrok.io";
+const lobbyId = "F3PhNa";
 
 class RealShipServices extends ShipServices {
   @override
@@ -17,7 +17,7 @@ class RealShipServices extends ShipServices {
     int y = coordinates.y + (chunkSize / 2).round() - 1;
     final queryParameters = {'x': x.toString(), 'y': y.toString()};
 
-    final response = await http.get(Uri.http(baseUri, "$lobbyId/view", queryParameters));
+    final response = await http.get(Uri.https(baseUri, "$lobbyId/view", queryParameters));
 
     if (response.statusCode == 200) {
       final res = ChunkInputModel.fromJson(jsonDecode(response.body));
@@ -35,20 +35,17 @@ class RealShipServices extends ShipServices {
   @override
   Future<Token> signIn(String idToken) async {
     final response = await http.post(
-        Uri.http(baseUri),
-        headers: { "Content-Type": 'application/x-www-form-urlencoded' },
-        body: 'idtoken=$idToken'
+        Uri.https(baseUri, "get-token"),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "idtoken=$idToken"
     );
 
     if (response.statusCode == 200) {
       print(jsonDecode(response.body));
       final res = TokenInputModel.fromJson(jsonDecode(response.body));
-
       return res.toToken();
     } else {
       throw Exception("error creating user token");
     }
-
-    return Token(token: "fake");
   }
 }

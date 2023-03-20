@@ -4,7 +4,7 @@ class TokenInputModel {
   final String value;
 
   TokenInputModel.fromJson(Map<String, dynamic> json)
-    : value = json['value'];
+    : value = json['token'];
 }
 
 extension Convert on TokenInputModel {

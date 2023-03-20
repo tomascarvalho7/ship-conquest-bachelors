@@ -2,7 +2,7 @@ create schema dbo;
 
 CREATE TABLE dbo.user
 (
-    gid INT NOT NULL,
+    id varchar(30) NOT NULL,
     name VARCHAR(24) NOT NULL,
     email varchar(60) CHECK(email LIKE '%@%') NOT null UNIQUE,
     PRIMARY KEY (id)
@@ -11,9 +11,9 @@ CREATE TABLE dbo.user
 CREATE TABLE dbo.Token
 (
     token varchar(256) not null primary key,
-    uid int not null,
-    FOREIGN KEY (uid) REFERENCES dbo.user(gid)
-)
+    uid varchar(30) not null,
+    FOREIGN KEY (uid) REFERENCES dbo.user(id)
+);
 
 CREATE TABLE dbo.Lobby
 (
@@ -27,5 +27,5 @@ CREATE TABLE dbo.Game
   map jsonb NOT NULL,
   tag VARCHAR(6) NOT NULL,
   PRIMARY KEY (tag),
-  FOREIGN KEY (tag) REFERENCES Lobby(tag)
+  FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
