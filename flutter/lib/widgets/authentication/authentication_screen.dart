@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/user_storage.dart';
 import 'package:ship_conquest/widgets/authentication/google_signin_api.dart';
 import 'package:ship_conquest/widgets/screens/game_screen.dart';
 
-import '../../domain/token.dart';
 import '../../services/ship_services.dart';
 
 class AuthenticationScreen extends StatelessWidget {
@@ -12,6 +12,7 @@ class AuthenticationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ShipServices services = Provider.of<ShipServices>(context, listen: false);
+    UserStorage userStorage = Provider.of<UserStorage>(context, listen: false);
 
     return Container(
         width: double.infinity,
@@ -22,23 +23,27 @@ class AuthenticationScreen extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.white,
-                  Colors.white70,
-                  Colors.black,
+                  Colors.white12,
                 ]
             )
         ),
         alignment: Alignment.center,
         child: GoogleAuthButton(
               onClick: () async {
-                signIn(services).then((value) {
-                  /*Navigator.pushReplacement(context,
+                signIn(services, userStorage).then((value) {
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => GameScreen())
-                  );*/
-                  //Providers dont get transported through new routes, so it doesnt work
+                  );
                 });
               }
             )
     );
+  }
+  Future signIn(ShipServices services, UserStorage userStorage) async {
+    final account = await GoogleSignInApi.login();
+    final userInfo = await GoogleSignInApi.getUserInfo(account!);
+    final userToken = await services.signIn(userInfo);
+    userStorage.setToken(userToken.token);
   }
 }
 
@@ -85,8 +90,4 @@ class GoogleAuthButton extends StatelessWidget {
   }
 }
 
-Future<Token> signIn(ShipServices services) async {
-  final account = await GoogleSignInApi.login();
-  final userInfo = await GoogleSignInApi.getUserInfo(account!);
-  return await services.signIn(userInfo);
-}
+

@@ -7,7 +7,7 @@ import 'package:ship_conquest/services/input_models/token_input_model.dart';
 import 'package:ship_conquest/services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "9d67-2001-8a0-6e0e-d200-d8c6-7010-870f-7caa.eu.ngrok.io";
+const baseUri = "db5a-2001-8a0-6e0e-d200-29c6-92b5-1c56-91ae.eu.ngrok.io";
 const lobbyId = "F3PhNa";
 
 class RealShipServices extends ShipServices {
@@ -41,7 +41,6 @@ class RealShipServices extends ShipServices {
     );
 
     if (response.statusCode == 200) {
-      print(jsonDecode(response.body));
       final res = TokenInputModel.fromJson(jsonDecode(response.body));
       return res.toToken();
     } else {
