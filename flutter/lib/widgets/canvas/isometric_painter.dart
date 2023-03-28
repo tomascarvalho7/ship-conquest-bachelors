@@ -14,7 +14,9 @@ class IsometricPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (var tile in tiles) {
+    final length = tiles.length;
+    for (var i = 0; i < length; i++) {
+      final tile = tiles[i];
       double height = tile.height(animation.value);
 
       drawCube(

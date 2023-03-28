@@ -37,7 +37,7 @@ void drawCube({
       offset + Offset(size / 2, size * 2), // right edge
       // second
       offset + Offset(0, size / 4), // left edge
-      offset + Offset(0, size * 3 / 2), // bottom edge
+      offset + Offset(0, size * 2 - size / 4), // bottom edge
       offset + Offset(size / 2, size * 2), // right edge
     ],
   );
@@ -53,7 +53,7 @@ void drawCube({
       offset + Offset(size / 2, size * 2), // left edge
       // second
       offset + Offset(size, size / 4), // right edge
-      offset + Offset(size, size * 3 / 2), // bottom edge
+      offset + Offset(size, size * 2 - size / 4), // bottom edge
       offset + Offset(size / 2, size * 2), // left edge
     ],
   );

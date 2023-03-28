@@ -9,7 +9,7 @@ import 'coordinate.dart';
 class IsometricTile {
   final Position position; // tile origin
   final double Function(double x) height; // tile get height function
-  final IsometricTilePaint Function(double x) tilePaint; // tile paint
+  final IsometricTilePaint Function(double x) tilePaint; // tile get paint
 
   IsometricTile({required this.position, required this.height, required this.tilePaint});
 

@@ -18,7 +18,7 @@ fun HeightMap.pulse(origin: Position, radius: Int): List<Vector3>  {
                val xF = x.toFloat()
                val distance = sqrt((xF).pow(2) + (yF).pow(2))
 
-               if (distance <= radius) {
+               if (radius / distance >= .95) {
                    val pos = origin + Position(x, y)
                    val z = data[pos]
 

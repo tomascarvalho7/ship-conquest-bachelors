@@ -26,7 +26,7 @@ class GameService(
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag)
             // return
-            if (game != null)   right(game.map.pulse(origin = position, radius = 35))
+            if (game != null)   right(game.map.pulse(origin = position, radius = viewDistance))
             else                left(GetChunksError.GameNotFound)
         }
     }

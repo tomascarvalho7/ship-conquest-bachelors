@@ -124,7 +124,7 @@ object SimplexNoise {
             var x = 0
             while (x < size) {
                 val value = noise((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat()
-                noiseMap.add(x = x, y = y, value = (value + 1) / 2) //generate values between 0 and 1
+                noiseMap.add(x = x, y = y, value = (value + 1) / 2) // generate values between 0 and 1
                 x++
             }
             y++

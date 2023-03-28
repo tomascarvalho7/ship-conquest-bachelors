@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
 const val islandSize = 30
 const val frequency = .1f
 
-class WorldGenerator(val worldSize: Int) {
+class WorldGenerator(private val worldSize: Int) {
     private val falloffGrid = Falloff.generateFalloffMap(islandSize)
 
     fun generate(islandDensity: Factor): HeightMap {

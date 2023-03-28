@@ -12,7 +12,7 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
 
     override fun checkUserExists(googleId: String): Boolean {
         logger.info("Checking if user with id = {} exists", googleId)
-        val userCount = handle.createQuery("SELECT count(*) from dbo.user where id = :googleId;")
+        val userCount = handle.createQuery("SELECT count(*) from dbo.user where id = :googleId")
             .bind("googleId", googleId)
             .mapTo<Int>()
             .single()

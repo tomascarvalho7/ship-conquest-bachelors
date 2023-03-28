@@ -21,7 +21,7 @@ object Falloff {
 
     private fun evaluate(value: Float): Float {
         val a = 3f
-        val b = 1.2f
+        val b = 1.4f
 
         return value.pow(a) / (value.pow(a) + (b - b * value).pow(a))
     }

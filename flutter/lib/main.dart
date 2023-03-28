@@ -4,23 +4,34 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color_gradient.dart';
 import 'package:ship_conquest/domain/color_ramp.dart';
 import 'package:ship_conquest/domain/color_mark.dart';
+import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/position.dart';
-import 'package:ship_conquest/domain/user_storage.dart';
+import 'package:ship_conquest/providers/minimap_provider.dart';
+import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/providers/camera.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
-import 'package:ship_conquest/services/fake_ship_services.dart';
-import 'package:ship_conquest/services/real_ship_services.dart';
-import 'package:ship_conquest/services/ship_services.dart';
-import 'package:ship_conquest/widgets/authentication/authentication_screen.dart';
-import 'package:ship_conquest/widgets/screens/game.dart';
+import 'package:ship_conquest/router.dart';
+import 'package:ship_conquest/services/ship_services/fake_ship_services.dart';
+import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
+import 'package:ship_conquest/services/ship_services/ship_services.dart';
+import 'package:ship_conquest/widgets/screens/signin/authentication_screen.dart';
+import 'package:ship_conquest/widgets/screens/game/game.dart';
 import 'package:ship_conquest/widgets/canvas/painter_preview.dart';
-import 'package:ship_conquest/widgets/screens/game_screen.dart';
+import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 
 import 'domain/factor.dart';
 
 void main() {
-  int chunkSize = 35;
-  runApp(
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+  final chunkSize = 10;
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) =>
       MultiProvider(
           providers: [
             ChangeNotifierProvider(
@@ -34,39 +45,16 @@ void main() {
             ChangeNotifierProvider(
                 create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)
             ),
+            ChangeNotifierProvider(create: (_) => MinimapProvider()),
             Provider<ShipServices>(create: (_) => RealShipServices()),
             Provider<UserStorage>(create: (_) => UserStorage())
           ],
-          child: const MyApp()
-      ),
+          child: MaterialApp.router(
+              title: 'Ship Conquest',
+              theme: ThemeData(primarySwatch: Colors.blue),
+              routerConfig: createRouter()
+          )
       );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    UserStorage userStorage = Provider.of<UserStorage>(context, listen: false);
-
-    return MaterialApp(
-      title: 'Ship Conquest',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home:  FutureBuilder<String?>(
-        future: userStorage.getToken(),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(); //waiting for completion
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}'); // error treatment has to be changed
-          } else {
-            return snapshot.data == null ? const AuthenticationScreen() : GameScreen();
-          }
-        },
-      ),
-    );
-  }
-}
-
-const tileSize = 16.0;
+const tileSize = 32.0;

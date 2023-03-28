@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/user_storage.dart';
-import 'package:ship_conquest/widgets/authentication/google_signin_api.dart';
-import 'package:ship_conquest/widgets/screens/game_screen.dart';
+import 'package:ship_conquest/providers/user_storage.dart';
+import 'package:ship_conquest/services/google/google_signin_api.dart';
+import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 
-import '../../services/ship_services.dart';
+import '../../../services/ship_services/ship_services.dart';
 
 class AuthenticationScreen extends StatelessWidget {
   const AuthenticationScreen({super.key});
@@ -22,20 +23,14 @@ class AuthenticationScreen extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.white,
-                  Colors.white12,
+                  Color.fromRGBO(198, 223, 255, 1.0),
+                  Color.fromRGBO(87, 160, 255, 1.0)
                 ]
             )
         ),
         alignment: Alignment.center,
         child: GoogleAuthButton(
-              onClick: () async {
-                signIn(services, userStorage).then((value) {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => GameScreen())
-                  );
-                });
-              }
+              onClick: () => signIn(services, userStorage).then((_) => context.go("/game"))
             )
     );
   }

@@ -26,7 +26,7 @@ class LobbyService(
     fun createLobby(name: String): CreateLobbyResult {
         val lobbyName = name.toLobbyName() ?: return left(CreateLobbyError.InvalidServerName)
         // generate world
-        val world = WorldGenerator(300).generate(Factor(70))
+        val world = WorldGenerator(600).generate(Factor(70))
 
         return transactionManager.run { transaction ->
             val tag = generateTag(transaction.lobbyRepo::get)

@@ -1,14 +1,16 @@
+import 'dart:collection';
 import 'dart:convert';
+import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/tile_list.dart';
 import 'package:ship_conquest/domain/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/services/input_models/chunk_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
-import 'package:ship_conquest/services/ship_services.dart';
+import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "db5a-2001-8a0-6e0e-d200-29c6-92b5-1c56-91ae.eu.ngrok.io";
-const lobbyId = "F3PhNa";
+const baseUri = "5025-46-189-174-32.eu.ngrok.io";
+const lobbyId = "SsO6AJ";
 
 class RealShipServices extends ShipServices {
   @override
@@ -46,5 +48,14 @@ class RealShipServices extends ShipServices {
     } else {
       throw Exception("error creating user token");
     }
+  }
+
+  @override
+  Future<Minimap> getMinimap(Token token) async {
+    // TODO()
+    return Minimap(
+        length: 600,
+        pixels: HashMap() // empty map
+    );
   }
 }
