@@ -37,6 +37,16 @@ data class Problem(val title: String, val detail: String) {
             title = "Failed to create a token",
             detail = "Failed to create a token, please try again."
         )
+
+        fun noTrackedRecord() =  Problem(
+            title = "There seems to be no record tracked from you",
+            detail = "There is no record from your boats in this game"
+        )
+
+        fun invalidNavigation() = Problem(
+            title = "Invalid navigation path",
+            detail = "The navigation path you described isn't valid"
+        )
     }
 }
 

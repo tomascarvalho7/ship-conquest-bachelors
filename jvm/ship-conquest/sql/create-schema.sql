@@ -1,6 +1,6 @@
 create schema dbo;
 
-CREATE TABLE dbo.user
+CREATE TABLE dbo.User
 (
     id varchar(30) NOT NULL,
     name VARCHAR(24) NOT NULL,
@@ -28,4 +28,13 @@ CREATE TABLE dbo.Game
   tag VARCHAR(6) NOT NULL,
   PRIMARY KEY (tag),
   FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.VisitedPoints
+(
+    gameTag varchar(6) NOT NULL,
+    uid varchar(30) NOT NULL,
+    points jsonb,
+    PRIMARY KEY (gameTag),
+    FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );

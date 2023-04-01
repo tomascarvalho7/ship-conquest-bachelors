@@ -6,4 +6,6 @@ DROP TABLE IF EXISTS dbo.Lobby;
 
 DROP TABLE IF EXISTS dbo.User;
 
+DROP TABLE IF EXISTS dbo.VisitedPoints;
+
 drop schema dbo;
