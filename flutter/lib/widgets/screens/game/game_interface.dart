@@ -1,28 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import 'minimap/minimap_icon.dart';
+import '../minimap/minimap_icon.dart';
 
 class GameInterface extends StatelessWidget {
   final Widget gameView;
-  final Widget Function() minimapView;
-  const GameInterface({super.key, required this.gameView, required this.minimapView});
+  const GameInterface({super.key, required this.gameView});
 
   @override
   Widget build(BuildContext context) =>
       Stack(
         children: [
           gameView,
-          MinimapIcon(
-              onClick: () => showDialog(
-                  context: context,
-                  builder: (context) =>
-                      Dialog(
-                          insetPadding: const EdgeInsets.all(10),
-                          backgroundColor: const Color.fromRGBO(355, 355, 355, .9),
-                          child: minimapView(),
-                      )
-              )
-          )
+          MinimapIcon(onClick: () => context.push('/minimap'))
         ]
       );
 }

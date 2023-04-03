@@ -2,8 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 
-import '../domain/color_gradient.dart';
-import '../domain/coordinate.dart';
+import '../domain/color/color_gradient.dart';
+import '../domain/space/coordinate.dart';
 import '../domain/minimap.dart';
 
 class MinimapProvider with ChangeNotifier {

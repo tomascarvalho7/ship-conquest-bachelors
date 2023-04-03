@@ -10,7 +10,7 @@ class ImagePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size _) {
-    final offset = - size / 2;
+    final offset = 0.0;
 
     canvas.drawImageRect(
         image,

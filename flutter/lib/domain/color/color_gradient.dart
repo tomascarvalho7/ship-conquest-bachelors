@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/color_ramp.dart';
+import 'package:ship_conquest/domain/color/color_ramp.dart';
 
-import 'factor.dart';
+import '../utils/factor.dart';
 
 /// Build a set of colors based on a transformation with a colorRamp instance
 class ColorGradient {

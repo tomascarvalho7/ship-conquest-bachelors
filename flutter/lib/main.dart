@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/color_gradient.dart';
-import 'package:ship_conquest/domain/color_ramp.dart';
-import 'package:ship_conquest/domain/color_mark.dart';
+import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/color/color_ramp.dart';
+import 'package:ship_conquest/domain/color/color_mark.dart';
 import 'package:ship_conquest/domain/minimap.dart';
-import 'package:ship_conquest/domain/position.dart';
+import 'package:ship_conquest/domain/ship.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
+import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/providers/camera.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
@@ -19,7 +21,7 @@ import 'package:ship_conquest/widgets/screens/game/game.dart';
 import 'package:ship_conquest/widgets/canvas/painter_preview.dart';
 import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 
-import 'domain/factor.dart';
+import 'domain/utils/factor.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,26 +29,15 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  final chunkSize = 10;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) =>
       MultiProvider(
           providers: [
-            ChangeNotifierProvider(
-                create: (_) => Camera(
-                    origin: Position(
-                        x: - MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width / 2,
-                        y: - MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height / 4
-                    )
-                )
-            ),
-            ChangeNotifierProvider(
-                create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)
-            ),
+            ChangeNotifierProvider(create: (_) => ShipManager(ships: [Ship(path: [])])),
             ChangeNotifierProvider(create: (_) => MinimapProvider()),
-            Provider<ShipServices>(create: (_) => RealShipServices()),
+            Provider<ShipServices>(create: (_) => FakeShipServices()),
             Provider<UserStorage>(create: (_) => UserStorage())
           ],
           child: MaterialApp.router(
@@ -58,3 +49,4 @@ class MyApp extends StatelessWidget {
 }
 
 const tileSize = 32.0;
+const chunkSize = 10;

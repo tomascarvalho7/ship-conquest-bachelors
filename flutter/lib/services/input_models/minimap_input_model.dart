@@ -1,10 +1,10 @@
 import 'dart:collection';
 
-import 'package:ship_conquest/domain/color_gradient.dart';
+import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/services/input_models/coordinate_input_model.dart';
 
-import '../../domain/coord_2d.dart';
+import '../../domain/space/coord_2d.dart';
 
 class MinimapInputModel {
   final List<CoordinateInputModel> points;

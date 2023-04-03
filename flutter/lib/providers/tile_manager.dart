@@ -3,13 +3,13 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/coord_2d.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
-import '../domain/tile_list.dart';
-import '../domain/coordinate.dart';
-import '../domain/position.dart';
+import '../domain/space/tile_list.dart';
+import '../domain/space/coordinate.dart';
+import '../domain/space/position.dart';
 
 class TileManager with ChangeNotifier {
   final int chunkSize;
@@ -19,17 +19,17 @@ class TileManager with ChangeNotifier {
   // variables
   final List<Coordinate> tiles = List.empty(growable: true);
   final HashMap<Coord2D, int> _tilesHM = HashMap();
-  Offset _lastCoords = const Offset(double.infinity, double.infinity);
+  Position _lastCoords = const Position(x: double.infinity, y: double.infinity);
 
-  Future<bool> lookForTiles(Offset coordinates, ShipServices services) async {
-    if (_distance(_lastCoords, coordinates) < tileSize * 2) return false;
-    _lastCoords = coordinates;
-    await _updateTiles(coordinates, services);
+  Future<bool> lookForTiles(Position position, ShipServices services) async {
+    if (_distance(_lastCoords, position) < tileSize * 2) return false;
+    _lastCoords = position;
+    await _updateTiles(position, services);
     return true;
   }
 
-  // x -> y
-  double _distance(Offset x, Offset y) => sqrt(pow(y.dx - x.dx, 2) + pow(y.dy - x.dy, 2));
+  // a -> b
+  double _distance(Position a, Position b) => sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 
   Coordinate _screenToIsometricCoord(Position position) {
     late final double widthHalf = tileSize / 2;
@@ -42,11 +42,11 @@ class TileManager with ChangeNotifier {
   }
 
   // update visible tiles
-  Future<void> _updateTiles(Offset coordinates, ShipServices services) async {
+  Future<void> _updateTiles(Position position, ShipServices services) async {
     // clear tiles
     tiles.clear();
     _tilesHM.clear();
-    Coordinate coord = _screenToIsometricCoord(Position(x: coordinates.dx, y: coordinates.dy));
+    Coordinate coord = _screenToIsometricCoord(position);
 
     // generate placeholder water tiles
     _generateWaterTiles(coord);

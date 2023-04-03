@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'dart:ui';
 
-import 'coord_2d.dart';
+import 'space/coord_2d.dart';
 
 class Minimap {
   final int length;

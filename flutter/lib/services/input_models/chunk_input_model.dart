@@ -1,7 +1,7 @@
-import 'package:ship_conquest/domain/coordinate.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/services/input_models/coordinate_input_model.dart';
 
-import '../../domain/tile_list.dart';
+import '../../domain/space/tile_list.dart';
 
 class ChunkInputModel {
   final List<CoordinateInputModel> tiles;

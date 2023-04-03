@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:ship_conquest/domain/minimap.dart';
-import 'package:ship_conquest/domain/tile_list.dart';
-import 'package:ship_conquest/domain/coordinate.dart';
+import 'package:ship_conquest/domain/space/tile_list.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 
 import 'ship_services.dart';

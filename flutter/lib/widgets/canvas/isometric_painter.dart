@@ -1,14 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/position.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
-import '../../domain/color_gradient.dart';
-import '../../domain/isometric_tile.dart';
+import '../../domain/color/color_gradient.dart';
+import '../../domain/isometric/isometric_tile.dart';
 
 class IsometricPainter extends CustomPainter {
   final double tileSize;
   final Animation<double> animation;
   final List<IsometricTile> tiles;
-
 
   IsometricPainter({required this.tileSize, required this.animation, required this.tiles}) : super(repaint: animation);
 

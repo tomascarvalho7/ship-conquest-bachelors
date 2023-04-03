@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ship_conquest/domain/coord_2d.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 
 void pulse<T>({required int radius, required T Function(Coord2D coord) block}) {
   for(int y = - radius; y <= radius; y++) {

@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:ship_conquest/domain/factor.dart';
+import 'package:ship_conquest/domain/utils/factor.dart';
 
 class ColorMark {
   // value between 0 and 1

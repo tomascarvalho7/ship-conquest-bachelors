@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/isometric_tile_paint.dart';
-import 'package:ship_conquest/domain/position.dart';
+import 'package:ship_conquest/domain/isometric/isometric_tile_paint.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 
-import 'coordinate.dart';
+import '../space/coordinate.dart';
 
 class IsometricTile {
   final Position position; // tile origin

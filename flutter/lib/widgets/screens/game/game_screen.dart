@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../domain/color_gradient.dart';
-import '../../../domain/color_mark.dart';
-import '../../../domain/color_ramp.dart';
-import '../../../domain/factor.dart';
+import '../../../domain/color/color_gradient.dart';
+import '../../../domain/color/color_mark.dart';
+import '../../../domain/color/color_ramp.dart';
+import '../../../domain/ship.dart';
+import '../../../domain/space/position.dart';
+import '../../../domain/utils/factor.dart';
+import '../../../main.dart';
+import '../../../providers/camera.dart';
+import '../../../providers/ship_manager.dart';
+import '../../../providers/ship_manager.dart';
+import '../../../providers/tile_manager.dart';
 import 'game.dart';
 
 class GameScreen extends StatelessWidget {
@@ -23,8 +31,16 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Game(
-        background: Colors.blueAccent,
-        colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)));
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => Camera()),
+          ChangeNotifierProvider(
+              create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)
+          )
+        ],
+        child: Game(
+            background: Colors.blueAccent,
+            colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))
+    );
   }
 }

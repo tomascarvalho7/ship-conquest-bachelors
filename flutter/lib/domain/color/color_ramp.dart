@@ -1,6 +1,6 @@
 import 'dart:ui';
-import 'package:ship_conquest/domain/color_mark.dart';
-import 'factor.dart';
+import 'package:ship_conquest/domain/color/color_mark.dart';
+import '../utils/factor.dart';
 
 /// Replicate the colorRamp node from blender
 class ColorRamp {

@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:typed_data';
 
-import '../../../canvas/image_painter.dart';
+import '../../../../providers/minimap_provider.dart';
+import '../../canvas/image_painter.dart';
 
 class MinimapView extends StatelessWidget {
-  final Minimap? minimap;
   final Color background = const Color.fromRGBO(0, 0, 0, 0.1);
-  const MinimapView({super.key, required this.minimap});
+  final Widget? child;
+  const MinimapView({super.key, this.child});
 
   @override
-  Widget build(BuildContext context) => Container(
-      width: 350,
-      height: 350,
-      alignment: Alignment.center,
-      child: loadMinimap()
-  );
+  Widget build(BuildContext context) =>
+      Consumer<MinimapProvider>(
+          builder: (_, minimapProv, __) =>
+              loadMinimap(minimapProv.minimap),
+      );
 
-  Widget loadMinimap() {
-    final curMiniMap = minimap;
-    if (curMiniMap == null || curMiniMap.length == 0) return loading();
+  Widget loadMinimap(Minimap minimap) {
+    if (minimap.length == 0) return loading();
 
     return FutureBuilder<ui.Image>(
-        future: _generateMinimapTexture(curMiniMap),
+        future: _generateMinimapTexture(minimap),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return minimapRender(snapshot.data!, curMiniMap.length);
+            return minimapRender(snapshot.data!, minimap.length);
           } else {
             return loading();
           }
@@ -40,15 +40,16 @@ class MinimapView extends StatelessWidget {
       CustomPaint(
           painter: ImagePainter(
               image: img,
-              size: 325,
+              size: 900,
               length: size
-          )
+          ),
+          child: child,
       );
 
   Widget loading() =>
       const SizedBox(
-        width: 60,
-        height: 60,
+        width: 900,
+        height: 900,
         child: CircularProgressIndicator(),
       );
 

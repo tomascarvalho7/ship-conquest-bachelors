@@ -7,12 +7,14 @@ class MinimapIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
+      left: 0,
+      top: 40,
       child: FloatingActionButton(
         onPressed: onClick,
         child: Image.network(
           'https://icon-library.com/images/maps-icon-png/maps-icon-png-3.jpg',
-          width: 64,
-          height: 64,
+          width: 50,
+          height: 50,
         )
       )
     );

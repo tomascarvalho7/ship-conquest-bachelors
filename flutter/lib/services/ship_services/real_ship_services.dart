@@ -1,15 +1,15 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'package:ship_conquest/domain/minimap.dart';
-import 'package:ship_conquest/domain/tile_list.dart';
-import 'package:ship_conquest/domain/coordinate.dart';
+import 'package:ship_conquest/domain/space/tile_list.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/services/input_models/chunk_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "5025-46-189-174-32.eu.ngrok.io";
+const baseUri = "df09-194-210-196-167.eu.ngrok.io";
 const lobbyId = "SsO6AJ";
 
 class RealShipServices extends ShipServices {

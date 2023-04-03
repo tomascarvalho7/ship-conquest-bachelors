@@ -1,25 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/coordinate.dart';
-import 'package:ship_conquest/domain/position.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 
 class ShipWidget extends StatelessWidget {
   final Animation<double> animation;
-  final Coordinate coord;
+  final Position position;
   final double tileSize;
   // constructor
-  ShipWidget({super.key, required this.coord, required this.tileSize, required this.animation});
+  ShipWidget({super.key, required this.position, required this.tileSize, required this.animation});
 
   // optimizations
   late final scale = tileSize * 4;
-  late final double tileSizeWidthHalf = tileSize / 2;
-  late final double tileSizeHeightHalf = tileSizeWidthHalf / 2;
-  late final position = Position(
-    x: (coord.x - coord.y) * tileSizeWidthHalf,
-    y: (coord.x + coord.y) * tileSizeHeightHalf,
-  );
-  late final double waveOffset = (coord.x + coord.y) / -3;
+  late final double waveOffset = (position.x + position.y) / -3;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +28,7 @@ class ShipWidget extends StatelessWidget {
               Transform.translate(
                   offset: Offset(
                       position.x,
-                      position.y + sin(animation.value + waveOffset) * tileSizeHeightHalf
+                      position.y + sin(animation.value + waveOffset) * tileSize / 4
                   ),
                   child: child
               )
