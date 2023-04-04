@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import kotlin.math.sqrt
 
 //take these out of here
-const val googleId = ""
+const val googleId = "117449194507120458325"
 const val chunkSize = 35.0
 const val viewDistance = 10
 @Service
@@ -56,7 +56,7 @@ class GameService(
         }
     }
 
-    // prob not needed rn
+    // prob not needed rnº
     fun addVisitedPoint(tag: String, uid: String, position: Position) {
         return transactionManager.run { transaction ->
             if (!transaction.gameRepo.checkVisitedPointsExist(tag, uid)) {
