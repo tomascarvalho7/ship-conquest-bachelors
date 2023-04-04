@@ -8,4 +8,5 @@ class Position {
   Offset toOffset() => Offset(x, y);
 
   Position operator +(Position other) => Position(x: x + other.x, y: y + other.y);
+  Position operator -(Position other) => Position(x: x - other.x, y: y - other.y);
 }

@@ -12,16 +12,14 @@ class ShipIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => // TODO !
-      Center(
-        child: Transform.translate(
-            offset: Offset(position.x, position.y),
-            child: Container(
-                width: 30,
-                height: 30,
-                alignment: Alignment.center,
-                color: Colors.green,
-                child: child
-            )
+    Transform.translate(
+        offset: Offset(80, position.y),
+        child: Container(
+            width: 30,
+            height: 30,
+            alignment: Alignment.center,
+            color: Colors.green,
+            child: child
         )
-      );
+    );
 }

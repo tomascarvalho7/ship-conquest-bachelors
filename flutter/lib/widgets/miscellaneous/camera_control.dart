@@ -8,15 +8,20 @@ class CameraControl extends StatelessWidget {
   final Color background;
   final Widget child;
   // constructor
-  const CameraControl({super.key, required this.background, required this.child});
+  const CameraControl({
+    super.key,
+    required this.background,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) =>
       Consumer<Camera>(
           builder: (_, camera, __) =>
           GestureDetector(
-              onScaleStart: (details) => camera.onStart(),
-              onScaleUpdate: (details) => camera.onUpdate(details.scale, details.focalPointDelta),
+              onScaleStart: (details) => onStart(camera, details),
+              onScaleUpdate: (details) => onUpdate(camera, details),
+              onScaleEnd: onEnd,
               child: Container(
                   color: background,
                   width: double.infinity,
@@ -32,4 +37,14 @@ class CameraControl extends StatelessWidget {
               )
           ),
       );
+
+  void onStart(Camera camera, ScaleStartDetails details) {
+    camera.onStart();
+  }
+
+  void onUpdate(Camera camera, ScaleUpdateDetails details) {
+    camera.onUpdate(details.scale, details.focalPointDelta);
+  }
+
+  void onEnd(ScaleEndDetails details) { /* do nothing */ }
 }

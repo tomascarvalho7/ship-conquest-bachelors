@@ -4,12 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/camera.dart';
 import 'package:ship_conquest/providers/path_manager.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
-import 'package:ship_conquest/widgets/miscellaneous/path/path_controller.dart';
-import 'package:ship_conquest/widgets/miscellaneous/ship/ship_icon.dart';
+import 'package:ship_conquest/widgets/miscellaneous/path/camera_path_controller.dart';
 import 'package:ship_conquest/widgets/screens/minimap/minimap_view.dart';
-
-import '../../miscellaneous/camera_control.dart';
-import '../../miscellaneous/ship/fleet.dart';
+import '../../miscellaneous/path/path_view.dart';
 
 class MinimapScreen extends StatelessWidget {
   const MinimapScreen({super.key});
@@ -24,29 +21,14 @@ class MinimapScreen extends StatelessWidget {
           child: screen(context),
       );
 
-  Widget screen(BuildContext context) =>
-      Stack(children: [
-          CameraControl(
-              background: const Color.fromRGBO(51, 56, 61, 1),
-              child: Consumer<ShipManager>(
-                builder: (_, shipManager, child) =>
-                  Stack(
-                      children: [
-                        child!, // MinimapView()
-                        ...shipManager.buildListFromShips(
-                          (ship) => PathController(
-                              start: ship.getPosition(),
-                              widget: ShipIcon(ship: ship)
-                          )
-                        )
-                      ]
-                  ),
-                  child: const Center(child: MinimapView())
-              )
-          ),
-          closeButton(() => context.pop())
-        ],
-      );
+  Widget screen(BuildContext context) {
+    return Stack(
+      children: [
+        const MinimapScreenVisuals(),
+        closeButton(() => context.pop())
+      ],
+    );
+  }
 
 
   Widget closeButton(void Function() onPressed) =>
@@ -59,4 +41,30 @@ class MinimapScreen extends StatelessWidget {
               child: const SizedBox(width: 50, height: 50,)
           )
       );
+}
+
+class MinimapScreenVisuals extends StatelessWidget {
+  const MinimapScreenVisuals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    PathManager pathManager = context.read<PathManager>();
+
+    return Consumer<ShipManager>(
+        builder: (_, shipManager, __) =>
+            CameraPathController(
+                background: const Color.fromRGBO(51, 56, 61, 1),
+                pathManager: pathManager,
+                nodes: shipManager.getShipPositions(),
+                child: Center(
+                    child: MinimapView(
+                        child: PathView(
+                            hooks: shipManager.getShipPositions()
+                        )
+                    )
+                )
+            )
+    );
+  }
+
 }
