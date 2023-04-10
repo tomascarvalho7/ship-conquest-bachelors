@@ -6,7 +6,7 @@ import 'package:ship_conquest/providers/route_manager.dart';
 
 import '../../../domain/space/quadratic_bezier.dart';
 import '../../canvas/draw_star_path.dart';
-
+/*
 class PathView extends StatelessWidget {
   const PathView({super.key});
 
@@ -22,9 +22,9 @@ class PathView extends StatelessWidget {
                 if (points == null) return renderNothing();
                 // else calculate path
                 return FutureBuilder(
-                    future: buildPath(minimap.minimap, points.start, mid, end, radius)
+                    future: buildPath(minimap.minimap, points.start, points.mid, points.end, radius),
                     builder: (_, snapshot) =>
-                )
+                );
               }
           )
     );
@@ -39,4 +39,4 @@ class PathView extends StatelessWidget {
         child: Container()
       );
 
-}
+}*/

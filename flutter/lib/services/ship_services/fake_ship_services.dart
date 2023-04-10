@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
@@ -21,7 +22,7 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Minimap> getMinimap(Token token) async {
+  Future<Minimap> getMinimap(Token token, ColorGradient colorGradient) async {
     return Minimap(
       length: 500,
       pixels: HashMap() // empty map

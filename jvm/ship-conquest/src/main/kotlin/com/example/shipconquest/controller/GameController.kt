@@ -38,10 +38,10 @@ class GameController(val service: GameService) {
 
     @GetMapping("/{tag}/minimap")
     fun getMinimap(@PathVariable tag: String): ResponseEntity<*> { // needs authorization to get uid
-        val result = service.getMinimap(tag = tag, uid = "117449194507120458325")
+        val result = service.getMinimap(tag = tag, uid = "")
 
         return when (result) {
-            is Either.Right -> response(content = MinimapOutputModel(points = result.value))
+            is Either.Right -> response(content = MinimapOutputModel(points = result.value, size = result.value.size))
             is Either.Left -> when(result.value) {
                 GetMinimapError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())

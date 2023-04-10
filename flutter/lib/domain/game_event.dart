@@ -35,7 +35,7 @@ class GameEvent {
     // set camera focus to main ship
     camera.setFocus(shipManager.getMainShip().getPosition());
     // fetch minimap
-    services.getMinimap(Token(token: 'TODO')).then(
+    services.getMinimap(Token(token: 'TODO'), colorGradient).then(
             (minimap) {
               minimapProvider.init(minimap);
               lookAround(services);

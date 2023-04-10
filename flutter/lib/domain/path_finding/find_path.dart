@@ -1,22 +1,24 @@
+import 'dart:collection';
+
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/path_finding/utils.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 
-import '../space/coord_2d.dart';
 import 'distances.dart';
 import 'node.dart';
 
-List<Coord2D> findShortestPath(
+List<Position> findShortestPath(
     Minimap map,
-    Coord2D start,
-    Coord2D end,
-    Coord2D influencePoint,
+    Position start,
+    Position end,
+    Position influencePoint,
     int safetyRadius
     ) {
   final double startH = calculateHeuristic(start, end, influencePoint);
   final Node startNode = Node(position: start, h: startH, f: startH);
   final List<Node> foundNodes = List.empty(growable: true);
   foundNodes.add(startNode);
-  final List<Node> exploredNodes = List.empty(growable: true);
+  final HashMap<int, Node> exploredNodes = HashMap();
 
   while (foundNodes.isNotEmpty) {
     final Node currNode = foundNodes.reduce((firstNode, secondNode) =>
@@ -25,11 +27,11 @@ List<Coord2D> findShortestPath(
       return reconstructPath(currNode);
     }
     foundNodes.remove(currNode);
-    exploredNodes.add(currNode);
+    exploredNodes[exploredNodes.length + 1] = currNode;
     final List neighbors = calculateNeighbours(currNode, map, safetyRadius, exploredNodes);
 
     for(Node currNeighbour in neighbors) {
-      if(exploredNodes.contains(currNeighbour)) {
+      if(exploredNodes.containsValue(currNeighbour)) {
         continue;
       }
 
@@ -42,11 +44,8 @@ List<Coord2D> findShortestPath(
         final Node copyNode = currNeighbour.copyWith(g: tempG, h: h, f: tempG + h, parent: currNode);
 
         Node? existingNode;
-        try {
-          existingNode = foundNodes.firstWhere((node) => node.position == copyNode.position);
-        } catch (error) {
-          existingNode = null;
-        }
+        existingNode = foundNodes.firstOrNull((node) => node.position == copyNode.position);
+
         if(existingNode != null) {
           if(copyNode.f < existingNode.f) {
             foundNodes.add(copyNode);
@@ -59,4 +58,15 @@ List<Coord2D> findShortestPath(
     }
   }
   return List.empty(growable: false);
+}
+
+extension FirstOrNull on List<Node> {
+  Node? firstOrNull(bool Function(Node) condition) {
+    for(var node in this) {
+      if(condition(node)) {
+        return node;
+      }
+    }
+    return null;
+  }
 }

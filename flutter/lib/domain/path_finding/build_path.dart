@@ -21,7 +21,7 @@ Future<List<QuadraticBezier>> buildPath(
   const nrPoints = 2; // change nr of points
   final points = defineMiddlePoints(path, nrPoints * 4);
 
-  getPos(index) => positionFromCoord2D(points[index * 4]);
+  getPos(index) => positionWithOffset(points[index * 4]);
 
   return List.generate(
       nrPoints,
@@ -29,6 +29,6 @@ Future<List<QuadraticBezier>> buildPath(
   );
 }
 
-Position positionFromCoord2D(Coord2D coord) =>
+Position positionWithOffset(Position pos) =>
   // offset (to center) + position
-  const Position(x: 0.5, y: 0.5) + Position(x: coord.x * tileSize, y: coord.y * tileSize);
+  const Position(x: 0.5, y: 0.5) + Position(x: pos.x * tileSize, y: pos.y * tileSize);

@@ -20,7 +20,7 @@ fun findShortestPath(
     val startH = calculateHeuristic(start, end, influencePoint)
     val startNode = Node(position = start, h = startH, f = startH)
     val foundNodes = mutableSetOf(startNode)
-    val exploredNodes = mutableSetOf<Node>()
+    val exploredNodes = HashMap<Int, Node>()// mutableSetOf<Node>()
 
     while (foundNodes.isNotEmpty()) {
         val currNode = foundNodes.minByOrNull { node -> node.f }
@@ -29,11 +29,11 @@ fun findShortestPath(
             return reconstructPath(currNode)
         }
         foundNodes.remove(currNode) //remove the node from the list
-        exploredNodes.add(currNode)
+        exploredNodes[exploredNodes.size + 1] = currNode
         val neighbors = calculateNeighbours(currNode, map, safetyRadius, mapSize, exploredNodes)
 
         for (currNeighbour in neighbors) {
-            if (currNeighbour in exploredNodes) {
+            if (currNeighbour in exploredNodes.values) {
                 continue
             }
 

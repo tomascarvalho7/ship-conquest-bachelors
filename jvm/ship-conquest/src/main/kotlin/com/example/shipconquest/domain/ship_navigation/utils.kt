@@ -4,7 +4,7 @@ import com.example.shipconquest.domain.Position
 
 fun calculateHeuristic(currPoint: Position, end: Position, influencePoint: Position): Double {
     val distance = calculateManhattanDistance(currPoint, end)
-    val penalty = calculateManhattanDistance(currPoint, influencePoint) /2
+    val penalty = calculateManhattanDistance(currPoint, influencePoint) / 2
     return distance + penalty
 }
 
@@ -23,7 +23,7 @@ fun calculateNeighbours(
     map: List<Position>,
     safetyRadius: Int,
     mapSize: Int,
-    ignore: Set<Node>
+    ignore: HashMap<Int, Node>
 ): List<Node> {
     val pos = node.position
     val resultList = mutableListOf<Node>()
@@ -40,7 +40,7 @@ fun calculateNeighbours(
                     currPos
                 ) <= safetyRadius
             } // calculate according to radius
-            val shouldBeIgnored = ignore.any { node -> node.position == currPos }
+            val shouldBeIgnored = ignore.any { node -> node.value.position == currPos }
             if (!shouldBeIgnored && isSafe && currPos != pos) {
                 resultList.add(
                     Node(

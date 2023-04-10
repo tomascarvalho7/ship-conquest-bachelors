@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 import kotlin.math.sqrt
 
 //take these out of here
-const val googleId = "117449194507120458325"
+const val googleId = ""
 const val chunkSize = 35.0
 const val viewDistance = 10
 @Service

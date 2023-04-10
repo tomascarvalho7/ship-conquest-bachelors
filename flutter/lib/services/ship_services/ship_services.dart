@@ -1,3 +1,4 @@
+import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
 
@@ -9,5 +10,5 @@ abstract class ShipServices {
 
   Future<Token> signIn(String idToken);
 
-  Future<Minimap> getMinimap(Token token);
+  Future<Minimap> getMinimap(Token token, ColorGradient colorGradient);
 }

@@ -1,7 +1,7 @@
-import '../space/coord_2d.dart';
+import '../space/position.dart';
 
 class Node {
-  final Coord2D position;
+  final Position position;
   final double f;
   final double g;
   final double h;
