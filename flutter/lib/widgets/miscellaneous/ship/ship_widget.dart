@@ -11,13 +11,13 @@ class ShipWidget extends StatelessWidget {
   ShipWidget({super.key, required this.position, required this.tileSize, required this.animation});
 
   // optimizations
+  late final positionOffset = position - Position(x: scale / 2, y: scale / 2);
   late final scale = tileSize * 4;
   late final double waveOffset = (position.x + position.y) / -3;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedBuilder(
+  Widget build(BuildContext context) =>
+      AnimatedBuilder(
           animation: animation,
           child: Image.asset(
             'assets/images/ship_dark.png',
@@ -27,12 +27,10 @@ class ShipWidget extends StatelessWidget {
           builder: (context, child) =>
               Transform.translate(
                   offset: Offset(
-                      position.x,
-                      position.y + sin(animation.value + waveOffset) * tileSize / 4
+                      positionOffset.x,
+                      positionOffset.y + sin(animation.value + waveOffset) * tileSize / 4
                   ),
                   child: child
               )
-      )
-    );
-  }
+      );
 }

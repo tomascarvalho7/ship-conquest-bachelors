@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../../domain/path/path_points.dart';
 import '../../domain/space/position.dart';
 
-class PathPainter extends CustomPainter {
+class RoutePainter extends CustomPainter {
   final List<Position> hooks;
   final PathPoints? points;
   final Color start;
   final Color mid;
   final Color end;
   // constructor
-  PathPainter({required this.hooks, required this.points, required this.start, required this.mid, required this.end});
+  RoutePainter({required this.hooks, required this.points, required this.start, required this.mid, required this.end});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -30,7 +30,7 @@ class PathPainter extends CustomPainter {
   }
 
   void drawPoint(Canvas canvas, Position position, Color color) {
-    canvas.drawCircle(position.toOffset(), 10, Paint()..color = color);
+    canvas.drawCircle(position.toOffset(), 15, Paint()..color = color);
   }
 
   void paintPath(Canvas canvas, Position start, Position mid, Position end, double distance) {
@@ -38,7 +38,7 @@ class PathPainter extends CustomPainter {
       ..shader = RadialGradient(
           colors: [this.start, this.mid, this.end]
       ).createShader(Rect.fromCircle(center: start.toOffset(), radius: distance))
-      ..strokeWidth = 10
+      ..strokeWidth = 12.5
       ..style = PaintingStyle.stroke
       ..strokeJoin = StrokeJoin.round;
 
@@ -50,5 +50,5 @@ class PathPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant PathPainter oldDelegate) => true;
+  bool shouldRepaint(covariant RoutePainter oldDelegate) => true;
 }

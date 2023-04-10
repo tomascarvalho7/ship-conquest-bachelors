@@ -4,7 +4,7 @@ import 'package:ship_conquest/domain/path/path_segment.dart';
 
 import '../domain/space/position.dart';
 
-class PathManager with ChangeNotifier {
+class RouteManager with ChangeNotifier {
   Position? _startPoint;
   PathPoints? _pathPoints;
   PathSegment? _pathSegment;
@@ -27,19 +27,20 @@ class PathManager with ChangeNotifier {
     _pathSegment = segment;
   }
 
-  void moveNode(Position position) {
+  void moveNode(Position delta) {
     if (_pathSegment == null) return; // no nodes to move
 
     if (_pathSegment == PathSegment.start) {
-      draw(_startPoint!, position);
+      draw(_startPoint!, delta);
     } else if (_pathSegment == PathSegment.mid) {
-      updateMid(position);
+      updateMid(delta);
     } else {
-      updateEnd(position);
+      updateEnd(delta);
     }
   }
 
-  void draw(Position start, Position end) {
+  void draw(Position start, Position endDelta) {
+    Position end = (_pathPoints?.end ?? const Position(x: 0, y: 0)) + endDelta;
     Position mid = Position(
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2
@@ -53,7 +54,7 @@ class PathManager with ChangeNotifier {
     PathPoints? path = pathPoints;
 
     if (path != null) {
-      _pathPoints = PathPoints(start: path.start, mid: mid, end: path.end);
+      _pathPoints = PathPoints(start: path.start, mid: path.mid + mid, end: path.end);
       notifyListeners(); // update widgets
     }
   }
@@ -62,7 +63,7 @@ class PathManager with ChangeNotifier {
     PathPoints? path = pathPoints;
 
     if (path != null) {
-      _pathPoints = PathPoints(start: path.start, mid: path.mid, end: end);
+      _pathPoints = PathPoints(start: path.start, mid: path.mid, end: path.end + end);
       notifyListeners(); // update widgets
     }
   }

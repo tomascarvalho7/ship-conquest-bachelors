@@ -16,29 +16,36 @@ class CameraControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<Camera>(
-          builder: (_, camera, __) =>
-          GestureDetector(
-              onScaleStart: (details) => onStart(camera, details),
-              onScaleUpdate: (details) => onUpdate(camera, details),
-              onScaleEnd: onEnd,
-              child: Container(
-                  color: background,
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Transform(
-                      transform: Matrix4.compose(
-                          Vector3(camera.coordinates.x, camera.coordinates.y, 0.0),
-                          Quaternion.identity(),
-                          Vector3.all(camera.scaleFactor)
-                      ),
-                      child: child
-                  )
+      LayoutBuilder(
+          builder: (_, constraints) =>
+              Consumer<Camera>(
+                builder: (_, camera, __) =>
+                    GestureDetector(
+                        onScaleStart: (details) => onStart(camera, details, constraints),
+                        onScaleUpdate: (details) => onUpdate(camera, details),
+                        onScaleEnd: onEnd,
+                        child: Container(
+                            color: background,
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: Transform(
+                                transform: Matrix4.compose(
+                                    Vector3(
+                                        constraints.maxWidth / 2 + camera.coordinates.x,
+                                        constraints.maxHeight / 2 + camera.coordinates.y,
+                                        0.0
+                                    ),
+                                    Quaternion.identity(),
+                                    Vector3.all(camera.scaleFactor)
+                                ),
+                                child: child
+                            )
+                        )
+                    ),
               )
-          ),
       );
 
-  void onStart(Camera camera, ScaleStartDetails details) {
+  void onStart(Camera camera, ScaleStartDetails details, BoxConstraints constraints) {
     camera.onStart();
   }
 

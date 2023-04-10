@@ -1,7 +1,7 @@
-import 'package:ship_conquest/domain/space/map_position.dart';
+import '../space/coord_2d.dart';
 
 class Node {
-  final MapPosition position;
+  final Coord2D position;
   final double f;
   final double g;
   final double h;

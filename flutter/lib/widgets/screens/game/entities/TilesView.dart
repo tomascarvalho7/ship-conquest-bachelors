@@ -37,14 +37,12 @@ class TilesView extends StatelessWidget {
       }
     }).toList(growable: false);
 
-    return Center(
-      child: CustomPaint(
-          painter: IsometricPainter(
-              tileSize: tileSize,
-              animation: animation,
-              tiles: isoTiles
-          )
-      )
+    return CustomPaint(
+        painter: IsometricPainter(
+            tileSize: tileSize,
+            animation: animation,
+            tiles: isoTiles
+        )
     );
   }
 }

@@ -13,7 +13,7 @@ class ShipIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) => // TODO !
     Transform.translate(
-        offset: Offset(80, position.y),
+        offset: Offset(position.x, position.y),
         child: Container(
             width: 30,
             height: 30,

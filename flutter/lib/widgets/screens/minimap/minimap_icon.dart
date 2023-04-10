@@ -11,11 +11,7 @@ class MinimapIcon extends StatelessWidget {
       top: 40,
       child: FloatingActionButton(
         onPressed: onClick,
-        child: Image.network(
-          'https://icon-library.com/images/maps-icon-png/maps-icon-png-3.jpg',
-          width: 50,
-          height: 50,
-        )
+        child: const SizedBox(width: 50, height: 50,)
       )
     );
   }

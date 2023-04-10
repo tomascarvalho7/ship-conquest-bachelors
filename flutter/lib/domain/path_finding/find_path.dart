@@ -1,11 +1,17 @@
-import 'package:ship_conquest/domain/ship_navigation/distances.dart';
-import 'package:ship_conquest/domain/ship_navigation/node.dart';
-import 'package:ship_conquest/domain/ship_navigation/utils.dart';
-import 'package:ship_conquest/domain/space/map_position.dart';
+import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/path_finding/utils.dart';
 
+import '../space/coord_2d.dart';
+import 'distances.dart';
+import 'node.dart';
 
-List<MapPosition> findShortestPath(List<MapPosition> map, MapPosition start,
-    MapPosition end, MapPosition influencePoint, int safetyRadius, int mapSize) {
+List<Coord2D> findShortestPath(
+    Minimap map,
+    Coord2D start,
+    Coord2D end,
+    Coord2D influencePoint,
+    int safetyRadius
+    ) {
   final double startH = calculateHeuristic(start, end, influencePoint);
   final Node startNode = Node(position: start, h: startH, f: startH);
   final List<Node> foundNodes = List.empty(growable: true);
@@ -20,7 +26,7 @@ List<MapPosition> findShortestPath(List<MapPosition> map, MapPosition start,
     }
     foundNodes.remove(currNode);
     exploredNodes.add(currNode);
-    final List<Node> neighbors = calculateNeighbours(currNode, map, safetyRadius, mapSize, exploredNodes);
+    final List neighbors = calculateNeighbours(currNode, map, safetyRadius, exploredNodes);
 
     for(Node currNeighbour in neighbors) {
       if(exploredNodes.contains(currNeighbour)) {

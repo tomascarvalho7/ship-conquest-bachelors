@@ -1,33 +1,42 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/path/path_points.dart';
-import 'package:ship_conquest/widgets/canvas/path_painter.dart';
+import 'package:ship_conquest/domain/path_finding/build_path.dart';
+import 'package:ship_conquest/providers/minimap_provider.dart';
+import 'package:ship_conquest/providers/route_manager.dart';
 
-import '../../../domain/space/position.dart';
-import '../../../providers/path_manager.dart';
+import '../../../domain/space/quadratic_bezier.dart';
+import '../../canvas/draw_star_path.dart';
 
 class PathView extends StatelessWidget {
-  final List<Position> hooks;
-  const PathView({super.key, required this.hooks});
-
-  // constants
-  static const Color startColor = Colors.yellowAccent;
-  static const Color midColor = Colors.orangeAccent;
-  static const Color endColor = Colors.redAccent;
+  const PathView({super.key});
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<PathManager>(
-        builder: (_, pathManager, __) =>
-            CustomPaint(
-                painter: PathPainter(
-                  hooks: hooks,
-                  start: startColor,
-                  mid: midColor,
-                  end: endColor,
-                  points: pathManager.pathPoints
-                  ),
-                child: Container()
-            )
+    Consumer<MinimapProvider>(
+        builder: (_, minimap, __) =>
+          Consumer<RouteManager>(
+              builder: (_, routeManager, __) {
+                // calculate path
+                final points = routeManager.pathPoints;
+                // if there are no points => render nothing
+                if (points == null) return renderNothing();
+                // else calculate path
+                return FutureBuilder(
+                    future: buildPath(minimap.minimap, points.start, mid, end, radius)
+                    builder: (_, snapshot) =>
+                )
+              }
+          )
+    );
+
+  Widget renderNothing() => Container();
+
+  Widget bezierPath(List<QuadraticBezier> beziers) =>
+      CustomPaint(
+        painter: DrawStarPath(
+            beziers: beziers
+        ),
+        child: Container()
       );
+
 }
