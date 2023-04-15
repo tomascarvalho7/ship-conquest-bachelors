@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import '../../../../providers/minimap_provider.dart';
+import '../../../utils/constants.dart';
 import '../../canvas/image_painter.dart';
 
 class MinimapView extends StatelessWidget {
@@ -40,7 +41,7 @@ class MinimapView extends StatelessWidget {
       CustomPaint(
           painter: ImagePainter(
               image: img,
-              size: 900,
+              size: minimapSize.round(),
               length: size
           ),
           child: child,
@@ -48,8 +49,8 @@ class MinimapView extends StatelessWidget {
 
   Widget loading() =>
       const SizedBox(
-        width: 900,
-        height: 900,
+        width: minimapSize,
+        height: minimapSize,
         child: CircularProgressIndicator(),
       );
 

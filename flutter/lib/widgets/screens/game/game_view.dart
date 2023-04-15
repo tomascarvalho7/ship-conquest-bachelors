@@ -1,14 +1,16 @@
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
-import 'package:ship_conquest/domain/game_event.dart';
-import 'package:ship_conquest/providers/ship_manager.dart';
+import 'package:ship_conquest/domain/ship/dynamic_ship.dart';
+import 'package:ship_conquest/widgets/miscellaneous/ship/dynamic_ship_widget.dart';
+import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/fleet.dart';
-import '../../../main.dart';
 import '../../../providers/tile_manager.dart';
+import '../../../utils/constants.dart';
 import '../../miscellaneous/camera_control.dart';
-import 'entities/TilesView.dart';
+import 'entities/tiles_view.dart';
 import '../../miscellaneous/ship/ship_widget.dart';
 
 class GameView extends StatelessWidget {
@@ -39,11 +41,21 @@ class GameView extends StatelessWidget {
                       colorGradient: colorGradient,
                     ),
                     Fleet(
-                        widget: (ship) => ShipWidget(
-                          position: ship.getPosition(),
-                          tileSize: tileSize,
-                          animation: animation,
-                        )
+                        widget: (ship) {
+                          if (ship is DynamicShip) {
+                            return DynamicShipWidget(
+                              ship: ship,
+                              waveAnim: animation,
+                              tileSize: tileSize,
+                            );
+                          } else {
+                            return ShipWidget(
+                              ship: ship,
+                              tileSize: tileSize,
+                              waveAnim: animation,
+                            );
+                          }
+                        }
                     )
                   ],
                 ),

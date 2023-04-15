@@ -1,10 +1,9 @@
-
 import 'package:flutter/cupertino.dart';
 
 import '../../../../domain/color/color_gradient.dart';
 import '../../../../domain/isometric/isometric_tile.dart';
 import '../../../../domain/space/coordinate.dart';
-import '../../../../main.dart';
+import '../../../../utils/constants.dart';
 import '../../../canvas/isometric_painter.dart';
 
 class TilesView extends StatelessWidget {
@@ -14,10 +13,6 @@ class TilesView extends StatelessWidget {
   final Widget? child;
 
   const TilesView({super.key, required this.animation, required this.tiles, required this.colorGradient, this.child});
-
-  // optimizations
-  final double tileSizeWidthHalf = tileSize / 2;
-  final double tileSizeHeightHalf = tileSize / 4;
 
   @override
   Widget build(BuildContext context) {

@@ -2,64 +2,64 @@ import 'dart:collection';
 
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/path_finding/utils.dart';
-import 'package:ship_conquest/domain/space/position.dart';
 
-import 'distances.dart';
+import '../space/coord_2d.dart';
 import 'node.dart';
 
-List<Position> findShortestPath(
+/*
+/// Finds the shortest path between two points on a map, avoiding obstacles and
+/// considering an influence point
+List<Coord2D> findShortestPath(
     Minimap map,
-    Position start,
-    Position end,
-    Position influencePoint,
-    int safetyRadius
-    ) {
-  final double startH = calculateHeuristic(start, end, influencePoint);
-  final Node startNode = Node(position: start, h: startH, f: startH);
-  final List<Node> foundNodes = List.empty(growable: true);
-  foundNodes.add(startNode);
-  final HashMap<int, Node> exploredNodes = HashMap();
+    Coord2D start,
+    Coord2D end,
+    Coord2D influencePoint,
+    int safetyRadius,
+    {int maxIterations = 5000}
+    )  {
+  // Set up initial nodes and maps
+  final startH = calculateHeuristic(start, end, influencePoint);
+  final startNode = Node(position: start, h: startH, f: startH);
+  final foundNodes = [startNode];
+  final exploredNodes = HashMap<Coord2D, Node>();
+  var iterations = 0;
 
+  // Keep searching for the shortest path until no more nodes are found, or maxIterations is reached.
   while (foundNodes.isNotEmpty) {
-    final Node currNode = foundNodes.reduce((firstNode, secondNode) =>
-        firstNode.f < secondNode.f ? firstNode : secondNode);
-    if (currNode.position == end) {
-      return reconstructPath(currNode);
-    }
+    iterations++;
+    // Find the node with the lowest f score
+    final currNode = foundNodes.reduce((a, b) => a.f < b.f ? a : b);
+    // When the final destination is reached, return the built path
+    if (currNode.position == end || iterations == maxIterations) return reconstructPath(currNode);
+
     foundNodes.remove(currNode);
-    exploredNodes[exploredNodes.length + 1] = currNode;
-    final List neighbors = calculateNeighbours(currNode, map, safetyRadius, exploredNodes);
+    exploredNodes[currNode.position] = currNode;
 
-    for(Node currNeighbour in neighbors) {
-      if(exploredNodes.containsValue(currNeighbour)) {
-        continue;
-      }
+    // Find neighbors of the current node and update their costs
+    for (final currNeighbour in calculateNeighbours(currNode, map, safetyRadius, exploredNodes)) {
+      if (exploredNodes.containsValue(currNeighbour)) continue;
+      final tempG = currNode.g + calculateEuclideanDistance(currNode.position, currNeighbour.position);
+      final neighbourNode = foundNodes.firstWhere((node) => node.position == currNeighbour.position, orElse: () => currNeighbour);
 
-      final double tempG = currNode.g + calculateEuclideanDistance(currNode.position, currNeighbour.position);
+      // Update neighbor node if it has a lower cost or hasn't been found yet
+      if (tempG < neighbourNode.g || !foundNodes.contains(currNeighbour)) {
+        final h = calculateHeuristic(currNeighbour.position, end, influencePoint);
+        final copyNode = currNeighbour.update(g: tempG, h: h, f: tempG + h, parent: currNode);
 
-      final Node neighbourNode = foundNodes.firstWhere((node) => node.position == currNeighbour.position, orElse: () => currNeighbour);
-
-      if(tempG < neighbourNode.g || !foundNodes.contains(currNeighbour)) {
-        final double h = calculateHeuristic(currNeighbour.position, end, influencePoint);
-        final Node copyNode = currNeighbour.copyWith(g: tempG, h: h, f: tempG + h, parent: currNode);
-
-        Node? existingNode;
-        existingNode = foundNodes.firstOrNull((node) => node.position == copyNode.position);
-
-        if(existingNode != null) {
-          if(copyNode.f < existingNode.f) {
-            foundNodes.add(copyNode);
-            foundNodes.remove(existingNode);
-          }
-        } else {
+        final existingNode = foundNodes.firstOrNull((node) => node.position == copyNode.position);
+        if (existingNode != null && copyNode.f < existingNode.f) {
+          foundNodes.add(copyNode);
+          foundNodes.remove(existingNode);
+        } else if (existingNode == null) {
           foundNodes.add(copyNode);
         }
       }
     }
   }
-  return List.empty(growable: false);
+  return [];
 }
 
+// Adds a firstOrNull method to the List class for convenience.
 extension FirstOrNull on List<Node> {
   Node? firstOrNull(bool Function(Node) condition) {
     for(var node in this) {
@@ -70,3 +70,4 @@ extension FirstOrNull on List<Node> {
     return null;
   }
 }
+*/

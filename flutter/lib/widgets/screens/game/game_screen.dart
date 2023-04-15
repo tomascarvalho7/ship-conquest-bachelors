@@ -4,21 +4,17 @@ import 'package:provider/provider.dart';
 import '../../../domain/color/color_gradient.dart';
 import '../../../domain/color/color_mark.dart';
 import '../../../domain/color/color_ramp.dart';
-import '../../../domain/ship.dart';
-import '../../../domain/space/position.dart';
 import '../../../domain/utils/factor.dart';
-import '../../../main.dart';
 import '../../../providers/camera.dart';
-import '../../../providers/ship_manager.dart';
-import '../../../providers/ship_manager.dart';
 import '../../../providers/tile_manager.dart';
+import '../../../utils/constants.dart';
 import 'game.dart';
 
 class GameScreen extends StatelessWidget {
   GameScreen({Key? key}) : super(key: key);
 
   final ColorRamp colorRamp = ColorRamp(colors: [
-    ColorMark(factor: Factor(0.0), color: Colors.blue),
+    ColorMark(factor: Factor(0.0), color: waterColor),
     ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 1.0)),
     ColorMark(factor: Factor(0.1), color: const Color.fromRGBO(210, 202, 151, 1.0)),
     ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(116, 153, 72, 1.0)),
@@ -34,9 +30,7 @@ class GameScreen extends StatelessWidget {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (_) => Camera()),
-          ChangeNotifierProvider(
-              create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)
-          )
+          ChangeNotifierProvider(create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize))
         ],
         child: Game(
             background: Colors.blueAccent,

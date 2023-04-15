@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
-import 'package:ship_conquest/domain/game_event.dart';
+import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -27,35 +28,43 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
   )
     ..repeat();
   late final animation = Tween<double>(begin: 0, end: 2 * pi).animate(controller);
+  late final GameEvent eventHandler;
+  late final timer = Timer.periodic(const Duration(seconds: 2), (_) => eventHandler.lookAround());
+
+  @override
+  void initState() {
+    super.initState();
+    // game event class, manages game events
+    eventHandler = GameEvent(
+      camera: context.read<Camera>(),
+      tileManager: context.read<TileManager>(),
+      shipManager: context.read<ShipManager>(),
+      minimapProvider: context.read<MinimapProvider>(),
+      services: context.read<ShipServices>(),
+      colorGradient: widget.colorGradient,
+    );
+    eventHandler.load(); // load
+    final t = timer;
+  }
 
   @override
   void dispose() {
     controller.dispose();
+    timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // get context with listen off, so it's not notified
-    ShipServices services = Provider.of<ShipServices>(context, listen: false);
-    // game event class, manages game events
-    GameEvent gameEvent = GameEvent(
-        camera: Provider.of<Camera>(context, listen: false),
-        tileManager: Provider.of<TileManager>(context, listen: false),
-        shipManager: Provider.of<ShipManager>(context, listen: false),
-        minimapProvider: Provider.of<MinimapProvider>(context, listen: false),
-        colorGradient: widget.colorGradient,
-    );
-    gameEvent.load(services);
-
     return GameInterface(
         gameView: GameView(
           animation: animation,
           background: widget.background,
           colorGradient: widget.colorGradient,
-          gameEvent: gameEvent,
+          gameEvent: eventHandler,
         )
     );
   }
+
 }
 

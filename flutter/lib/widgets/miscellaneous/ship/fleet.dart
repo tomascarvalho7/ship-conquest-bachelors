@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-import '../../../domain/ship.dart';
+import '../../../domain/ship/ship.dart';
 import '../../../providers/ship_manager.dart';
 
 class Fleet extends StatelessWidget {

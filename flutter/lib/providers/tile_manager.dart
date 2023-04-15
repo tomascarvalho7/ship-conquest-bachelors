@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
+import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
@@ -22,31 +22,17 @@ class TileManager with ChangeNotifier {
   Position _lastCoords = const Position(x: double.infinity, y: double.infinity);
 
   Future<bool> lookForTiles(Position position, ShipServices services) async {
-    if (_distance(_lastCoords, position) < tileSize * 2) return false;
+    if (distance(_lastCoords, position) < 2) return false;
     _lastCoords = position;
-    await _updateTiles(position, services);
+    await _updateTiles(Coord2D(x: position.x.round(), y: position.y.round()), services);
     return true;
   }
 
-  // a -> b
-  double _distance(Position a, Position b) => sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
-
-  Coordinate _screenToIsometricCoord(Position position) {
-    late final double widthHalf = tileSize / 2;
-    late final double heightHalf = tileSize / 4;
-    return Coordinate(
-        x: -((position.y / heightHalf + (position.x / widthHalf)) / 2).floor(),
-        y: -((position.y / heightHalf - (position.x / widthHalf)) / 2).floor(),
-        z: -((position.y / heightHalf - (position.x / widthHalf)) / 2).floor()
-    );
-  }
-
   // update visible tiles
-  Future<void> _updateTiles(Position position, ShipServices services) async {
+  Future<void> _updateTiles(Coord2D coord, ShipServices services) async {
     // clear tiles
     tiles.clear();
     _tilesHM.clear();
-    Coordinate coord = _screenToIsometricCoord(position);
 
     // generate placeholder water tiles
     _generateWaterTiles(coord);
@@ -57,7 +43,7 @@ class TileManager with ChangeNotifier {
     return;
   }
 
-  void _generateWaterTiles(Coordinate origin) {
+  void _generateWaterTiles(Coord2D origin) {
       pulse(
           radius: chunkSize,
           block: (coord) {
@@ -69,7 +55,7 @@ class TileManager with ChangeNotifier {
       );
   }
 
-  Future<void> _fetchTerrainTiles(Coordinate coordinate, ShipServices services) async {
+  Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services) async {
       // fetch tiles from services
       TileList newChunk = await services.getNewChunk(chunkSize, coordinate);
       // update fetched tiles from existing ones

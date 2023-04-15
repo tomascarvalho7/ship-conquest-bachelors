@@ -31,8 +31,8 @@ class CameraControl extends StatelessWidget {
                             child: Transform(
                                 transform: Matrix4.compose(
                                     Vector3(
-                                        constraints.maxWidth / 2 + camera.coordinates.x,
-                                        constraints.maxHeight / 2 + camera.coordinates.y,
+                                        constraints.maxWidth / 2 + camera.coordinates.x * camera.scaleFactor,
+                                        constraints.maxHeight / 2 + camera.coordinates.y * camera.scaleFactor,
                                         0.0
                                     ),
                                     Quaternion.identity(),

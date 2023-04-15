@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/path/path_segment.dart';
 import 'package:ship_conquest/domain/space/offset.dart';
 import 'package:ship_conquest/widgets/miscellaneous/camera_control.dart';
+import 'package:ship_conquest/widgets/screens/minimap/events/minimap_event.dart';
 
 import '../../../domain/space/position.dart';
 import '../../../providers/camera.dart';
@@ -11,13 +12,14 @@ import '../../../providers/route_manager.dart';
 
 class CameraPathController extends CameraControl {
   final List<Position> nodes;
-  final RouteManager pathManager;
+  final MinimapEvent eventHandler;
+  late final RouteManager routeManager = eventHandler.route;
   // constructor
-  const CameraPathController({
+  CameraPathController({
     super.key,
     required super.background,
     required super.child,
-    required this.pathManager,
+    required this.eventHandler,
     required this.nodes,
   });
 
@@ -47,18 +49,18 @@ class CameraPathController extends CameraControl {
 
   @override
   void onUpdate(Camera camera, ScaleUpdateDetails details) {
-    if (pathManager.pathSegment == null) {
+    if (routeManager.pathSegment == null) {
       super.onUpdate(camera, details);
     } else {
       final Position position = _scale(details.focalPointDelta.toPosition(), camera.scaleFactor);
 
-      pathManager.moveNode(position);
+      eventHandler.moveNode(position);
     }
   }
 
   @override
   void onEnd(ScaleEndDetails details) {
-    pathManager.deselect();
+    routeManager.deselect();
     super.onEnd(details);
   }
 
@@ -67,7 +69,7 @@ class CameraPathController extends CameraControl {
     for(var i = 0; i < length; i++) {
       final Position hook = nodes[i];
       if (_distance(hook, position) < radius) {
-        pathManager.selectMainNode(hook);
+        routeManager.selectMainNode(hook);
         return true; // selected a main node !
       }
     }
@@ -76,14 +78,14 @@ class CameraPathController extends CameraControl {
   }
 
   bool selectSecondaryNodes(Position position, double scale) {
-    final pathPoints = pathManager.pathPoints;
+    final pathPoints = routeManager.pathPoints;
     if (pathPoints == null) return false; // there are no secondary points
 
     if (_distance(pathPoints.mid, position) < radius) {
-      pathManager.selectSecondaryNode(PathSegment.mid);
+      routeManager.selectSecondaryNode(PathSegment.mid);
       return true; // selected the mid node
     } else if (_distance(pathPoints.end, position) < radius) {
-      pathManager.selectSecondaryNode(PathSegment.end);
+      routeManager.selectSecondaryNode(PathSegment.end);
       return true; // selected the end node
     }
 

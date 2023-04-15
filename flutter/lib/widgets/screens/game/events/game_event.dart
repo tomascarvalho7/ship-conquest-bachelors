@@ -1,15 +1,16 @@
-
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
-import '../providers/camera.dart';
-import '../providers/minimap_provider.dart';
-import 'color/color_gradient.dart';
+import '../../../../domain/isometric/isometric.dart';
+import '../../../../providers/camera.dart';
+import '../../../../providers/minimap_provider.dart';
+import '../../../../domain/color/color_gradient.dart';
+import '../../../../utils/constants.dart';
 
-/// GameEvent class contains game business logic
+/// GameEvent class calls game business logic
 /// using the Game related providers.
 ///
 /// These providers are built like independent pieces
@@ -20,6 +21,7 @@ class GameEvent {
   final TileManager tileManager;
   final ShipManager shipManager;
   final MinimapProvider minimapProvider;
+  final ShipServices services;
   final ColorGradient colorGradient;
   // constructor
   GameEvent({
@@ -27,25 +29,26 @@ class GameEvent {
     required this.tileManager,
     required this.shipManager,
     required this.minimapProvider,
+    required this.services,
     required this.colorGradient
   });
 
   // load initial data
-  void load(ShipServices services)  {
+  void load() {
     // set camera focus to main ship
-    camera.setFocus(shipManager.getMainShip().getPosition());
+    camera.setFocus(toIsometric(shipManager.getMainShip().getPosition(-globalScale)));
     // fetch minimap
     services.getMinimap(Token(token: 'TODO'), colorGradient).then(
             (minimap) {
               minimapProvider.init(minimap);
-              lookAround(services);
+              lookAround();
             }
     );
   }
 
   // look around for new tiles
-  void lookAround(ShipServices services) async {
-    List<Position> shipPositions = shipManager.getShipPositions();
+  void lookAround() async {
+    List<Position> shipPositions = shipManager.getShipPositions(globalScale);
 
     for(var shipPosition in shipPositions) {
       bool looked = await tileManager.lookForTiles(shipPosition, services);

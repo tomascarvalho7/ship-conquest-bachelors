@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/camera.dart';
+import 'package:ship_conquest/providers/minimap_provider.dart';
 import 'package:ship_conquest/providers/route_manager.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
+import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:ship_conquest/widgets/miscellaneous/path/camera_path_controller.dart';
 import 'package:ship_conquest/widgets/miscellaneous/path/path_management_interface.dart';
-import 'package:ship_conquest/widgets/miscellaneous/ship/ship_icon.dart';
+import 'package:ship_conquest/widgets/miscellaneous/path/path_view.dart';
+import 'package:ship_conquest/widgets/screens/minimap/events/minimap_event.dart';
 import 'package:ship_conquest/widgets/screens/minimap/minimap_view.dart';
-import '../../../domain/ship.dart';
+import '../../../utils/constants.dart';
 import '../../miscellaneous/path/route_view.dart';
 
 class MinimapScreen extends StatelessWidget {
@@ -21,23 +24,53 @@ class MinimapScreen extends StatelessWidget {
             ChangeNotifierProvider(create: (_) => Camera()),
             ChangeNotifierProvider(create: (_) => RouteManager())
           ],
-          child: screen(context),
+          child: const MinimapScreenVisuals(),
       );
+}
 
-  Widget screen(BuildContext context) {
+class MinimapScreenVisuals extends StatelessWidget {
+  const MinimapScreenVisuals({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    MinimapEvent eventHandler = MinimapEvent(
+        camera: context.read<Camera>(),
+        minimap: context.read<MinimapProvider>(),
+        route: context.read<RouteManager>(),
+        shipManager: context.read<ShipManager>(),
+        services: context.read<ShipServices>()
+    );
+    eventHandler.load();
+
     return Stack(
       children: [
-        const MinimapScreenVisuals(),
-        pathManagementInterfaceHolder(),
+        minimapInterface(eventHandler),
+        pathManagementInterfaceHolder(eventHandler),
         closeButton(() => context.pop())
       ],
     );
   }
 
-  Widget pathManagementInterfaceHolder() =>
-      const Positioned(
+  Widget minimapInterface(MinimapEvent eventHandler) =>
+      Consumer<ShipManager>(
+          builder: (_, shipManager, __) =>
+              CameraPathController(
+                  background: const Color.fromRGBO(51, 56, 61, 1),
+                  eventHandler: eventHandler,
+                  nodes: shipManager.getShipPositions(eventHandler.scale),
+                  child: MinimapView(
+                      child: RouteView(
+                          hooks: shipManager.getShipPositions(eventHandler.scale),
+                          child: const PathView()
+                      )
+                  )
+              )
+      );
+
+  Widget pathManagementInterfaceHolder(MinimapEvent eventHandler) =>
+      Positioned(
           bottom: 20,
-          child: PathManagementInterface()
+          child: PathManagementInterface(eventHandler: eventHandler)
       );
 
   Widget closeButton(void Function() onPressed) =>
@@ -50,29 +83,4 @@ class MinimapScreen extends StatelessWidget {
               child: const SizedBox(width: 50, height: 50,)
           )
       );
-}
-
-class MinimapScreenVisuals extends StatelessWidget {
-  const MinimapScreenVisuals({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    RouteManager pathManager = context.read<RouteManager>();
-
-    return Consumer<ShipManager>(
-        builder: (_, shipManager, __) =>
-            CameraPathController(
-                background: const Color.fromRGBO(51, 56, 61, 1),
-                pathManager: pathManager,
-                nodes: shipManager.getShipPositions(),
-                child: MinimapView(
-                    child: RouteView(
-                        hooks: shipManager.getShipPositions(),
-                        child: ShipIcon(ship: Ship(path: []))
-                    )
-                )
-            )
-    );
-  }
-
 }

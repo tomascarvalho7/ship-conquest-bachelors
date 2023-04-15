@@ -1,11 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/isometric/isometric_tile_paint.dart';
-import 'package:ship_conquest/main.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
 
 import '../../domain/space/position.dart';
+import '../../utils/constants.dart';
 
 class TestPainter extends CustomPainter {
   final Animation<int> animation;

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/main.dart';
-
-import '../domain/ship.dart';
+import '../domain/ship/dynamic_ship.dart';
+import '../domain/ship/ship.dart';
 
 ///
 /// Provider handling Ship info
@@ -15,18 +15,14 @@ class ShipManager with ChangeNotifier {
 
   Ship getMainShip() => ships[0];
 
-  List<Position> getShipPositions() {
-    double x = 0;
-    double y = 0;
-    return [
-      Position(
-        x: (x - y) * tileSize / 2,
-        y: (x + y) * tileSize / 4,
-      )
-    ];
+  void setSail(int sId, ShipPath path) {
+    ships[sId] = DynamicShip(path: path);
+  }
+
+  List<Position> getShipPositions(double scale) {
+    return ships.map((e) => e.getPosition(scale)).toList();
   }
 
   List<T> buildListFromShips<T>(T Function(Ship ship) block) =>
     List.generate(ships.length, (index) => block(ships[index]));
-
 }

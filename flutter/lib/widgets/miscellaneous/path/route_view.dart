@@ -27,7 +27,7 @@ class RouteView extends StatelessWidget {
                   end: endColor,
                   points: pathManager.pathPoints
                   ),
-                child: Container()
+                child: Container(child: child)
             )
       );
 }

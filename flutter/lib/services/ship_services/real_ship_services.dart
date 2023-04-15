@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
@@ -18,7 +19,7 @@ const lobbyId = "itZFTI";
 
 class RealShipServices extends ShipServices {
   @override
-  Future<TileList> getNewChunk(int chunkSize, Coordinate coordinates) async {
+  Future<TileList> getNewChunk(int chunkSize, Coord2D coordinates) async {
     int x = coordinates.x + (chunkSize / 2).round() - 1;
     int y = coordinates.y + (chunkSize / 2).round() - 1;
     final queryParameters = {'x': x.toString(), 'y': y.toString()};
@@ -69,5 +70,11 @@ class RealShipServices extends ShipServices {
     } else {
       throw Exception("error fetching a new chunk");
     }
+  }
+
+  @override
+  Future<ShipPath> navigateTo(int sId, List<Coord2D> landmarks) {
+    // TODO: implement navigateTo
+    throw UnimplementedError();
   }
 }
