@@ -19,15 +19,26 @@ class DynamicShipWidget extends StatefulWidget {
 }
 
 class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProviderStateMixin {
-  late final path = widget.ship.path;
+  get path => widget.ship.path;
   late final waveAnim = widget.waveAnim;
   late final AnimationController controller = AnimationController(
       duration: path.getCurrentDuration(),
       vsync: this
-  )
-    ..forward();
+  )..forward();
   late final animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
   late final scale = widget.tileSize * 4;
+
+  @override
+  void didUpdateWidget(covariant DynamicShipWidget oldWidget) {
+    if(oldWidget.ship != widget.ship) controller.forward(from: 0.0);
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) =>

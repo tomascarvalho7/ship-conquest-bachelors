@@ -14,10 +14,11 @@ class DynamicShip extends Ship {
   @override
   Direction getOrientation() => getOrientationFromAngle(path.getAngleFromTime());
 
-  Direction getOrientationFromAngle(double angle) {
-    if (angle > 90 && angle <= 180) return Direction.up;
+  Direction getOrientationFromAngle(double ang) {
+    final angle = ang + 45;
+    if (angle > 0 && angle <= 90) return Direction.right;
+    if (angle > 90 && angle <= 180) return Direction.down;
     if (angle > 180 && angle <= 270) return Direction.left;
-    if (angle > 270 && angle <= 0) return Direction.down;
-    return Direction.right;
+    return Direction.up;
   }
 }

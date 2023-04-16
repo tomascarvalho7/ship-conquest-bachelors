@@ -33,7 +33,7 @@ class GameScreen extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize))
         ],
         child: Game(
-            background: Colors.blueAccent,
+            background: Colors.blueGrey,
             colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))
     );
   }

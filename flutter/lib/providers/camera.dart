@@ -17,8 +17,8 @@ class Camera with ChangeNotifier {
   void onUpdate(double size, Offset movementOffset) {
     _scaleFactor = _baseScaleFactor * size;
     _coordinates = Position(
-        x: _coordinates.x + movementOffset.dx,
-        y: _coordinates.y + movementOffset.dy
+        x: _coordinates.x + movementOffset.dx / _scaleFactor,
+        y: _coordinates.y + movementOffset.dy / _scaleFactor
     );
     notifyListeners();
   }

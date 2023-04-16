@@ -25,5 +25,5 @@ class Position {
   int get hashCode => x.hashCode ^ y.hashCode;
 
   @override
-  String toString() => 'x = $x, y = $y';
+  String toString() => '(x = $x, y = $y)';
 }

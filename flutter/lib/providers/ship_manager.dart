@@ -17,6 +17,7 @@ class ShipManager with ChangeNotifier {
 
   void setSail(int sId, ShipPath path) {
     ships[sId] = DynamicShip(path: path);
+    notifyListeners();
   }
 
   List<Position> getShipPositions(double scale) {

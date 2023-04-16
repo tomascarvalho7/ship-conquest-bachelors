@@ -7,6 +7,7 @@ import 'package:ship_conquest/domain/path_finding/node.dart';
 import 'package:ship_conquest/domain/path_finding/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
+import 'package:ship_conquest/utils/constants.dart';
 
 class PathBuilder {
   final int radius;
@@ -15,7 +16,8 @@ class PathBuilder {
   PathBuilder({required this.radius, this.maxIterations = 250});
 
   List<Coord2D> build(Minimap map, Coord2D start, Coord2D mid, Coord2D end, int step) {
-    if (end.x >= map.length || end.y >= map.length) return [];
+    if (end.x >= map.length || end.y >= map.length || end.x < 0 || end.y < 0) return [];
+    if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y) != waterColor) return [];
     final newNodes = HashMap<Coord2D, Node>(); // map of nodes to be evaluated
     final oldNodes = HashMap<Coord2D, Node>(); // map of nodes already evaluated
     newNodes[start] = Node(position: start); // add the start node to newNodes

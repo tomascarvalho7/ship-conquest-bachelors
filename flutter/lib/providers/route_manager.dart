@@ -24,6 +24,7 @@ class RouteManager with ChangeNotifier {
   void selectMainNode(Position start) {
     _pathSegment = PathSegment.start;
     _startPoint = start;
+    _pathPoints = null;
   }
 
   void deselect() {
@@ -48,7 +49,7 @@ class RouteManager with ChangeNotifier {
   }
 
   void draw(Minimap minimap, Position start, Position endDelta) {
-    Position end = (_pathPoints?.end ?? const Position(x: 0, y: 0)) + endDelta;
+    Position end = (_pathPoints?.end ?? start) + endDelta;
     Position mid = Position(
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2
@@ -110,6 +111,7 @@ class RouteManager with ChangeNotifier {
     );
 
     final path = pathBuilder.build(minimap, toCoord(start), toCoord(mid), toCoord(end), 30);
-    _path = pathBuilder.normalize(path, 2);
+    if (path.isNotEmpty) _path = pathBuilder.normalize(path, 2);
+    else _path = null;
   }
 }

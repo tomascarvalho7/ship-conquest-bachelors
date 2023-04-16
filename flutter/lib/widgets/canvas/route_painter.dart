@@ -6,11 +6,12 @@ import '../../domain/space/position.dart';
 class RoutePainter extends CustomPainter {
   final List<Position> hooks;
   final PathPoints? points;
+  final double scale;
   final Color start;
   final Color mid;
   final Color end;
   // constructor
-  RoutePainter({required this.hooks, required this.points, required this.start, required this.mid, required this.end});
+  RoutePainter({required this.hooks, required this.points, required this.scale, required this.start, required this.mid, required this.end});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -30,7 +31,7 @@ class RoutePainter extends CustomPainter {
   }
 
   void drawPoint(Canvas canvas, Position position, Color color) {
-    canvas.drawCircle(position.toOffset(), 15, Paint()..color = color);
+    canvas.drawCircle(position.toOffset(), 15 / scale, Paint()..color = color);
   }
 
   void paintPath(Canvas canvas, Position start, Position mid, Position end, double distance) {
@@ -38,7 +39,7 @@ class RoutePainter extends CustomPainter {
       ..shader = RadialGradient(
           colors: [this.start, this.mid, this.end]
       ).createShader(Rect.fromCircle(center: start.toOffset(), radius: distance))
-      ..strokeWidth = 12.5
+      ..strokeWidth = 12.5 / scale
       ..style = PaintingStyle.stroke
       ..strokeJoin = StrokeJoin.round;
 

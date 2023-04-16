@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/widgets/canvas/route_painter.dart';
 
 import '../../../domain/space/position.dart';
+import '../../../providers/camera.dart';
 import '../../../providers/route_manager.dart';
 
 class RouteView extends StatelessWidget {
@@ -17,17 +18,21 @@ class RouteView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<RouteManager>(
-        builder: (_, pathManager, __) =>
-            CustomPaint(
-                painter: RoutePainter(
-                  hooks: hooks,
-                  start: startColor,
-                  mid: midColor,
-                  end: endColor,
-                  points: pathManager.pathPoints
-                  ),
-                child: Container(child: child)
-            )
+      Consumer<Camera>(
+          builder: (_, camera, __) =>
+              Consumer<RouteManager>(
+                  builder: (_, pathManager, __) =>
+                      CustomPaint(
+                          painter: RoutePainter(
+                              hooks: hooks,
+                              scale: camera.scaleFactor,
+                              start: startColor,
+                              mid: midColor,
+                              end: endColor,
+                              points: pathManager.pathPoints
+                          ),
+                          child: Container(child: child)
+                      )
+              )
       );
 }

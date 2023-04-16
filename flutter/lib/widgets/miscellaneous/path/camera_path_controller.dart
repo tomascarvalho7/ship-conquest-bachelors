@@ -23,22 +23,20 @@ class CameraPathController extends CameraControl {
     required this.nodes,
   });
 
-  static const radius = 100;
+  static const radius = 50;
 
   // a -> b
   double _distance(Position a, Position b) => sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 
-  Position _scale(Position p, double s) => Position(x: p.x / s, y: p.y / s);
-
   @override
   void onStart(Camera camera, ScaleStartDetails details, BoxConstraints constraints) {
-    final Position screenPosition = details.localFocalPoint.toPosition() - camera.coordinates;
+    final Position screenPosition = details.localFocalPoint.toPosition() - camera.coordinates * camera.scaleFactor;
     final Position constraintOffset = Position(
         x: constraints.maxWidth / 2,
         y: constraints.maxHeight / 2
     );
 
-    final Position position = _scale(screenPosition - constraintOffset, camera.scaleFactor);
+    final Position position = (screenPosition - constraintOffset) * (1 / camera.scaleFactor);
 
     if (selectMainNodes(position, camera.scaleFactor)) return;
 
@@ -52,7 +50,7 @@ class CameraPathController extends CameraControl {
     if (routeManager.pathSegment == null) {
       super.onUpdate(camera, details);
     } else {
-      final Position position = _scale(details.focalPointDelta.toPosition(), camera.scaleFactor);
+      final Position position = details.focalPointDelta.toPosition() * (1 / camera.scaleFactor);
 
       eventHandler.moveNode(position);
     }
@@ -68,7 +66,7 @@ class CameraPathController extends CameraControl {
     final int length = nodes.length;
     for(var i = 0; i < length; i++) {
       final Position hook = nodes[i];
-      if (_distance(hook, position) < radius) {
+      if (_distance(hook, position) < radius / scale) {
         routeManager.selectMainNode(hook);
         return true; // selected a main node !
       }
@@ -81,10 +79,10 @@ class CameraPathController extends CameraControl {
     final pathPoints = routeManager.pathPoints;
     if (pathPoints == null) return false; // there are no secondary points
 
-    if (_distance(pathPoints.mid, position) < radius) {
+    if (_distance(pathPoints.mid, position) < radius / scale) {
       routeManager.selectSecondaryNode(PathSegment.mid);
       return true; // selected the mid node
-    } else if (_distance(pathPoints.end, position) < radius) {
+    } else if (_distance(pathPoints.end, position) < radius / scale) {
       routeManager.selectSecondaryNode(PathSegment.end);
       return true; // selected the end node
     }
