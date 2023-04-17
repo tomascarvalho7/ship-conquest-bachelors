@@ -10,6 +10,7 @@ class Coord2D {
   int get hashCode => Object.hash(x, y);
 
   Coord2D operator -(Coord2D other) => Coord2D(x: x - other.x, y: y - other.y);
+  Coord2D operator +(Coord2D other) => Coord2D(x: x + other.x, y: y + other.y);
   Position operator *(double other) => Position(x: x * other, y: y * other);
 
   @override

@@ -7,6 +7,7 @@ import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/router.dart';
 import 'package:ship_conquest/services/ship_services/fake_ship_services.dart';
+import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'domain/ship/direction.dart';
 import 'domain/space/position.dart';
@@ -27,8 +28,10 @@ class MyApp extends StatelessWidget {
             StaticShip(position: Position(x: 30, y: 30), orientation: Direction.up)
           ])),
           ChangeNotifierProvider(create: (_) => MinimapProvider()),
-          Provider<ShipServices>(create: (_) => FakeShipServices()),
-          Provider<UserStorage>(create: (_) => UserStorage())
+          Provider<UserStorage>(create: (_) => UserStorage()),
+          ProxyProvider<UserStorage, ShipServices>(
+              update: (_, userStorage, __) => FakeShipServices(/*userStorage: userStorage*/)
+          )
         ],
         child: MaterialApp.router(
             title: 'Ship Conquest',

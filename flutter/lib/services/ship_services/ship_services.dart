@@ -11,7 +11,7 @@ abstract class ShipServices {
 
   Future<Token> signIn(String idToken);
 
-  Future<Minimap> getMinimap(Token token, ColorGradient colorGradient);
+  Future<Minimap> getMinimap(ColorGradient colorGradient);
 
   Future<ShipPath> navigateTo(int sId, List<Coord2D> landmarks);
 }

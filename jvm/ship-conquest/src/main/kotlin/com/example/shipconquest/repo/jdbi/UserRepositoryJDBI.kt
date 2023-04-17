@@ -1,6 +1,7 @@
 package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.user.Token
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.repo.UserRepository
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
@@ -45,5 +46,14 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
             .single()
 
         return tokenCount != 0
+    }
+
+    override fun authenticateUserByToken(token: String): User {
+        logger.info("Checking if user token exists and getting user")
+        return handle.createQuery(
+            "select u.id, u.name from dbo.user u join dbo.token t on t.uid = u.id where t.token = :token;"
+        ).bind("token", token)
+            .mapTo<User>()
+            .single()
     }
 }

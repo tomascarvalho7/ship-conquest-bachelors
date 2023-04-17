@@ -1,11 +1,14 @@
 package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.ShipPathTime
 import com.example.shipconquest.domain.Vector3
+import java.time.Duration
+import java.time.LocalDateTime
 
 sealed class GetChunksError {
     object GameNotFound: GetChunksError()
+    object ShipPositionNotFound: GetChunksError()
 }
 
 typealias GetChunksResult = Either<GetChunksError, List<Vector3>>
@@ -21,4 +24,4 @@ sealed class NavigationError {
     object InvalidNavigationPath: NavigationError()
 }
 
-typealias NavigationResult = Either<NavigationError, String>
+typealias NavigationResult = Either<NavigationError, ShipPathTime>

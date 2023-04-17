@@ -1,6 +1,6 @@
-package com.example.shipconquest.domain.ship_navigation
+package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Coord2D
 
 /**
  *  Using the A* algorithm, find the shortest path avoiding the existing isles and using the influence point to modify the result
@@ -10,13 +10,13 @@ import com.example.shipconquest.domain.Position
  *  @return list of positions with the full path
  */
 fun findShortestPath(
-    map: List<Position>,
-    start: Position,
-    end: Position,
-    influencePoint: Position,
+    map: List<Coord2D>,
+    start: Coord2D,
+    end: Coord2D,
+    influencePoint: Coord2D,
     safetyRadius: Int,
     mapSize: Int
-): List<Position> {
+): List<Coord2D> {
     val startH = calculateHeuristic(start, end, influencePoint)
     val startNode = Node(position = start, h = startH, f = startH)
     val foundNodes = mutableSetOf(startNode)

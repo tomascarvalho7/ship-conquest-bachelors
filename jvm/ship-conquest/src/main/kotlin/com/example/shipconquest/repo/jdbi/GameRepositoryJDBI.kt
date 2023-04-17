@@ -1,7 +1,9 @@
 package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.Game
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.ship_navigation.CubicBezier
+import com.example.shipconquest.domain.ship_navigation.ShipPath
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
@@ -14,8 +16,10 @@ import org.jdbi.v3.core.statement.Update
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.LocalDateTime
 
-class GameRepositoryJDBI(private val handle: Handle): GameRepository {
+class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
     override fun get(tag: String): Game? {
         logger.info("Getting game from db with tag = {}", tag)
@@ -31,7 +35,7 @@ class GameRepositoryJDBI(private val handle: Handle): GameRepository {
             ?.toGame()
     }
 
-    override fun getVisitedPoints(tag: String, uid: String): List<Position>? {
+    override fun getVisitedPoints(tag: String, uid: String): List<Coord2D>? {
         logger.info("Getting visited spots from db with tag = {}", tag)
 
         return handle.createQuery(
@@ -59,7 +63,7 @@ class GameRepositoryJDBI(private val handle: Handle): GameRepository {
             .execute()
     }
 
-    override fun createVisitedPoint(tag: String, uid: String, point: Position) {
+    override fun createVisitedPoint(tag: String, uid: String, point: Coord2D) {
         logger.info("Adding a new visited point for user = {} in game = {}", uid, tag)
 
         handle.createUpdate(
@@ -73,7 +77,7 @@ class GameRepositoryJDBI(private val handle: Handle): GameRepository {
             .execute()
     }
 
-    override fun addVisitedPoint(tag: String, uid: String, point: Position) {
+    override fun addVisitedPoint(tag: String, uid: String, point: Coord2D) {
         logger.info("Adding a new visited point for user = {} in game = {}", uid, tag)
 
         handle.createUpdate(
@@ -99,7 +103,56 @@ class GameRepositoryJDBI(private val handle: Handle): GameRepository {
             .bind("uid", uid)
             .mapTo<Int>()
             .single()
-        return count != 0
+        return count == 0
+    }
+
+    override fun getShipPath(tag: String, shipId: String, uid: String): ShipPath? {
+        logger.info("Getting ship {} path of user {} in lobby {}", shipId, uid, tag)
+
+        return handle.createQuery("""
+            select landmarks, startTime, duration from dbo.shippath where gameTag = :tag and uid = :uid and shipId = :shipId;
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .mapTo<ShipPathDBModel>()
+            .singleOrNull()
+            ?.toShipPath()
+    }
+
+    override fun createShipPath(
+        tag: String,
+        shipId: String,
+        uid: String,
+        landmarks: List<CubicBezier>,
+        startTime: LocalDateTime,
+        duration: Duration
+    ) {
+        logger.info("Creating a ship path of boat {} of user {} in lobby {}", shipId, uid, tag)
+
+        handle.createUpdate("""
+            insert into dbo.ShipPath values(:tag, :uid, :shipId, :landmarks, :startTime, :duration);
+        """)
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .bindJson("landmarks", landmarks, ::serializeCubicBezierList)
+            .bind("startTime", startTime)
+            .bind("duration", duration)
+            .execute()
+    }
+
+    override fun deleteShipPath(tag: String, shipId: String, uid: String) {
+        logger.info("Deleting the ship path of boat {} of user {} in lobby {}", shipId, uid, tag)
+
+        handle.createUpdate("""
+            delete from dbo.ShipPath where gameTag = :tag and uid = :uid and shipId = :shipId;
+        """)
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .execute()
     }
 
     companion object {
@@ -118,19 +171,31 @@ class GameRepositoryJDBI(private val handle: Handle): GameRepository {
         fun serializeGameMap(map: HeightMap): String =
             objectMapper.writeValueAsString(map.toHeightMapDBModel())
 
-        fun serializePosition(position: Position): String =
-            objectMapper.writeValueAsString(position.toPositionDBModel())
-
-        fun serializePositionList(position: Position): String =
-            objectMapper.writeValueAsString(listOf(position.toPositionDBModel()))
-
         fun deserializeGameMap(json: String) =
             objectMapper.readValue<HeightMapDBModel>(json)
+
+        fun serializePosition(position: Coord2D): String =
+            objectMapper.writeValueAsString(position.toPositionDBModel())
 
         fun deserializePosition(json: String) =
             objectMapper.readValue<PositionDBModel>(json)
 
+        fun serializePositionList(position: Coord2D): String =
+            objectMapper.writeValueAsString(listOf(position.toPositionDBModel()))
+
         fun deserializePositionList(json: String) =
             objectMapper.readValue<Array<PositionDBModel>>(json)
+
+        fun serializeCubicBezier(bezier: CubicBezier): String =
+            objectMapper.writeValueAsString(bezier.toCubicBezierDBModel())
+
+        fun deserializeCubicBezier(json: String) =
+            objectMapper.readValue<CubicBezierDBModel>(json)
+
+        fun serializeCubicBezierList(bezierList: List<CubicBezier>): String =
+            objectMapper.writeValueAsString(bezierList.toCubicBezierDBModelList())
+
+        fun deserializeCubicBezierList(json:String) =
+            objectMapper.readValue<Array<CubicBezierDBModel>>(json)
     }
 }

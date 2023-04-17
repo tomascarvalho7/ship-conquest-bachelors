@@ -1,6 +1,7 @@
 package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.user.Token
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.UserLogic
 import com.example.shipconquest.domain.user.toToken
 import com.example.shipconquest.left
@@ -19,6 +20,12 @@ class UserService(
     private val userLogic: UserLogic,
 ): ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
+    fun authenticate(token: String): User? {
+        return transactionManager.run {transaction ->
+            transaction.userRepo.authenticateUserByToken(token)
+        }
+    }
 
     fun processUser(googleId: String, name: String, email: String): ProcessUserResult {
         //add verification logic, maybe check name size?

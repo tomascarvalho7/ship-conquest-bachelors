@@ -1,6 +1,6 @@
-package com.example.shipconquest.domain.ship_navigation
+package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Coord2D
 
 
 /**
@@ -9,8 +9,8 @@ import com.example.shipconquest.domain.Position
  * @param distance the desired distance between points
  * @return a list with the points of interest
  */
-fun defineMiddlePoints(path: List<Position>, numPoints: Int): List<Position> {
-    val extractedPoints = mutableListOf<Position>()
+fun defineMiddlePoints(path: List<Coord2D>, numPoints: Int): List<Coord2D> {
+    val extractedPoints = mutableListOf<Coord2D>()
     val step = (path.size - 1).toDouble() / (numPoints - 1).toDouble()
     for (i in 0 until numPoints) {
         val index = (i * step).toInt()

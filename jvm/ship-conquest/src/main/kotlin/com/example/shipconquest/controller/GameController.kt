@@ -5,7 +5,8 @@ import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.HorizonOutputModel
 import com.example.shipconquest.controller.model.output.MinimapOutputModel
-import com.example.shipconquest.controller.model.output.NavigateOutputModel
+import com.example.shipconquest.controller.model.output.ShipPathOutputModel
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.GameService
 import com.example.shipconquest.service.result.GetChunksError
 import com.example.shipconquest.service.result.GetMinimapError
@@ -19,14 +20,17 @@ class GameController(val service: GameService) {
      * name to be either view, glance, or inspectHorizon
      */
     @GetMapping("/{tag}/view")
-    fun view(@PathVariable tag: String, @RequestParam x: Int, @RequestParam y: Int): ResponseEntity<*> {
-        val result = service.getChunks(tag = tag, x = x, y = y)
+    fun view(user: User, @PathVariable tag: String, @RequestParam shipId: String): ResponseEntity<*> {
+        val result = service.getChunks(tag = tag, shipId = shipId, googleId = user.id)
 
         return when (result) {
             is Either.Right -> response(content = HorizonOutputModel(tiles = result.value))
             is Either.Left -> when(result.value) {
                 GetChunksError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
+
+                GetChunksError.ShipPositionNotFound ->
+                    Problem.response(status = 404, problem = Problem.shipPositionNotFound())
             }
         }
     }
@@ -37,8 +41,8 @@ class GameController(val service: GameService) {
     }
 
     @GetMapping("/{tag}/minimap")
-    fun getMinimap(@PathVariable tag: String): ResponseEntity<*> { // needs authorization to get uid
-        val result = service.getMinimap(tag = tag, uid = "")
+    fun getMinimap(user: User, @PathVariable tag: String): ResponseEntity<*> { // needs authorization to get uid
+        val result = service.getMinimap(tag = tag, uid = user.id)
 
         return when (result) {
             is Either.Right -> response(content = MinimapOutputModel(points = result.value, size = result.value.size))
@@ -52,11 +56,16 @@ class GameController(val service: GameService) {
     }
 
     @PostMapping("/{tag}/navigate")
-    fun navigate(@PathVariable tag: String, @RequestBody bodyObj: NavigationPathInputModel): ResponseEntity<*> {
-        val result = service.navigate(tag, bodyObj.points)
+    fun navigate(
+        user: User,
+        @PathVariable tag: String,
+        @RequestBody bodyObj: NavigationPathInputModel,
+        @RequestParam shipId: String
+    ): ResponseEntity<*> {
+        val result = service.navigate(tag, user.id, shipId, bodyObj.points)
 
         return when (result) {
-            is Either.Right -> response(content = NavigateOutputModel("Navigation accepted"))
+            is Either.Right -> response(content = ShipPathOutputModel(result.value.startTime, result.value.duration))
             is Either.Left -> when(result.value) {
                 NavigationError.InvalidNavigationPath ->
                     Problem.response(status = 404, problem = Problem.invalidNavigation())

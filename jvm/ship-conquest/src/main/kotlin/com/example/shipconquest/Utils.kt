@@ -1,8 +1,6 @@
 package com.example.shipconquest
 
-import com.example.shipconquest.repo.jdbi.mapper.HeightMapMapper
-import com.example.shipconquest.repo.jdbi.mapper.PositionListMapper
-import com.example.shipconquest.repo.jdbi.mapper.PositionMapper
+import com.example.shipconquest.repo.jdbi.mapper.*
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.postgres.PostgresPlugin
@@ -15,5 +13,7 @@ fun Jdbi.configure(): Jdbi {
     registerColumnMapper(HeightMapMapper())
     registerColumnMapper(PositionListMapper())
     registerColumnMapper(PositionMapper())
+    registerColumnMapper(CubicBezierMapper())
+    registerColumnMapper(CubicBezierListMapper())
     return this
 }

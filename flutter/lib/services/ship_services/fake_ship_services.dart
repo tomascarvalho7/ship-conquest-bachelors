@@ -26,7 +26,7 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Minimap> getMinimap(Token token, ColorGradient colorGradient) async {
+  Future<Minimap> getMinimap(ColorGradient colorGradient) async {
     return Minimap(
       length: 500,
       pixels: HashMap() // empty map

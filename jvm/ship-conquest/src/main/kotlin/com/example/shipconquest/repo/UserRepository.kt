@@ -1,6 +1,7 @@
 package com.example.shipconquest.repo
 
 import com.example.shipconquest.domain.user.Token
+import com.example.shipconquest.domain.user.User
 import org.slf4j.Logger
 
 interface UserRepository {
@@ -10,4 +11,5 @@ interface UserRepository {
     fun createUser(googleId: String, name: String, email:String)
     fun updateUserToken(googleId: String, token: Token)
     fun doesTokenExist(token: Token): Boolean
+    fun authenticateUserByToken(token: String): User
 }

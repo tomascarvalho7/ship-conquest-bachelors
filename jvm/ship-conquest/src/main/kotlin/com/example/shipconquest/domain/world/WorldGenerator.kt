@@ -1,12 +1,10 @@
 package com.example.shipconquest.domain.world
 
 import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Coord2D
 import com.example.shipconquest.domain.generators.Falloff
 import com.example.shipconquest.domain.generators.SimplexNoise
 import com.example.shipconquest.domain.generators.get
-import com.example.shipconquest.domain.minus
-import com.example.shipconquest.domain.plus
 import kotlin.math.roundToInt
 
 const val islandSize = 30
@@ -27,7 +25,7 @@ class WorldGenerator(private val worldSize: Int) {
 
     private fun generateIslandCoordinates(
         islandDensity: Factor, // 0 a 100
-    ): List<Position> {
+    ): List<Coord2D> {
         if (worldSize == 0) return emptyList()
 
         val numIslands = 3 // (worldSize / (101 - islandDensity.value)) / (islandSize * 2)
@@ -35,11 +33,11 @@ class WorldGenerator(private val worldSize: Int) {
         val offset = gridSize / 2
 
         return buildList {
-            this.add(Position(x = 10, y = 10))
+            this.add(Coord2D(x = 10, y = 10))
             for (y in 0 until numIslands) {
                 for (x in 0 until numIslands) {
-                    val position = Position(x = offset + x * gridSize, y = offset + y * gridSize)
-                    val randomOffset = Position(
+                    val position = Coord2D(x = offset + x * gridSize, y = offset + y * gridSize)
+                    val randomOffset = Coord2D(
                         x = (-offset..offset).random(),
                         y = (-offset..offset).random()
                     )
@@ -49,9 +47,9 @@ class WorldGenerator(private val worldSize: Int) {
         }
     }
 
-    private fun generateIslandTerrain(origin: Position, builder: HeightMapBuilder) {
+    private fun generateIslandTerrain(origin: Coord2D, builder: HeightMapBuilder) {
         val noiseMap = SimplexNoise.generateSimplexNoise(islandSize, frequency)
-        val offset = origin - Position(islandSize / 2, islandSize / 2)
+        val offset = origin - Coord2D(islandSize / 2, islandSize / 2)
         // apply falloff, scale noise
         for (y in 0 until islandSize) {
             for (x in 0 until islandSize) {

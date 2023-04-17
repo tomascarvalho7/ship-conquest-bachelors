@@ -1,14 +1,14 @@
-package com.example.shipconquest.domain.ship_navigation
+package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Coord2D
 
-fun calculateHeuristic(currPoint: Position, end: Position, influencePoint: Position): Double {
+fun calculateHeuristic(currPoint: Coord2D, end: Coord2D, influencePoint: Coord2D): Double {
     val distance = calculateManhattanDistance(currPoint, end)
     val penalty = calculateManhattanDistance(currPoint, influencePoint) / 2
     return distance + penalty
 }
 
-fun reconstructPath(lastNode: Node): List<Position> {
+fun reconstructPath(lastNode: Node): List<Coord2D> {
     val path = mutableListOf<Node>()
     var node: Node? = lastNode
     while (node != null) {
@@ -20,7 +20,7 @@ fun reconstructPath(lastNode: Node): List<Position> {
 
 fun calculateNeighbours(
     node: Node,
-    map: List<Position>,
+    map: List<Coord2D>,
     safetyRadius: Int,
     mapSize: Int,
     ignore: HashMap<Int, Node>
@@ -33,7 +33,7 @@ fun calculateNeighbours(
             if (i < 0 || i > mapSize || j < 0 || j > mapSize) {
                 continue
             }
-            val currPos = Position(i, j)
+            val currPos = Coord2D(i, j)
             val isSafe = map.none { pos ->
                 calculateEuclideanDistance(
                     pos,

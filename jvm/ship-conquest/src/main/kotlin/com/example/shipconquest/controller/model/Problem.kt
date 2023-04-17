@@ -28,6 +28,11 @@ data class Problem(val title: String, val detail: String) {
             detail = "The game resource identified was not found."
         )
 
+        fun shipPositionNotFound() = Problem(
+            title = "Ship position record doesn't exist",
+            detail = "There is no record of a ship with the given id belonging to you in the given lobby."
+        )
+
         fun invalidIdToken() = Problem(
             title = "ID Token is invalid",
             detail = "The ID Token you presented as invalid and authentication failed."
@@ -40,12 +45,12 @@ data class Problem(val title: String, val detail: String) {
 
         fun noTrackedRecord() =  Problem(
             title = "There seems to be no record tracked from you",
-            detail = "There is no record from your boats in this game"
+            detail = "There is no record from your boats in this game."
         )
 
         fun invalidNavigation() = Problem(
             title = "Invalid navigation path",
-            detail = "The navigation path you described isn't valid"
+            detail = "The navigation path you described isn't valid."
         )
     }
 }
