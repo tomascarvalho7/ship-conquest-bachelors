@@ -11,6 +11,7 @@ import 'package:ship_conquest/widgets/miscellaneous/path/path_management_interfa
 import 'package:ship_conquest/widgets/miscellaneous/path/path_view.dart';
 import 'package:ship_conquest/widgets/screens/minimap/events/minimap_event.dart';
 import 'package:ship_conquest/widgets/screens/minimap/minimap_view.dart';
+import '../../../providers/tile_manager.dart';
 import '../../../utils/constants.dart';
 import '../../miscellaneous/path/route_view.dart';
 
@@ -52,19 +53,23 @@ class MinimapScreenVisuals extends StatelessWidget {
   }
 
   Widget minimapInterface(MinimapEvent eventHandler) =>
-      Consumer<ShipManager>(
-          builder: (_, shipManager, __) =>
-              CameraPathController(
-                  background: const Color.fromRGBO(51, 56, 61, 1),
-                  eventHandler: eventHandler,
-                  nodes: shipManager.getShipPositions(eventHandler.scale),
-                  child: MinimapView(
-                      child: RouteView(
-                          hooks: shipManager.getShipPositions(eventHandler.scale),
-                          child: const PathView()
-                      )
-                  )
-              )
+      Consumer<MinimapProvider>(
+        builder: (_, minimapProvider, __) =>
+            Consumer<ShipManager>(
+                builder: (_, shipManager, __) =>
+                    CameraPathController(
+                        background: const Color.fromRGBO(51, 56, 61, 1),
+                        eventHandler: eventHandler,
+                        nodes: shipManager.getShipPositions(eventHandler.scale),
+                        child: MinimapView(
+                            minimap: minimapProvider.minimap,
+                            child: RouteView(
+                                hooks: shipManager.getShipPositions(eventHandler.scale),
+                                child: const PathView()
+                            )
+                        )
+                    )
+            )
       );
 
   Widget pathManagementInterfaceHolder(MinimapEvent eventHandler) =>

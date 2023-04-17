@@ -10,7 +10,7 @@ class ImagePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size _) {
-    final offset = 0.0;
+    const offset = 0.0;
 
     canvas.drawImageRect(
         image,
@@ -22,5 +22,5 @@ class ImagePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant ImagePainter oldDelegate) => oldDelegate.image != image;
 }

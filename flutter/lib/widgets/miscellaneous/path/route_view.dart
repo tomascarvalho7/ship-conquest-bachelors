@@ -9,6 +9,7 @@ import '../../../providers/route_manager.dart';
 class RouteView extends StatelessWidget {
   final List<Position> hooks;
   final Widget child;
+  // constructor
   const RouteView({super.key, required this.hooks, required this.child});
 
   // constants

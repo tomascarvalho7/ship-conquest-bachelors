@@ -8,7 +8,8 @@ import '../domain/minimap.dart';
 import '../domain/space/position.dart';
 
 class RouteManager with ChangeNotifier {
-  Position? _startPoint;
+  List<Position> _hooks = [];
+  int? _startIndex;
   PathPoints? _pathPoints;
   PathSegment? _pathSegment;
   List<Coord2D>? _path;
@@ -20,15 +21,23 @@ class RouteManager with ChangeNotifier {
   List<Coord2D>? get beziers => _path;
   late PathBuilder pathBuilder = PathBuilder(radius: 5);
 
+  void setupHooks(List<Position> hooks, Minimap minimap) {
+    _hooks = hooks;
+    final index = _startIndex;
+    final path = pathPoints;
+    if (index != null && path != null) {
+      _updatePoints(points: PathPoints(start: hooks[index], mid: path.mid, end: path.end), minimap: minimap);
+    }
+  }
+
   // select starter node
-  void selectMainNode(Position start) {
+  void selectMainNode(int startIndex) {
     _pathSegment = PathSegment.start;
-    _startPoint = start;
+    _startIndex = startIndex;
     _pathPoints = null;
   }
 
   void deselect() {
-    _startPoint = null;
     _pathSegment = null;
   }
 
@@ -39,8 +48,9 @@ class RouteManager with ChangeNotifier {
   void moveNode(Minimap minimap, Position delta) {
     if (_pathSegment == null) return; // no nodes to move
 
-    if (_pathSegment == PathSegment.start) {
-      draw(minimap, _startPoint!, delta);
+    final index = _startIndex;
+    if (_pathSegment == PathSegment.start && index != null) {
+      draw(minimap, _hooks[index], delta);
     } else if (_pathSegment == PathSegment.mid) {
       updateMid(minimap, delta);
     } else {

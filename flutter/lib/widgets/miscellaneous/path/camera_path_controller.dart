@@ -21,7 +21,10 @@ class CameraPathController extends CameraControl {
     required super.child,
     required this.eventHandler,
     required this.nodes,
-  });
+  }) {
+    // everytime this widget is inserted in the widget tree, setup eventHandler
+    eventHandler.setup();
+  }
 
   static const radius = 50;
 
@@ -67,7 +70,7 @@ class CameraPathController extends CameraControl {
     for(var i = 0; i < length; i++) {
       final Position hook = nodes[i];
       if (_distance(hook, position) < radius / scale) {
-        routeManager.selectMainNode(hook);
+        routeManager.selectMainNode(i);
         return true; // selected a main node !
       }
     }

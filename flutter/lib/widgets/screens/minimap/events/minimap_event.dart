@@ -30,6 +30,10 @@ class MinimapEvent {
     camera.setFocus(shipManager.getMainShip().getPosition(-scale));
   }
 
+  void setup() {
+    route.setupHooks(shipManager.getShipPositions(scale), minimap.minimap);
+  }
+
   // move control node
   void moveNode(Position delta) {
     route.moveNode(minimap.minimap, delta);

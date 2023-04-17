@@ -21,16 +21,22 @@ class DynamicShipWidget extends StatefulWidget {
 class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProviderStateMixin {
   get path => widget.ship.path;
   late final waveAnim = widget.waveAnim;
-  late final AnimationController controller = AnimationController(
+  late AnimationController controller = AnimationController(
       duration: path.getCurrentDuration(),
       vsync: this
   )..forward();
-  late final animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
+  late Animation<double> animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
   late final scale = widget.tileSize * 4;
 
   @override
   void didUpdateWidget(covariant DynamicShipWidget oldWidget) {
-    if(oldWidget.ship != widget.ship) controller.forward(from: 0.0);
+    if(oldWidget.ship != widget.ship) {
+      controller = AnimationController(
+          duration: path.getCurrentDuration(),
+          vsync: this
+      )..forward();
+      animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
+    }
     super.didUpdateWidget(oldWidget);
   }
 
@@ -43,7 +49,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
   @override
   Widget build(BuildContext context) =>
       AnimatedBuilder(
-          animation: Listenable.merge([widget.waveAnim, animation]),
+          animation: animation,
           builder: (context, _) {
             Position position = toIsometric(path.getPosition(animation.value));
             double angle = path.getAngle(animation.value);
@@ -52,7 +58,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
             return Transform.translate(
                 offset: Offset(
                     position.x,
-                    position.y //+ sin(waveAnim.value + waveOffset) * widget.tileSize / 8
+                    position.y + sin(waveOffset) * widget.tileSize / 8
                 ),
                 child: ShipView(
                   scale: scale,

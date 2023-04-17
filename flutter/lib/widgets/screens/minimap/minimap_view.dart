@@ -10,16 +10,14 @@ import '../../../utils/constants.dart';
 import '../../canvas/image_painter.dart';
 
 class MinimapView extends StatelessWidget {
+  final Minimap minimap;
   final Color background = const Color.fromRGBO(0, 0, 0, 0.1);
   final Widget? child;
-  const MinimapView({super.key, this.child});
+  const MinimapView({super.key, required this.minimap, this.child});
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<MinimapProvider>(
-          builder: (_, minimapProv, __) =>
-              loadMinimap(minimapProv.minimap),
-      );
+      loadMinimap(minimap);
 
   Widget loadMinimap(Minimap minimap) {
     if (minimap.length == 0) return loading();
