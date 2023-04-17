@@ -38,3 +38,14 @@ CREATE TABLE dbo.VisitedPoints
     PRIMARY KEY (gameTag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );
+
+CREATE TABLE dbo.ShipPath
+(
+    gameTag varchar(6) NOT NULL,
+    uid varchar(30) NOT NULL,
+    shipId varchar(30) NOT null,
+    landmarks jsonb,
+    startTime timestamp,
+    duration interval,
+    FOREIGN KEY (uid) REFERENCES dbo.User(id)
+);

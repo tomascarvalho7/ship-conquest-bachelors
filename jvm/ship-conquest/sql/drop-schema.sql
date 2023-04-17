@@ -8,4 +8,6 @@ DROP TABLE IF EXISTS dbo.User;
 
 DROP TABLE IF EXISTS dbo.VisitedPoints;
 
+DROP TABLE IF EXISTS dbo.ShipPath;
+
 drop schema dbo;
