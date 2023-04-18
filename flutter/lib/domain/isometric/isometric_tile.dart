@@ -2,16 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/isometric/isometric_tile_paint.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
 import '../space/coordinate.dart';
 
 class IsometricTile {
+  final Coord2D coord; // tile coordinate
   final Position position; // tile origin
   final double Function(double x) height; // tile get height function
   final IsometricTilePaint Function(double x) tilePaint; // tile get paint
 
-  IsometricTile({required this.position, required this.height, required this.tilePaint});
+  IsometricTile({required this.coord, required this.position, required this.height, required this.tilePaint});
 
   // create a isometric tile from a static terrain tile
   static IsometricTile fromTerrainTile({
@@ -24,6 +26,7 @@ class IsometricTile {
     final paint = IsometricTilePaint(color: color);
 
     return IsometricTile(
+        coord: Coord2D(x: coordinate.x, y: coordinate.y),
         position: Position(
           x: (coordinate.x - coordinate.y) * tileSizeWidthHalf,
           y: (coordinate.x + coordinate.y - (coordinate.z / 10)) * tileSizeHeightHalf,
@@ -45,6 +48,7 @@ class IsometricTile {
     double waveOffset = (coordinate.x + coordinate.y) / -3;
 
     return IsometricTile(
+        coord: Coord2D(x: coordinate.x, y: coordinate.y),
         position: Position(
           x: (coordinate.x - coordinate.y) * tileSizeWidthHalf,
           y: (coordinate.x + coordinate.y) * tileSizeHeightHalf,

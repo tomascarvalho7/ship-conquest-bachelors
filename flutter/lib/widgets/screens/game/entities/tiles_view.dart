@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/space/tiles_order.dart';
 
 import '../../../../domain/color/color_gradient.dart';
 import '../../../../domain/isometric/isometric_tile.dart';
@@ -6,17 +7,16 @@ import '../../../../domain/space/coordinate.dart';
 import '../../../../utils/constants.dart';
 import '../../../canvas/isometric_painter.dart';
 
-class TilesView extends StatelessWidget {
+class TilesView extends StatefulWidget {
   final Animation<double> animation;
-  final List<Coordinate> tiles;
+  final TilesOrder<Coordinate> tiles;
   final ColorGradient colorGradient;
-  final Widget? child;
+  // constructor
+  TilesView({super.key, required this.animation, required this.tiles, required this.colorGradient});
 
-  const TilesView({super.key, required this.animation, required this.tiles, required this.colorGradient, this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    List<IsometricTile> isoTiles = tiles.map((coord) {
+  late final TilesOrder<IsometricTile> isoTiles = TilesOrder(
+    tilesStates: tiles.tilesStates,
+    tiles: tiles.tiles.map((coord) {
       if (coord.z == 0) {
         return IsometricTile.fromWaterTile(
             coordinate: coord,
@@ -30,14 +30,43 @@ class TilesView extends StatelessWidget {
             color: colorGradient.get(coord.z)
         );
       }
-    }).toList(growable: false);
+    })
+  );
 
-    return CustomPaint(
-        painter: IsometricPainter(
-            tileSize: tileSize,
-            animation: animation,
-            tiles: isoTiles
-        )
-    );
+  @override
+  State<StatefulWidget> createState() => _TilesViewState();
+}
+
+class _TilesViewState extends State<TilesView> with TickerProviderStateMixin {
+  late AnimationController controller = AnimationController(
+      duration: const Duration(seconds: 1), vsync: this
+  )..forward();
+  late Animation<double> animation = Tween<double>(begin: 0, end: 1).animate(controller);
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
+
+  @override
+  void didUpdateWidget(covariant TilesView oldWidget) {
+    if(oldWidget.tiles != widget.tiles) {
+      // reset animation
+      controller.forward(from: 0.0);
+      animation = Tween<double>(begin: 0, end: 1).animate(controller);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(
+          painter: IsometricPainter(
+              tileSize: tileSize,
+              waveAnim: widget.animation,
+              fadeAnim: animation,
+              tilesOrder: widget.isoTiles,
+          )
+      );
 }

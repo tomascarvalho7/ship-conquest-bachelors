@@ -10,7 +10,7 @@ void drawCube({
   required IsometricTilePaint tilePaint,
   required Canvas canvas
 }) {
-  Offset offset = Offset(position.x, position.y);
+  Offset offset = Offset(position.x - size / 2, position.y - size / 4); // adjust the offset based on the size
   // top face
   Vertices verticesTF = Vertices(
     VertexMode.triangles,

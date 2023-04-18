@@ -1,5 +1,4 @@
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -47,15 +46,14 @@ class GameEvent {
   }
 
   // look around for new tiles
-  void lookAround() async {
+  void lookAround() {
     List<Position> shipPositions = shipManager.getShipPositions(globalScale);
 
     for(var shipPosition in shipPositions) {
-      bool looked = await tileManager.lookForTiles(shipPosition, services);
-      // if new tiles were found, add them to minimap
-      if (looked) {
-        minimapProvider.update(tileManager.tiles, colorGradient);
-      }
+      // add new tiles near every ship to minimap
+      tileManager.lookForTiles(shipPosition, services).then(
+              (tiles) => minimapProvider.update(tiles, colorGradient)
+      );
     }
   }
 }
