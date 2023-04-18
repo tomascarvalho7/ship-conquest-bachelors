@@ -4,7 +4,6 @@ import com.example.shipconquest.domain.Game
 import com.example.shipconquest.domain.Coord2D
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.ship_navigation.ShipPath
-import com.example.shipconquest.repo.jdbi.dbmodel.ShipPathDBModel
 import org.slf4j.Logger
 import java.time.Duration
 import java.time.LocalDateTime
@@ -26,5 +25,19 @@ interface GameRepository {
         startTime: LocalDateTime,
         duration: Duration
     )
-    fun deleteShipPath(tag: String, shipId: String, uid: String)
+
+    fun deleteShipEntry(tag: String, shipId: String, uid: String)
+
+    fun getShipStaticPosition(tag: String, shipId: String, uid: String): Coord2D?
+    fun createShipStaticPosition(
+        tag: String,
+        shipId: String,
+        uid: String,
+        staticPosition: Coord2D
+    )
+    fun checkShipPathExists(
+        tag: String,
+        shipId: String,
+        uid: String,
+    ): Boolean
 }

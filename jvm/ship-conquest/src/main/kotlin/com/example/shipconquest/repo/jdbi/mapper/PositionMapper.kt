@@ -8,8 +8,8 @@ import org.postgresql.util.PGobject
 import java.sql.ResultSet
 
 class PositionMapper: ColumnMapper<PositionDBModel> {
-    override fun map(r: ResultSet, columnNumber: Int, ctx: StatementContext?): PositionDBModel {
+    override fun map(r: ResultSet, columnNumber: Int, ctx: StatementContext?): PositionDBModel? {
         val obj = r.getObject(columnNumber, PGobject::class.java)
-        return GameRepositoryJDBI.deserializePosition(obj.value ?: throw IllegalStateException())
+        return GameRepositoryJDBI.deserializePosition(obj.value)
     }
 }

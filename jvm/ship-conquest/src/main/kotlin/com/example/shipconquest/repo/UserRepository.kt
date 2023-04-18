@@ -11,5 +11,5 @@ interface UserRepository {
     fun createUser(googleId: String, name: String, email:String)
     fun updateUserToken(googleId: String, token: Token)
     fun doesTokenExist(token: Token): Boolean
-    fun authenticateUserByToken(token: String): User
+    fun authenticateUserByToken(token: String): User?
 }

@@ -7,6 +7,7 @@ import com.example.shipconquest.domain.ship_navigation.ShipPath
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
+import com.example.shipconquest.repo.jdbi.mapper.PositionMapper
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -16,6 +17,7 @@ import org.jdbi.v3.core.statement.Update
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.sql.Types
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -129,22 +131,23 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         startTime: LocalDateTime,
         duration: Duration
     ) {
-        logger.info("Creating a ship path of boat {} of user {} in lobby {}", shipId, uid, tag)
+        logger.info("Creating a ship path of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         handle.createUpdate("""
-            insert into dbo.ShipPath values(:tag, :uid, :shipId, :landmarks, :startTime, :duration);
+            insert into dbo.ShipPath values(:tag, :uid, :shipId, :static_pos, :landmarks, :startTime, :duration);
         """)
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
+            .bindNull("static_pos", Types.OTHER)
             .bindJson("landmarks", landmarks, ::serializeCubicBezierList)
             .bind("startTime", startTime)
             .bind("duration", duration)
             .execute()
     }
 
-    override fun deleteShipPath(tag: String, shipId: String, uid: String) {
-        logger.info("Deleting the ship path of boat {} of user {} in lobby {}", shipId, uid, tag)
+    override fun deleteShipEntry(tag: String, shipId: String, uid: String) {
+        logger.info("Deleting the ship path of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         handle.createUpdate("""
             delete from dbo.ShipPath where gameTag = :tag and uid = :uid and shipId = :shipId;
@@ -153,6 +156,53 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .bind("uid", uid)
             .bind("shipId", shipId)
             .execute()
+    }
+
+    override fun getShipStaticPosition(tag: String, shipId: String, uid: String): Coord2D? {
+        logger.info("Getting static ship position of ship {} of user {} in lobby {}", shipId, uid, tag)
+
+        return handle.createQuery("""
+            select static_position from dbo.shippath where gameTag = :tag and uid = :uid and shipId = :shipId;
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .map(PositionMapper())
+            .singleOrNull()
+            ?.toPosition()
+    }
+
+    override fun createShipStaticPosition(tag: String, shipId: String, uid: String, staticPosition: Coord2D) {
+        logger.info("Creating a ship static position of ship {} of user {} in lobby {}", shipId, uid, tag)
+
+        handle.createUpdate("""
+            insert into dbo.ShipPath values(:tag, :uid, :shipId, :static_pos, :landmarks, :startTime, :duration);
+        """)
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .bindJson("static_pos", staticPosition, ::serializePosition)
+            .bindNull("landmarks", Types.OTHER)
+            .bindNull("startTime", Types.OTHER)
+            .bindNull("duration", Types.OTHER)
+            .execute()
+    }
+
+    override fun checkShipPathExists(tag: String, shipId: String, uid: String): Boolean {
+        logger.info("Checking if ship {} path exists of user = {} lobby = {}", shipId, uid, tag)
+
+        val result = handle.createQuery(
+            """
+               select static_position from dbo.ShipPath where gameTag = :tag AND uid = :uid AND shipId = :shipId
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .map(PositionMapper())
+            .singleOrNull()
+        return result == null
     }
 
     companion object {
@@ -177,9 +227,11 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         fun serializePosition(position: Coord2D): String =
             objectMapper.writeValueAsString(position.toPositionDBModel())
 
-        fun deserializePosition(json: String) =
-            objectMapper.readValue<PositionDBModel>(json)
-
+        fun deserializePosition(json: String?): PositionDBModel? {
+            if(json != null) {
+                return objectMapper.readValue<PositionDBModel>(json)
+            } else return null
+        }
         fun serializePositionList(position: Coord2D): String =
             objectMapper.writeValueAsString(listOf(position.toPositionDBModel()))
 

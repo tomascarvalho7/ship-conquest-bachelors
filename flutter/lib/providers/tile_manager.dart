@@ -64,13 +64,13 @@ class TileManager with ChangeNotifier {
   }
 
   Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services) async {
-      // fetch tiles from services
-      TileList newChunk = await services.getNewChunk(chunkSize, coordinate);
-      // update fetched tiles from existing ones
-      for(var tile in newChunk.tiles) {
-        int? index = _newTilesMap[Coord2D(x: tile.x, y: tile.y)];
-        if(index != null) _newTiles.replace(index, tile);
-      }
+    // fetch tiles from services
+    TileList newChunk = await services.getNewChunk(chunkSize, coordinate);
+    // update fetched tiles from existing ones
+    for(var tile in newChunk.tiles) {
+      int? index = _newTilesMap[Coord2D(x: tile.x, y: tile.y)];
+      if(index != null) _newTiles = _newTiles.replace(index, tile);
+    }
   }
 
   Sequence<Coordinate> _buildGlobalTiles() {

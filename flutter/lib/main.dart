@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => MinimapProvider()),
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider<UserStorage, ShipServices>(
-              update: (_, userStorage, __) => FakeShipServices(/*userStorage: userStorage*/)
+              update: (_, userStorage, __) => RealShipServices(userStorage: userStorage)
           )
         ],
         child: MaterialApp.router(

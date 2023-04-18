@@ -1,11 +1,8 @@
 package com.example.shipconquest.service
 
-import com.example.shipconquest.domain.Coord2D
-import com.example.shipconquest.domain.ShipPathTime
-import com.example.shipconquest.domain.Vector3
+import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
-import com.example.shipconquest.domain.toCoord2D
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
@@ -31,25 +28,32 @@ class GameService(
 ) : ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)
-                ?: return@run left(GetChunksError.ShipPositionNotFound)
-
-            val position = path.getPositionFromTime()
-            val coord = position.toCoord2D()
+            val staticPosition = transaction.gameRepo.getShipStaticPosition(tag, shipId, googleId)
+            val position = if(staticPosition != null) {
+                staticPosition.toPosition()
+            } else {
+                val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)
+                    ?: return@run left(GetChunksError.ShipPositionNotFound)
+                val pos = path.getPositionFromTime()
+                if(pos.toCoord2D() == path.landmarks.last().p3) {
+                    transaction.gameRepo.deleteShipEntry(tag, shipId, googleId) // vou mudar para um update depois
+                    transaction.gameRepo.createShipStaticPosition(tag, shipId, googleId, pos.toCoord2D())
+                }
+                pos
+            }.toCoord2D()
 
             val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, googleId)
             if (visitedPoints == null) {
-                transaction.gameRepo.createVisitedPoint(tag, googleId, coord)
+                transaction.gameRepo.createVisitedPoint(tag, googleId, position)
             }
-            if(visitedPoints != null && visitedPoints.all { point -> calculateEuclideanDistance(coord, point) >= chunkSize }) {
-                transaction.gameRepo.addVisitedPoint(tag, googleId, coord)
+            if(visitedPoints != null && visitedPoints.all { point -> calculateEuclideanDistance(position, point) >= chunkSize }) {
+                transaction.gameRepo.addVisitedPoint(tag, googleId, position)
             }
             val game = transaction.gameRepo.get(tag = tag)
 
-            if (game != null) right(game.map.pulse(origin = coord, radius = viewDistance))
+            if (game != null) right(game.map.pulse(origin = position, radius = viewDistance))
             else left(GetChunksError.GameNotFound)
         }
     }
@@ -92,12 +96,8 @@ class GameService(
         }
 
         return transactionManager.run { transaction ->
-            if(transaction.gameRepo.getShipPath(tag, shipId, uid) == null) {
-                transaction.gameRepo.createShipPath(tag, shipId, uid, landmarks, startTime, duration)
-            } else {
-                transaction.gameRepo.deleteShipPath(tag, shipId, uid)
-                transaction.gameRepo.createShipPath(tag, shipId, uid, landmarks, startTime, duration)
-            }
+            transaction.gameRepo.deleteShipEntry(tag, shipId, uid)
+            transaction.gameRepo.createShipPath(tag, shipId, uid, landmarks, startTime, duration)
             right(ShipPathTime(startTime.toString(), formattedDuration))
         }
     }

@@ -20,8 +20,8 @@ import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart'
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "905e-2001-8a0-6e2e-ba00-2085-6cfd-4ea-66ad.ngrok-free.app";
-const lobbyId = "VdS0Q5";
+const baseUri = "882f-2001-8a0-6e2e-ba00-b87b-9160-c2f8-c519.ngrok-free.app";
+const lobbyId = "AxPXd5";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;

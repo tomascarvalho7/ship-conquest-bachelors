@@ -48,12 +48,12 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
         return tokenCount != 0
     }
 
-    override fun authenticateUserByToken(token: String): User {
+    override fun authenticateUserByToken(token: String): User? {
         logger.info("Checking if user token exists and getting user")
         return handle.createQuery(
             "select u.id, u.name from dbo.user u join dbo.token t on t.uid = u.id where t.token = :token;"
         ).bind("token", token)
             .mapTo<User>()
-            .single()
+            .singleOrNull()
     }
 }
