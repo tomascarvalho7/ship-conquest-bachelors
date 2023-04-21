@@ -1,6 +1,7 @@
 package com.example.shipconquest.domain.ship_navigation
 
 import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.toCoord2D
 import com.example.shipconquest.domain.toPosition
 import java.time.Duration
 import java.time.LocalDateTime

@@ -12,7 +12,7 @@ class GameInterface extends StatelessWidget {
       Stack(
         children: [
           gameView,
-          MinimapIcon(onClick: () => context.push('/minimap'))
+          MinimapIcon(onClick: () => context.push('/game/minimap'))
         ]
       );
 }

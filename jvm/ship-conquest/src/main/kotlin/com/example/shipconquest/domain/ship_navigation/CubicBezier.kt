@@ -2,6 +2,7 @@ package com.example.shipconquest.domain.ship_navigation
 
 import com.example.shipconquest.domain.Coord2D
 import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.toCoord2D
 import com.example.shipconquest.domain.toPosition
 import kotlin.math.atan2
 import kotlin.math.pow

@@ -1,8 +1,10 @@
 package com.example.shipconquest.service
 
+import com.example.shipconquest.controller.model.output.ShipPathOutputModel
 import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
+import com.example.shipconquest.domain.ship_navigation.ShipPath
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
@@ -14,9 +16,7 @@ import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.temporal.TemporalUnit
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
 
 //take these out of here
@@ -102,6 +102,30 @@ class GameService(
         }
     }
 
+    fun getShipPosition(tag: String, uid: String, shipId: String): GetShipPositionResult {
+        return transactionManager.run { transaction ->
+            val position = transaction.gameRepo.getShipStaticPosition(tag, shipId, uid)
+            if(position != null) {
+                right(position)
+            } else {
+                left(GetShipPositionError.ShipNotFound)
+            }
+        }
+    }
+
+    fun getShipPath(tag: String, uid: String, shipId: String): GetShipPathResult {
+        return transactionManager.run { transaction ->
+            val path = transaction.gameRepo.getShipPath(tag, shipId, uid)
+
+            if(path != null) {
+                val newPath = ShipPathOutputModel(path.landmarks, path.startTime.toString(), formatDuration(path.duration))
+                right(newPath)
+            } else {
+                left(GetShipPathError.ShipNotFound)
+            }
+        }
+    }
+
     fun printMap(tag: String) {
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag) ?: return@run
@@ -138,4 +162,13 @@ fun buildBeziers(points: List<Coord2D>): List<CubicBezier> {
             p3 = points[(index * 4) + 3]
         )
     }
+}
+
+fun formatDuration(durationString: Duration): String {
+    val durationMillis = durationString.toMillis()
+
+    val dateFormat = SimpleDateFormat("mm:ss.SSS")
+    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+    return dateFormat.format(Date(durationMillis))
 }

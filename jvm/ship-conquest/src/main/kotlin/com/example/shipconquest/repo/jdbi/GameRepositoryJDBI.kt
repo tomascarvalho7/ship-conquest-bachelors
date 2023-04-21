@@ -134,12 +134,11 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         logger.info("Creating a ship path of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         handle.createUpdate("""
-            insert into dbo.ShipPath values(:tag, :uid, :shipId, :static_pos, :landmarks, :startTime, :duration);
+            insert into dbo.ShipPath values(:tag, :uid, :shipId, :landmarks, :startTime, :duration);
         """)
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .bindNull("static_pos", Types.OTHER)
             .bindJson("landmarks", landmarks, ::serializeCubicBezierList)
             .bind("startTime", startTime)
             .bind("duration", duration)
@@ -156,13 +155,21 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .bind("uid", uid)
             .bind("shipId", shipId)
             .execute()
+
+        handle.createUpdate("""
+            delete from dbo.ShipPosition where gameTag = :tag and uid = :uid and shipId = :shipId;
+        """)
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("shipId", shipId)
+            .execute()
     }
 
     override fun getShipStaticPosition(tag: String, shipId: String, uid: String): Coord2D? {
         logger.info("Getting static ship position of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         return handle.createQuery("""
-            select static_position from dbo.shippath where gameTag = :tag and uid = :uid and shipId = :shipId;
+            select static_position from dbo.shipposition where gameTag = :tag and uid = :uid and shipId = :shipId;
             """
         )
             .bind("tag", tag)
@@ -177,15 +184,12 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         logger.info("Creating a ship static position of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         handle.createUpdate("""
-            insert into dbo.ShipPath values(:tag, :uid, :shipId, :static_pos, :landmarks, :startTime, :duration);
+            insert into dbo.ShipPosition values(:tag, :uid, :shipId, :static_pos);
         """)
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
             .bindJson("static_pos", staticPosition, ::serializePosition)
-            .bindNull("landmarks", Types.OTHER)
-            .bindNull("startTime", Types.OTHER)
-            .bindNull("duration", Types.OTHER)
             .execute()
     }
 

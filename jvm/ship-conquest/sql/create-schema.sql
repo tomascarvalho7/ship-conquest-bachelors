@@ -12,7 +12,6 @@ CREATE TABLE dbo.Token
 (
     token varchar(256) not null primary key,
     uid varchar(30) not null,
-    PRIMARY KEY (token),
     FOREIGN KEY (uid) REFERENCES dbo.user(id)
 );
 
@@ -46,7 +45,6 @@ CREATE TABLE dbo.ShipPath
     gameTag varchar(6) NOT NULL,
     uid varchar(30) NOT NULL,
     shipId varchar(30) NOT null,
-    static_position jsonb,
     landmarks jsonb,
     startTime timestamp,
     duration interval,
@@ -54,3 +52,15 @@ CREATE TABLE dbo.ShipPath
     FOREIGN KEY (uid) REFERENCES dbo.User(id),
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
+
+CREATE TABLE dbo.ShipPosition
+(
+    gameTag varchar(6) NOT NULL,
+    uid varchar(30) NOT NULL,
+    shipId varchar(30) NOT null,
+    static_position jsonb,
+    PRIMARY KEY (gameTag, uid, shipId),
+    FOREIGN KEY (uid) REFERENCES dbo.User(id),
+    FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
+);
+

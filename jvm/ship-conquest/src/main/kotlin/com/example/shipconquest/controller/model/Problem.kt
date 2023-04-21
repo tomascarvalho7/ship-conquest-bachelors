@@ -52,6 +52,11 @@ data class Problem(val title: String, val detail: String) {
             title = "Invalid navigation path",
             detail = "The navigation path you described isn't valid."
         )
+
+        fun shipNotFound() = Problem(
+            title = "Ship not found",
+            detail = "The ship you looked for was not found."
+        )
     }
 }
 

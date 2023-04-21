@@ -1,9 +1,18 @@
+import 'dart:convert';
+
+import 'package:ship_conquest/domain/space/cubic_bezier.dart';
+import 'package:ship_conquest/services/input_models/cubic_bezier_input_model.dart';
+
 class ShipPathInputModel {
+  final List<CubicBezierInputModel> landmarks;
   final DateTime startTime;
   final Duration duration;
 
   ShipPathInputModel.fromJson(Map<String, dynamic> json)
-      : startTime = DateTime.parse(json['startTime']),
+      : landmarks = List<dynamic>.from(json['landmarks'])
+        .map((e) => CubicBezierInputModel.fromJson(e))
+        .toList(),
+        startTime = DateTime.parse(json['startTime']),
         duration = parseDurationString(json['duration']);
 }
 

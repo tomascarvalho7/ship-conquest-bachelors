@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
@@ -46,6 +47,20 @@ class FakeShipServices extends ShipServices {
         landmarks: buildBeziers(landmarks),
         startTime: DateTime.now(),
         duration: Duration(seconds: (distance * 10).round())
+    );
+  }
+
+  @override
+  Future<Position> getMainShipPosition() async {
+    return const Position(x: 30, y: 30);
+  }
+
+  @override
+  Future<ShipPath> getMainShipPath() async {
+    return ShipPath(
+        landmarks: List.empty(),
+        startTime: DateTime.now(),
+        duration: const Duration(seconds: 0)
     );
   }
 }

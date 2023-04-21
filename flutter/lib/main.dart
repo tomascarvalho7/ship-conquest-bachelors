@@ -24,14 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (_) => ShipManager(ships: [
-            StaticShip(position: Position(x: 30, y: 30), orientation: Direction.up)
-          ])),
-          ChangeNotifierProvider(create: (_) => MinimapProvider()),
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider<UserStorage, ShipServices>(
               update: (_, userStorage, __) => RealShipServices(userStorage: userStorage)
-          )
+          ),
+          ChangeNotifierProvider(create: (_) => MinimapProvider()) // needs to be in the next layer, game but there are complications
         ],
         child: MaterialApp.router(
             title: 'Ship Conquest',

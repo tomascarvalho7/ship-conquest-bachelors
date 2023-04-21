@@ -7,21 +7,26 @@ import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/build_bezier.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/services/input_models/chunk_input_model.dart';
+import 'package:ship_conquest/services/input_models/coord_2d_input_model.dart';
+import 'package:ship_conquest/services/input_models/cubic_bezier_input_model.dart';
 import 'package:ship_conquest/services/input_models/minimap_input_model.dart';
-import 'package:ship_conquest/services/input_models/ship_path_input_model.dart';
+import 'package:ship_conquest/services/input_models/ship_path_time_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
 import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "882f-2001-8a0-6e2e-ba00-b87b-9160-c2f8-c519.ngrok-free.app";
-const lobbyId = "AxPXd5";
+import '../input_models/ship_path_input_model.dart';
+
+const baseUri = "ee8f-2001-8a0-6e2e-ba00-18cb-e5cb-931e-67bd.ngrok-free.app";
+const lobbyId = "eIquTH";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -118,7 +123,7 @@ class RealShipServices extends ShipServices {
     );
 
     if (response.statusCode == 200) {
-      final res = ShipPathInputModel.fromJson(jsonDecode(response.body));
+      final res = ShipPathTimeInputModel.fromJson(jsonDecode(response.body));
 
       return ShipPath(landmarks: buildBeziers(landmarks),
           startTime: res.startTime,
@@ -127,6 +132,56 @@ class RealShipServices extends ShipServices {
       throw Exception("error navigating with ship");
     }
   }
+
+  @override
+  Future<Position?> getMainShipPosition() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "$lobbyId/ship/position", {'shipId': '1'}),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      final res = Coord2DInputModel.fromJson(jsonDecode(response.body));
+
+      return Position(x: res.x.toDouble(), y: res.y.toDouble());
+    } else if(response.statusCode == 404) {
+      return null;
+    } else {
+      throw Exception("error navigating with ship");
+    }
+  }
+
+  @override
+  Future<ShipPath?> getMainShipPath() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "$lobbyId/ship/path", {'shipId': '1'}),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      final res = ShipPathInputModel.fromJson(jsonDecode(response.body));
+
+      return ShipPath(landmarks: res.landmarks.toCubicBezierList(),
+          startTime: res.startTime,
+          duration: res.duration);
+
+    } else if(response.statusCode == 404){
+      return null;
+    } else {
+      throw Exception("error navigating with ship");
+    }
+  }
+
 }
 
 double calcDistance(Coord2D p1, Coord2D p2) {
