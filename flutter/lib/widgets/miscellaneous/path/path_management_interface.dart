@@ -25,7 +25,7 @@ class PathManagementInterface extends StatelessWidget {
                           FlexButton(
                             onPressed: () => eventHandler.confirm(),
                             child: IconSwitch(
-                                condition: pathManager.beziers != null,
+                                condition: pathManager.routePoints.isNotEmpty,
                                 icon: Icons.check,
                                 size: 75,
                                 enabled: Colors.green,

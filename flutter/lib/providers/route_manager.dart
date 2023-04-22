@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/path/path_points.dart';
 import 'package:ship_conquest/domain/path/path_segment.dart';
-import 'package:ship_conquest/domain/path_builder/path_builder.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 
 import '../domain/minimap.dart';
@@ -12,14 +11,18 @@ class RouteManager with ChangeNotifier {
   int? _startIndex;
   PathPoints? _pathPoints;
   PathSegment? _pathSegment;
-  List<Coord2D>? _path;
+  List<Coord2D> _routePoints = [];
 
   PathPoints? get pathPoints => _pathPoints;
   PathSegment? get pathSegment => _pathSegment;
 
   // path builder
-  List<Coord2D>? get beziers => _path;
-  late PathBuilder pathBuilder = PathBuilder(radius: 5);
+  List<Coord2D> get routePoints => _routePoints;
+
+  void setRoutePoints(List<Coord2D> points) {
+    _routePoints = points;
+    notifyListeners();
+  }
 
   void setupHooks(List<Position> hooks, Minimap minimap) {
     _hooks = hooks;
@@ -97,31 +100,18 @@ class RouteManager with ChangeNotifier {
   }
 
   void confirm() {
-    _path = null;
+    _routePoints = []; // clear route
     _pathPoints = null; // clear path
     notifyListeners(); // update widgets
   }
 
   void cancel() {
-    _path = null;
+    _routePoints = []; // clear route
     _pathPoints = null; // clear path
     notifyListeners(); // update widgets
   }
 
   void _updatePoints({required PathPoints points, required Minimap minimap}) {
     _pathPoints = PathPoints(start: points.start, mid: points.mid, end: points.end);
-    _buildPath(points.start, points.mid, points.end, minimap);
-  }
-
-  void _buildPath(Position start, Position mid, Position end, Minimap minimap) {
-    // TODO: hardcoded
-    toCoord(Position pos) => Coord2D(
-        x: pos.x.round(),
-        y: pos.y.round(),
-    );
-
-    final path = pathBuilder.build(minimap, toCoord(start), toCoord(mid), toCoord(end), 30);
-    if (path.isNotEmpty) _path = pathBuilder.normalize(path, 2);
-    else _path = null;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/domain/space/tile_state.dart';
-import 'package:ship_conquest/domain/space/tiles_order.dart';
+import 'package:ship_conquest/domain/tile/tile_state.dart';
+import 'package:ship_conquest/domain/tile/tiles_order.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
 import '../../domain/color/color_gradient.dart';
 import '../../domain/isometric/isometric_tile.dart';

@@ -11,5 +11,5 @@ data class Position(val x: Double, val y: Double) {
         Position(x = this.x * scalar, y = this.y * scalar)
 }
 
-fun Position.toCoord2D() =
-    Coord2D(x.toInt(), y.toInt())
+fun Position.toVector2() =
+    Vector2(x.toInt(), y.toInt())

@@ -1,15 +1,15 @@
 package com.example.shipconquest.domain.world
 
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.Vector3
 import kotlin.math.*
 
-data class HeightMap(val data: Map<Coord2D, Int>, val size: Int)
+data class HeightMap(val data: Map<Vector2, Int>, val size: Int)
 
 /**
  * pulse elements inside a [HeightMap] inside a [origin] with a [radius]
  */
-fun HeightMap.pulse(origin: Coord2D, radius: Int): List<Vector3>  {
+fun HeightMap.pulse(origin: Vector2, radius: Int): List<Vector3>  {
     return buildList {
         for(y in -radius..radius) {
             val yF = y.toFloat()
@@ -18,7 +18,7 @@ fun HeightMap.pulse(origin: Coord2D, radius: Int): List<Vector3>  {
                val distance = sqrt((xF).pow(2) + (yF).pow(2))
 
                if (radius / distance >= .95) {
-                   val pos = origin + Coord2D(x, y)
+                   val pos = origin + Vector2(x, y)
                    val z = data[pos]
 
                    if (z != null) {

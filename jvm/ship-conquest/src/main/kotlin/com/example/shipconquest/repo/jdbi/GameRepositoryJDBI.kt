@@ -1,7 +1,7 @@
 package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.Game
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.ship_navigation.ShipPath
 import com.example.shipconquest.domain.world.HeightMap
@@ -17,7 +17,6 @@ import org.jdbi.v3.core.statement.Update
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.sql.Types
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -37,7 +36,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             ?.toGame()
     }
 
-    override fun getVisitedPoints(tag: String, uid: String): List<Coord2D>? {
+    override fun getVisitedPoints(tag: String, uid: String): List<Vector2>? {
         logger.info("Getting visited spots from db with tag = {}", tag)
 
         return handle.createQuery(
@@ -65,7 +64,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .execute()
     }
 
-    override fun createVisitedPoint(tag: String, uid: String, point: Coord2D) {
+    override fun createVisitedPoint(tag: String, uid: String, point: Vector2) {
         logger.info("Adding a new visited point for user = {} in game = {}", uid, tag)
 
         handle.createUpdate(
@@ -79,7 +78,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .execute()
     }
 
-    override fun addVisitedPoint(tag: String, uid: String, point: Coord2D) {
+    override fun addVisitedPoint(tag: String, uid: String, point: Vector2) {
         logger.info("Adding a new visited point for user = {} in game = {}", uid, tag)
 
         handle.createUpdate(
@@ -165,7 +164,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .execute()
     }
 
-    override fun getShipStaticPosition(tag: String, shipId: String, uid: String): Coord2D? {
+    override fun getShipStaticPosition(tag: String, shipId: String, uid: String): Vector2? {
         logger.info("Getting static ship position of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         return handle.createQuery("""
@@ -180,7 +179,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             ?.toPosition()
     }
 
-    override fun createShipStaticPosition(tag: String, shipId: String, uid: String, staticPosition: Coord2D) {
+    override fun createShipStaticPosition(tag: String, shipId: String, uid: String, staticPosition: Vector2) {
         logger.info("Creating a ship static position of ship {} of user {} in lobby {}", shipId, uid, tag)
 
         handle.createUpdate("""
@@ -228,7 +227,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         fun deserializeGameMap(json: String) =
             objectMapper.readValue<HeightMapDBModel>(json)
 
-        fun serializePosition(position: Coord2D): String =
+        fun serializePosition(position: Vector2): String =
             objectMapper.writeValueAsString(position.toPositionDBModel())
 
         fun deserializePosition(json: String?): PositionDBModel? {
@@ -236,7 +235,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
                 return objectMapper.readValue<PositionDBModel>(json)
             } else return null
         }
-        fun serializePositionList(position: Coord2D): String =
+        fun serializePositionList(position: Vector2): String =
             objectMapper.writeValueAsString(listOf(position.toPositionDBModel()))
 
         fun deserializePositionList(json: String) =

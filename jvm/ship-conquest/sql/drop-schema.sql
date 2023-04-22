@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS dbo.Island;
+
 drop table dbo.user cascade;
 drop table dbo.token cascade;
 drop table dbo.lobby cascade;

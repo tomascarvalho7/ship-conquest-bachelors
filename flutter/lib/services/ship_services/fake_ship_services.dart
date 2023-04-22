@@ -4,12 +4,11 @@ import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/domain/space/tile_list.dart';
-import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 
 import '../../domain/space/coord_2d.dart';
+import '../../domain/tile/tile_list.dart';
 import '../../domain/utils/build_bezier.dart';
 import 'ship_services.dart';
 

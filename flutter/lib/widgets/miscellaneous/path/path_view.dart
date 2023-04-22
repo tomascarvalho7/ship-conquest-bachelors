@@ -17,7 +17,7 @@ class PathView extends StatelessWidget {
               Consumer<RouteManager>(
                   builder: (_, routeManager, __) {
                     return renderNothing();
-                    final beziers = routeManager.beziers;
+                    final beziers = routeManager.routePoints;
 
                     if (beziers == null) return renderNothing();
 

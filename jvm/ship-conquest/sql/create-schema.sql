@@ -64,3 +64,16 @@ CREATE TABLE dbo.ShipPosition
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
 
+CREATE TABLE dbo.Island
+(
+    tag varchar(6) NOT NULL,
+    islandId INT GENERATED ALWAYS AS IDENTITY,
+    x INT NOT NULL,
+    y INT NOT NULL,
+    radius INT NOT NULL,
+    incomePerHour INT,
+    uid varchar(30),
+    PRIMARY KEY (tag, islandId),
+    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
+    FOREIGN KEY (uid) REFERENCES dbo.User(id)
+);

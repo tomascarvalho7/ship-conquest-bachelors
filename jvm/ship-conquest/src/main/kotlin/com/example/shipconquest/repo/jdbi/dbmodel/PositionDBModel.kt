@@ -1,19 +1,19 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 
 data class PositionDBModel(val x: Int, val y: Int)
 
-fun Coord2D.toPositionDBModel(): PositionDBModel {
+fun Vector2.toPositionDBModel(): PositionDBModel {
     return PositionDBModel(x, y)
 }
 
-fun PositionDBModel.toPosition(): Coord2D {
-    return Coord2D(x, y)
+fun PositionDBModel.toPosition(): Vector2 {
+    return Vector2(x, y)
 }
 
-fun Array<PositionDBModel>.toPositionList(): List<Coord2D> {
+fun Array<PositionDBModel>.toPositionList(): List<Vector2> {
     return map { position ->
-        Coord2D(position.x, position.y)
+        Vector2(position.x, position.y)
     }
 }

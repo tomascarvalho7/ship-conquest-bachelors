@@ -4,15 +4,14 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/sequence.dart';
-import 'package:ship_conquest/domain/space/tiles_order.dart';
-import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
-import '../domain/space/tile_list.dart';
 import '../domain/space/coordinate.dart';
 import '../domain/space/position.dart';
-import '../domain/space/tile_state.dart';
+import '../domain/tile/tile_list.dart';
+import '../domain/tile/tile_state.dart';
+import '../domain/tile/tiles_order.dart';
 
 class TileManager with ChangeNotifier {
   final int chunkSize;

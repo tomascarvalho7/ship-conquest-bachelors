@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:typed_data';
 
-import '../../../../providers/minimap_provider.dart';
 import '../../../utils/constants.dart';
 import '../../canvas/image_painter.dart';
 

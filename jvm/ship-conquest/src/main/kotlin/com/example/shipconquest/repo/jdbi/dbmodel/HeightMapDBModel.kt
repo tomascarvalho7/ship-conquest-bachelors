@@ -1,6 +1,6 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.world.HeightMap
 
 data class HeightMapDBModel(val size: Int, val data: Map<Int, Int>)
@@ -18,7 +18,7 @@ fun HeightMapDBModel.toHeightMap() =
     HeightMap(
         size = size,
         data = data.mapKeys { (index, _) ->
-            Coord2D(
+            Vector2(
                 x = index % size,
                 y = index.floorDiv(size)
             )

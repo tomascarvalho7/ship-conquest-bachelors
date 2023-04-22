@@ -1,7 +1,7 @@
-import 'package:ship_conquest/domain/space/tile_state.dart';
+import 'package:ship_conquest/domain/tile/tile_state.dart';
 import 'package:ship_conquest/domain/space/sequence.dart';
 
-import 'coord_2d.dart';
+import '../space/coord_2d.dart';
 
 class TilesOrder<T> {
   final Sequence<T> tiles;

@@ -6,6 +6,7 @@ import com.example.shipconquest.domain.lobby.Lobby
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.toLobbyName
 import com.example.shipconquest.domain.world.WorldGenerator
+import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.right
@@ -26,12 +27,21 @@ class LobbyService(
     fun createLobby(name: String): CreateLobbyResult {
         val lobbyName = name.toLobbyName() ?: return left(CreateLobbyError.InvalidServerName)
         // generate world
-        val world = WorldGenerator(600).generate(Factor(70))
+        val generator = WorldGenerator(600)
+        val origins = generator.generateIslandCoordinates(Factor(70))
+        val world = generator.generate(origins)
 
         return transactionManager.run { transaction ->
+            // generate tag
             val tag = generateTag(transaction.lobbyRepo::get)
+            // create lobby & game
             transaction.lobbyRepo.createLobby(lobby = Lobby(tag = tag, name = lobbyName.name))
             transaction.gameRepo.createGame(game = Game(tag = tag, map = world))
+            // create island from world map
+            for(origin in origins) {
+                val island = WildIsland(coordinate = origin, radius = generator.islandSize)
+                transaction.islandRepo.create(tag = tag, island = island)
+            }
             // return
             right(value = tag)
         }

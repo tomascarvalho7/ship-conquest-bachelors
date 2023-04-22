@@ -1,3 +1,4 @@
+import 'package:ship_conquest/domain/game_data.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
@@ -5,6 +6,7 @@ import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
 import '../../../../domain/isometric/isometric.dart';
 import '../../../../providers/camera.dart';
+import '../../../../providers/global_state.dart';
 import '../../../../providers/minimap_provider.dart';
 import '../../../../domain/color/color_gradient.dart';
 import '../../../../utils/constants.dart';
@@ -16,6 +18,7 @@ import '../../../../utils/constants.dart';
 /// and the GameEvent class combines them to implement
 /// the different game events.
 class GameEvent {
+  final GlobalState state;
   final Camera camera;
   final TileManager tileManager;
   final ShipManager shipManager;
@@ -24,6 +27,7 @@ class GameEvent {
   final ColorGradient colorGradient;
   // constructor
   GameEvent({
+    required this.state,
     required this.camera,
     required this.tileManager,
     required this.shipManager,
@@ -32,17 +36,22 @@ class GameEvent {
     required this.colorGradient
   });
 
+  // save game data
+  void saveGameData() {
+    state.updateGameData(
+      GameData(
+          minimap: minimapProvider.minimap,
+          ships: shipManager.ships
+      )
+    );
+  }
+
   // load initial data
   void load() {
     // set camera focus to main ship
     camera.setFocus(toIsometric(shipManager.getMainShip().getPosition(-globalScale)));
-    // fetch minimap
-    services.getMinimap(colorGradient).then(
-            (minimap) {
-              minimapProvider.init(minimap);
-              lookAround();
-            }
-    );
+    // look around !
+    lookAround();
   }
 
   // look around for new tiles

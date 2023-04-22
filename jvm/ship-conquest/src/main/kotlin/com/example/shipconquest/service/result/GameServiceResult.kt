@@ -2,20 +2,17 @@ package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.output.ShipPathOutputModel
-import com.example.shipconquest.domain.Coord2D
-import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ShipPathTime
 import com.example.shipconquest.domain.Vector3
-import com.example.shipconquest.domain.ship_navigation.ShipPath
-import java.time.Duration
-import java.time.LocalDateTime
+import com.example.shipconquest.domain.world.Horizon
 
 sealed class GetChunksError {
     object GameNotFound: GetChunksError()
     object ShipPositionNotFound: GetChunksError()
 }
 
-typealias GetChunksResult = Either<GetChunksError, List<Vector3>>
+typealias GetChunksResult = Either<GetChunksError, Horizon>
 
 sealed class GetMinimapError {
     object GameNotFound: GetMinimapError()
@@ -34,7 +31,7 @@ sealed class GetShipPositionError {
     object ShipNotFound: GetShipPositionError()
 }
 
-typealias GetShipPositionResult = Either<GetShipPositionError, Coord2D>
+typealias GetShipPositionResult = Either<GetShipPositionError, Vector2>
 
 sealed class GetShipPathError {
     object ShipNotFound: GetShipPathError()

@@ -8,9 +8,8 @@ import '../domain/minimap.dart';
 import '../domain/space/sequence.dart';
 
 class MinimapProvider with ChangeNotifier {
-  late Minimap minimap = Minimap(length: 0, pixels: HashMap());
-
-  init(Minimap newMinimap) => minimap = newMinimap;
+  Minimap minimap;
+  MinimapProvider({required this.minimap});
 
   update(Sequence<Coordinate> tiles, ColorGradient colorGradient) {
     final length = tiles.length;

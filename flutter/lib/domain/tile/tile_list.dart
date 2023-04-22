@@ -1,4 +1,4 @@
-import 'coordinate.dart';
+import '../space/coordinate.dart';
 
 class TileList {
   final List<Coordinate> tiles;

@@ -3,21 +3,18 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:ship_conquest/domain/minimap.dart';
-import 'package:ship_conquest/domain/path_finding/node.dart';
-import 'package:ship_conquest/domain/path_finding/utils.dart';
+import 'package:ship_conquest/domain/path_builder/node.dart';
+import 'package:ship_conquest/domain/path_builder/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/utils/constants.dart';
 
 class PathBuilder {
-  final int radius;
-  final int maxIterations;
-  // constructor
-  PathBuilder({required this.radius, this.maxIterations = 250});
-
-  List<Coord2D> build(Minimap map, Coord2D start, Coord2D mid, Coord2D end, int step) {
+  static List<Coord2D> build(Minimap map, Coord2D start, Coord2D mid, Coord2D end, int step, int radius, int maxIterations) {
     if (end.x >= map.length || end.y >= map.length || end.x < 0 || end.y < 0) return [];
-    if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y) != waterColor) return [];
+    if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y)?.value != waterColor.value) {
+      return [];
+    }
     final newNodes = HashMap<Coord2D, Node>(); // map of nodes to be evaluated
     final oldNodes = HashMap<Coord2D, Node>(); // map of nodes already evaluated
     newNodes[start] = Node(position: start); // add the start node to newNodes
@@ -56,7 +53,7 @@ class PathBuilder {
     return [];
   }
 
-  List<Coord2D> normalize(List<Coord2D> path, int size) {
+  static List<Coord2D> normalize(List<Coord2D> path, int size) {
     if (path.isEmpty) return [];
 
     final length = size * 4;

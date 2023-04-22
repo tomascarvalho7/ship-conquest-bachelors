@@ -8,7 +8,6 @@ import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/domain/space/tile_list.dart';
 import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/build_bezier.dart';
@@ -23,6 +22,7 @@ import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart'
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
+import '../../domain/tile/tile_list.dart';
 import '../input_models/ship_path_input_model.dart';
 
 const baseUri = "ee8f-2001-8a0-6e2e-ba00-18cb-e5cb-931e-67bd.ngrok-free.app";

@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../../providers/user_storage.dart';
 
-class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
+class InitialLoadingScreen extends StatelessWidget {
+  const InitialLoadingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

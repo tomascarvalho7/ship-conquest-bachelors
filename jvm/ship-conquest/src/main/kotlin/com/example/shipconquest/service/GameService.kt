@@ -4,7 +4,8 @@ import com.example.shipconquest.controller.model.output.ShipPathOutputModel
 import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
-import com.example.shipconquest.domain.ship_navigation.ShipPath
+import com.example.shipconquest.domain.world.Horizon
+import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
@@ -31,29 +32,37 @@ class GameService(
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
             val staticPosition = transaction.gameRepo.getShipStaticPosition(tag, shipId, googleId)
-            val position = if(staticPosition != null) {
-                staticPosition.toPosition()
+            val coord: Vector2 = if(staticPosition != null) {
+                staticPosition.toPosition().toVector2()
             } else {
                 val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)
                     ?: return@run left(GetChunksError.ShipPositionNotFound)
-                val pos = path.getPositionFromTime()
-                if(pos.toCoord2D() == path.landmarks.last().p3) {
+                val pos = path.getPositionFromTime().toVector2()
+                if(pos == path.landmarks.last().p3) {
                     transaction.gameRepo.deleteShipEntry(tag, shipId, googleId) // vou mudar para um update depois
-                    transaction.gameRepo.createShipStaticPosition(tag, shipId, googleId, pos.toCoord2D())
+                    transaction.gameRepo.createShipStaticPosition(tag, shipId, googleId, pos)
                 }
                 pos
-            }.toCoord2D()
+            }
 
             val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, googleId)
             if (visitedPoints == null) {
-                transaction.gameRepo.createVisitedPoint(tag, googleId, position)
+                transaction.gameRepo.createVisitedPoint(tag, googleId, coord)
             }
-            if(visitedPoints != null && visitedPoints.all { point -> calculateEuclideanDistance(position, point) >= chunkSize }) {
-                transaction.gameRepo.addVisitedPoint(tag, googleId, position)
+            if(visitedPoints != null && visitedPoints.all { point -> calculateEuclideanDistance(coord, point) >= chunkSize }) {
+                transaction.gameRepo.addVisitedPoint(tag, googleId, coord)
             }
             val game = transaction.gameRepo.get(tag = tag)
 
-            if (game != null) right(game.map.pulse(origin = position, radius = viewDistance))
+            val islands = transaction.islandRepo.getAll(tag = tag)
+            val nearIslands = getNearIslands(coordinate = coord, islands = islands)
+
+            if (game != null) right(
+                value = Horizon(
+                    tiles = game.map.pulse(origin = coord, radius = viewDistance),
+                    islands = nearIslands.map { island -> island.coordinate }
+                )
+            )
             else left(GetChunksError.GameNotFound)
         }
     }
@@ -73,7 +82,7 @@ class GameService(
         }
     }
 
-    fun navigate(tag: String, uid: String, shipId: String, points: List<Coord2D>): NavigationResult {
+    fun navigate(tag: String, uid: String, shipId: String, points: List<Vector2>): NavigationResult {
         val startTime = LocalDateTime.now()
         var distance = 0.0;
         for(i in 0 until points.size - 1) {
@@ -84,12 +93,7 @@ class GameService(
         val duration = Duration.ofSeconds((distance * 10).roundToLong())
         val landmarks = buildBeziers(points)
 
-        val durationMillis = duration.toMillis()
-
-        val dateFormat = SimpleDateFormat("mm:ss.SSS")
-        dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-        val formattedDuration = dateFormat.format(Date(durationMillis))
+        val formattedDuration = formatDuration(duration)
 
         if(!validateNavigationPath(landmarks)) {
             return left(NavigationError.InvalidNavigationPath)
@@ -132,7 +136,7 @@ class GameService(
 
             for (y in 0 until game.map.size) {
                 for (x in 0 until game.map.size) {
-                    val pos = Coord2D(x = x, y = y)
+                    val pos = Vector2(x = x, y = y)
                     val tile = game.map.data[pos]?.div(10)
 
                     if (tile == null)
@@ -151,7 +155,7 @@ fun validateNavigationPath(landmarks: List<CubicBezier>): Boolean {
     return true
 }
 
-fun buildBeziers(points: List<Coord2D>): List<CubicBezier> {
+fun buildBeziers(points: List<Vector2>): List<CubicBezier> {
     if (points.size % 4 != 0) return emptyList()
 
     return List(points.size / 4) { index ->

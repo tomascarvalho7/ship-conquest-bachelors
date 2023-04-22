@@ -61,7 +61,7 @@ class CameraPathController extends CameraControl {
 
   @override
   void onEnd(ScaleEndDetails details) {
-    routeManager.deselect();
+    eventHandler.deselectAndBuildPath();
     super.onEnd(details);
   }
 

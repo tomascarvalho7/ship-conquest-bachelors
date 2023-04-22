@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
@@ -36,6 +37,7 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
     super.initState();
     // game event class, manages game events
     eventHandler = GameEvent(
+      state: context.read<GlobalState>(),
       camera: context.read<Camera>(),
       tileManager: context.read<TileManager>(),
       shipManager: context.read<ShipManager>(),

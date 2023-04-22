@@ -1,13 +1,13 @@
 package com.example.shipconquest.domain.world
 
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 import java.util.HashMap
 
 class HeightMapBuilder(val size: Int) {
-    private val hashMap = HashMap<Coord2D, Int>()
+    private val hashMap = HashMap<Vector2, Int>()
 
     fun add(x: Int, y: Int, height: Int) {
-        hashMap[Coord2D(x = x, y = y)] = height
+        hashMap[Vector2(x = x, y = y)] = height
     }
 
     fun build(builderFn: (builder: HeightMapBuilder) -> Unit): HeightMap {

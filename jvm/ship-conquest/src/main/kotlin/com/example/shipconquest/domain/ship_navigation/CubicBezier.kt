@@ -1,14 +1,13 @@
 package com.example.shipconquest.domain.ship_navigation
 
-import com.example.shipconquest.domain.Coord2D
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.toCoord2D
 import com.example.shipconquest.domain.toPosition
 import kotlin.math.atan2
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class CubicBezier(val p0: Coord2D, val p1: Coord2D, val p2: Coord2D, val p3: Coord2D) {
+class CubicBezier(val p0: Vector2, val p1: Vector2, val p2: Vector2, val p3: Vector2) {
 
     fun get(n: Double): Position {
         val _n = 1.0 - n

@@ -20,7 +20,7 @@ class GameController(val service: GameService) {
         val result = service.getChunks(tag = tag, shipId = shipId, googleId = user.id)
 
         return when (result) {
-            is Either.Right -> response(content = HorizonOutputModel(tiles = result.value))
+            is Either.Right -> response(content = result.value.toHorizonOutputModel())
             is Either.Left -> when (result.value) {
                 GetChunksError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
