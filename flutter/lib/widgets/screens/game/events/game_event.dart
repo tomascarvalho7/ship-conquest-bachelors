@@ -44,12 +44,20 @@ class GameEvent {
           ships: shipManager.ships
       )
     );
+    state.updateCameraState(camera.coordinates, camera.scaleFactor);
   }
 
   // load initial data
   void load() {
-    // set camera focus to main ship
-    camera.setFocus(toIsometric(shipManager.getMainShip().getPosition(-globalScale)));
+    final lastStatePos = state.cameraPos;
+    final lastStateScale = state.cameraScale;
+    if (lastStatePos != null && lastStateScale != null) {
+      // set camera focus to previous position
+      camera.setFocus(lastStatePos, scale: lastStateScale);
+    } else {
+      // set camera focus to main ship
+      camera.setFocus(toIsometric(shipManager.getMainShip().getPosition(-globalScale)));
+    }
     // look around !
     lookAround();
   }

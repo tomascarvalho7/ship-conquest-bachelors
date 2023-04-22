@@ -10,8 +10,9 @@ class Camera with ChangeNotifier {
   double get scaleFactor => _scaleFactor;
   double get baseScaleFactor => _baseScaleFactor;
 
-  void setFocus(Position position) {
+  void setFocus(Position position, {double scale = 1.0}) {
     _coordinates = position;
+    _scaleFactor = scale;
   }
 
   void onUpdate(double size, Offset movementOffset) {

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:ship_conquest/domain/utils/get_time_percentage.dart';
 
 import '../space/position.dart';
@@ -41,6 +43,12 @@ class ShipPath {
   double getAngleFromTime() {
     final percentage = getTimePercentage(startTime, endTime);
     return getAngle(percentage * landmarks.length);
+  }
+
+  double getStartFromTime() {
+    final timeElapsed = DateTime.now().difference(startTime);
+    final percentage = timeElapsed.inMilliseconds / duration.inMilliseconds;
+    return min(landmarks.length.toDouble(), percentage * landmarks.length);
   }
 
   Duration getCurrentDuration() => endTime.difference(DateTime.now());

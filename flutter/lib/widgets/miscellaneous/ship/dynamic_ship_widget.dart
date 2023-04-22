@@ -25,7 +25,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
       duration: path.getCurrentDuration(),
       vsync: this
   )..forward();
-  late Animation<double> animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
+  late Animation<double> animation = Tween<double>(begin: path.getStartFromTime(), end: path.landmarks.length.toDouble()).animate(controller);
   late final scale = widget.tileSize * 4;
 
   @override

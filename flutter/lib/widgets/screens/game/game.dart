@@ -59,6 +59,7 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return GameInterface(
+        eventHandler: eventHandler,
         gameView: GameView(
           animation: animation,
           background: widget.background,
