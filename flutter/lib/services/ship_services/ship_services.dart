@@ -17,7 +17,5 @@ abstract class ShipServices {
 
   Future<ShipPath> navigateTo(int sId, List<Coord2D> landmarks);
 
-  Future<Position?> getMainShipPosition();
-
-  Future<ShipPath?> getMainShipPath();
+  Future<Object?> getMainShipLocation();
 }

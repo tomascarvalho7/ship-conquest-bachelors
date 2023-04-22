@@ -1,5 +1,7 @@
 package com.example.shipconquest.service
 
+import com.example.shipconquest.controller.model.output.PositionOutputModel
+import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
 import com.example.shipconquest.controller.model.output.ShipPathOutputModel
 import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
@@ -9,6 +11,8 @@ import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
+import com.example.shipconquest.repo.jdbi.dbmodel.PositionDBModel
+import com.example.shipconquest.repo.jdbi.dbmodel.toShipPath
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
@@ -23,6 +27,7 @@ import kotlin.math.roundToLong
 //take these out of here
 const val chunkSize = 20.0
 const val viewDistance = 15
+
 @Service
 class GameService(
     override val transactionManager: TransactionManager
@@ -32,13 +37,13 @@ class GameService(
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
             val staticPosition = transaction.gameRepo.getShipStaticPosition(tag, shipId, googleId)
-            val coord: Vector2 = if(staticPosition != null) {
+            val coord: Vector2 = if (staticPosition != null) {
                 staticPosition.toPosition().toVector2()
             } else {
-                val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)
+                val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)?.toShipPath()
                     ?: return@run left(GetChunksError.ShipPositionNotFound)
                 val pos = path.getPositionFromTime().toVector2()
-                if(pos == path.landmarks.last().p3) {
+                if (pos == path.landmarks.last().p3) {
                     transaction.gameRepo.deleteShipEntry(tag, shipId, googleId) // vou mudar para um update depois
                     transaction.gameRepo.createShipStaticPosition(tag, shipId, googleId, pos)
                 }
@@ -49,7 +54,12 @@ class GameService(
             if (visitedPoints == null) {
                 transaction.gameRepo.createVisitedPoint(tag, googleId, coord)
             }
-            if(visitedPoints != null && visitedPoints.all { point -> calculateEuclideanDistance(coord, point) >= chunkSize }) {
+            if (visitedPoints != null && visitedPoints.all { point ->
+                    calculateEuclideanDistance(
+                        coord,
+                        point
+                    ) >= chunkSize
+                }) {
                 transaction.gameRepo.addVisitedPoint(tag, googleId, coord)
             }
             val game = transaction.gameRepo.get(tag = tag)
@@ -85,47 +95,55 @@ class GameService(
     fun navigate(tag: String, uid: String, shipId: String, points: List<Vector2>): NavigationResult {
         val startTime = LocalDateTime.now()
         var distance = 0.0;
-        for(i in 0 until points.size - 1) {
+        for (i in 0 until points.size - 1) {
             val a = points[i];
             val b = points[i + 1];
             distance += calculateEuclideanDistance(a, b)
         }
         val duration = Duration.ofSeconds((distance * 10).roundToLong())
-        val landmarks = buildBeziers(points)
 
         val formattedDuration = formatDuration(duration)
 
-        if(!validateNavigationPath(landmarks)) {
+        if (!validateNavigationPath(buildBeziers(points))) {
             return left(NavigationError.InvalidNavigationPath)
         }
 
         return transactionManager.run { transaction ->
             transaction.gameRepo.deleteShipEntry(tag, shipId, uid)
-            transaction.gameRepo.createShipPath(tag, shipId, uid, landmarks, startTime, duration)
+            transaction.gameRepo.createShipPath(
+                tag,
+                shipId,
+                uid,
+                points,
+                startTime,
+                duration
+            )
             right(ShipPathTime(startTime.toString(), formattedDuration))
         }
     }
 
-    fun getShipPosition(tag: String, uid: String, shipId: String): GetShipPositionResult {
+    fun getShipLocation(tag: String, uid: String, shipId: String): GetShipLocationResult {
         return transactionManager.run { transaction ->
             val position = transaction.gameRepo.getShipStaticPosition(tag, shipId, uid)
-            if(position != null) {
-                right(position)
-            } else {
-                left(GetShipPositionError.ShipNotFound)
-            }
-        }
-    }
-
-    fun getShipPath(tag: String, uid: String, shipId: String): GetShipPathResult {
-        return transactionManager.run { transaction ->
             val path = transaction.gameRepo.getShipPath(tag, shipId, uid)
 
-            if(path != null) {
-                val newPath = ShipPathOutputModel(path.landmarks, path.startTime.toString(), formatDuration(path.duration))
-                right(newPath)
+            if (position != null) {
+                right(
+                    ShipLocationOutputModel(
+                        listOf(PositionOutputModel(position.x, position.y)),
+                        null,
+                        null)
+                )
+            } else if (path != null) {
+                right(
+                    ShipLocationOutputModel(
+                        path.landmarks.map { PositionOutputModel(it.x, it.y) },
+                        path.startTime.toString(),
+                        formatDuration(path.duration)
+                    )
+                )
             } else {
-                left(GetShipPathError.ShipNotFound)
+                left(GetShipLocationError.ShipNotFound)
             }
         }
     }

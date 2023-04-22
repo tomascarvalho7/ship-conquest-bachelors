@@ -1,6 +1,7 @@
 package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
+import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
 import com.example.shipconquest.controller.model.output.ShipPathOutputModel
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ShipPathTime
@@ -27,14 +28,8 @@ sealed class NavigationError {
 
 typealias NavigationResult = Either<NavigationError, ShipPathTime>
 
-sealed class GetShipPositionError {
-    object ShipNotFound: GetShipPositionError()
+sealed class GetShipLocationError {
+    object ShipNotFound: GetShipLocationError()
 }
 
-typealias GetShipPositionResult = Either<GetShipPositionError, Vector2>
-
-sealed class GetShipPathError {
-    object ShipNotFound: GetShipPathError()
-}
-
-typealias GetShipPathResult = Either<GetShipPathError, ShipPathOutputModel>
+typealias GetShipLocationResult = Either<GetShipLocationError, ShipLocationOutputModel>

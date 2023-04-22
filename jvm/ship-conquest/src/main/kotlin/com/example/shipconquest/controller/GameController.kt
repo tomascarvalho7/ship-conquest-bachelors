@@ -37,7 +37,7 @@ class GameController(val service: GameService) {
     }
 
     @GetMapping("/{tag}/minimap")
-    fun getMinimap(user: User, @PathVariable tag: String): ResponseEntity<*> { // needs authorization to get uid
+    fun getMinimap(user: User, @PathVariable tag: String): ResponseEntity<*> {
         val result = service.getMinimap(tag = tag, uid = user.id)
 
         return when (result) {
@@ -76,42 +76,18 @@ class GameController(val service: GameService) {
         }
     }
 
-    @GetMapping("/{tag}/ship/position")
-    fun getShipPosition(
+    @GetMapping("/{tag}/ship/location")
+    fun getShipLocation(
         user: User,
         @PathVariable tag: String,
         @RequestParam shipId: String
-    ): ResponseEntity<*> { // needs authorization to get uid
-        val result = service.getShipPosition(tag = tag, uid = user.id, shipId = shipId)
+    ): ResponseEntity<*> {
+        val result = service.getShipLocation(tag = tag, uid = user.id, shipId = shipId)
 
         return when (result) {
-            is Either.Right -> response(content = PositionOutputModel(result.value.x, result.value.y))
+            is Either.Right -> response(content = result.value)
             is Either.Left -> when (result.value) {
-                GetShipPositionError.ShipNotFound ->
-                    Problem.response(status = 404, problem = Problem.shipNotFound())
-            }
-        }
-    }
-
-    @GetMapping("/{tag}/ship/path")
-    fun getShipPath(
-        user: User,
-        @PathVariable tag: String,
-        @RequestParam shipId: String
-    ): ResponseEntity<*> { // needs authorization to get uid
-        val result = service.getShipPath(tag = tag, uid = user.id, shipId = shipId)
-
-        return when (result) {
-            is Either.Right -> response(
-                content = ShipPathOutputModel(
-                    result.value.landmarks,
-                    result.value.startTime.toString(),
-                    result.value.duration.toString()
-                )
-            )
-
-            is Either.Left -> when (result.value) {
-                GetShipPathError.ShipNotFound ->
+                GetShipLocationError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
             }
         }

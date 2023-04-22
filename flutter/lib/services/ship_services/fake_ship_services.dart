@@ -50,17 +50,8 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Position> getMainShipPosition() async {
+  Future<Position> getMainShipLocation() async {
     return const Position(x: 30, y: 30);
-  }
-
-  @override
-  Future<ShipPath> getMainShipPath() async {
-    return ShipPath(
-        landmarks: List.empty(),
-        startTime: DateTime.now(),
-        duration: const Duration(seconds: 0)
-    );
   }
 }
 

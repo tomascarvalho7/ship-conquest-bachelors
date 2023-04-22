@@ -4,6 +4,8 @@ import com.example.shipconquest.domain.Game
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.ship_navigation.ShipPath
+import com.example.shipconquest.repo.jdbi.dbmodel.PositionDBModel
+import com.example.shipconquest.repo.jdbi.dbmodel.ShipPathDBModel
 import org.slf4j.Logger
 import java.time.Duration
 import java.time.LocalDateTime
@@ -16,12 +18,12 @@ interface GameRepository {
     fun addVisitedPoint(tag: String, uid: String, point: Vector2)
     fun createVisitedPoint(tag: String, uid: String, point: Vector2)
     fun checkVisitedPointsExist(tag: String, uid: String): Boolean
-    fun getShipPath(tag: String, shipId: String, uid: String): ShipPath?
+    fun getShipPath(tag: String, shipId: String, uid: String): ShipPathDBModel?
     fun createShipPath(
         tag: String,
         shipId: String,
         uid: String,
-        landmarks: List<CubicBezier>,
+        landmarks: List<Vector2>,
         startTime: LocalDateTime,
         duration: Duration
     )

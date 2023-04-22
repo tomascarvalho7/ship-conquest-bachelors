@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         providers: [
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider<UserStorage, ShipServices>(
-              update: (_, userStorage, __) => FakeShipServices(/*userStorage: userStorage*/)
+              update: (_, userStorage, __) => RealShipServices(userStorage: userStorage)
           ),
           Provider(create: (_) => GlobalState(
               colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))

@@ -25,7 +25,7 @@ import 'package:http/http.dart' as http;
 import '../../domain/tile/tile_list.dart';
 import '../input_models/ship_path_input_model.dart';
 
-const baseUri = "ee8f-2001-8a0-6e2e-ba00-18cb-e5cb-931e-67bd.ngrok-free.app";
+const baseUri = "a8da-2001-8a0-6e2e-ba00-78d8-5bc8-dadc-3e33.ngrok-free.app";
 const lobbyId = "eIquTH";
 
 class RealShipServices extends ShipServices {
@@ -134,35 +134,12 @@ class RealShipServices extends ShipServices {
   }
 
   @override
-  Future<Position?> getMainShipPosition() async {
+  Future<Object?> getMainShipLocation() async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
     final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/ship/position", {'shipId': '1'}),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
-
-    if (response.statusCode == 200) {
-      final res = Coord2DInputModel.fromJson(jsonDecode(response.body));
-
-      return Position(x: res.x.toDouble(), y: res.y.toDouble());
-    } else if(response.statusCode == 404) {
-      return null;
-    } else {
-      throw Exception("error navigating with ship");
-    }
-  }
-
-  @override
-  Future<ShipPath?> getMainShipPath() async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
-
-    final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/ship/path", {'shipId': '1'}),
+        Uri.https(baseUri, "$lobbyId/ship/location", {'shipId': '1'}),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         }
@@ -170,18 +147,24 @@ class RealShipServices extends ShipServices {
 
     if (response.statusCode == 200) {
       final res = ShipPathInputModel.fromJson(jsonDecode(response.body));
+      final startTime = res.startTime;
+      final duration = res.duration;
 
-      return ShipPath(landmarks: res.landmarks.toCubicBezierList(),
-          startTime: res.startTime,
-          duration: res.duration);
 
-    } else if(response.statusCode == 404){
+      if(res.landmarks.length == 1) {
+          return Position(x: res.landmarks.first.x.toDouble(), y: res.landmarks.first.y.toDouble());
+      } else if(startTime != null && duration != null){
+          return ShipPath(landmarks: buildBeziers(res.landmarks.map((coord) => Coord2D(x: coord.x, y: coord.y)).toList()),
+              startTime: startTime,
+              duration: duration);
+      }
+
+    } else if(response.statusCode == 404) {
       return null;
     } else {
       throw Exception("error navigating with ship");
     }
   }
-
 }
 
 double calcDistance(Coord2D p1, Coord2D p2) {

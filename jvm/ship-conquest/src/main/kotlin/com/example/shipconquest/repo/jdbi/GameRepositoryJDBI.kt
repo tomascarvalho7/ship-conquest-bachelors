@@ -74,7 +74,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         )
             .bind("gameTag", tag)
             .bind("uid", uid)
-            .bindJson("point", point, ::serializePositionList)
+            .bindJson("point", point, ::serializePosition)
             .execute()
     }
 
@@ -107,7 +107,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         return count == 0
     }
 
-    override fun getShipPath(tag: String, shipId: String, uid: String): ShipPath? {
+    override fun getShipPath(tag: String, shipId: String, uid: String): ShipPathDBModel? {
         logger.info("Getting ship {} path of user {} in lobby {}", shipId, uid, tag)
 
         return handle.createQuery("""
@@ -119,14 +119,13 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .bind("shipId", shipId)
             .mapTo<ShipPathDBModel>()
             .singleOrNull()
-            ?.toShipPath()
     }
 
     override fun createShipPath(
         tag: String,
         shipId: String,
         uid: String,
-        landmarks: List<CubicBezier>,
+        landmarks: List<Vector2>,
         startTime: LocalDateTime,
         duration: Duration
     ) {
@@ -138,7 +137,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .bindJson("landmarks", landmarks, ::serializeCubicBezierList)
+            .bindJson("landmarks", landmarks, ::serializePositionList)
             .bind("startTime", startTime)
             .bind("duration", duration)
             .execute()
@@ -235,8 +234,8 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
                 return objectMapper.readValue<PositionDBModel>(json)
             } else return null
         }
-        fun serializePositionList(position: Vector2): String =
-            objectMapper.writeValueAsString(listOf(position.toPositionDBModel()))
+        fun serializePositionList(position: List<Vector2>): String =
+            objectMapper.writeValueAsString(position.map { PositionDBModel(it.x, it.y) })
 
         fun deserializePositionList(json: String) =
             objectMapper.readValue<Array<PositionDBModel>>(json)

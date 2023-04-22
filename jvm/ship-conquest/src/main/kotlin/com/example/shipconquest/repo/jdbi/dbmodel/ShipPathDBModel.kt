@@ -1,10 +1,12 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
+import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.ShipPath
+import com.example.shipconquest.service.buildBeziers
 import java.time.Duration
 import java.time.LocalDateTime
 
-data class ShipPathDBModel(val landmarks: Array<CubicBezierDBModel>, val startTime: LocalDateTime, val duration: Duration) {
+data class ShipPathDBModel(val landmarks: Array<PositionDBModel>, val startTime: LocalDateTime, val duration: Duration) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -27,9 +29,4 @@ data class ShipPathDBModel(val landmarks: Array<CubicBezierDBModel>, val startTi
 }
 
 fun ShipPathDBModel.toShipPath(): ShipPath =
-    ShipPath(landmarks = landmarks.toCubicBezierList(), startTime = startTime, duration = duration)
-
-fun ShipPath.toShipPathBDModel(): ShipPathDBModel =
-    ShipPathDBModel(landmarks = landmarks.map {
-        CubicBezierDBModel(it.p0, it.p1, it.p2, it.p3)
-    }.toTypedArray(), startTime, duration)
+    ShipPath(landmarks = buildBeziers(landmarks.map { Vector2(it.x, it.y) }), startTime = startTime, duration = duration)
