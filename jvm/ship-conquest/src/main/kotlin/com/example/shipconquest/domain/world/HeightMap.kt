@@ -19,12 +19,10 @@ fun HeightMap.pulse(origin: Vector2, radius: Int): List<Vector3>  {
 
                if (radius / distance >= .95) {
                    val pos = origin + Vector2(x, y)
-                   val z = data[pos]
+                   val z = data[pos] ?: 0
 
-                   if (z != null) {
-                       // add vector3 containing height coordinates to list
-                       add(element = Vector3(x = pos.x, y = pos.y, z = z))
-                   }
+                   // add vector3 containing height coordinates to list
+                   add(element = Vector3(x = pos.x, y = pos.y, z = z))
                }
            }
         }

@@ -229,11 +229,9 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         fun serializePosition(position: Vector2): String =
             objectMapper.writeValueAsString(position.toPositionDBModel())
 
-        fun deserializePosition(json: String?): PositionDBModel? {
-            if(json != null) {
-                return objectMapper.readValue<PositionDBModel>(json)
-            } else return null
-        }
+        fun deserializePosition(json: String): PositionDBModel =
+            objectMapper.readValue<PositionDBModel>(json)
+
         fun serializePositionList(position: List<Vector2>): String =
             objectMapper.writeValueAsString(position.map { PositionDBModel(it.x, it.y) })
 

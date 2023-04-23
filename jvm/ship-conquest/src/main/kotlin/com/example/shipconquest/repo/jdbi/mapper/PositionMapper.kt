@@ -10,6 +10,8 @@ import java.sql.ResultSet
 class PositionMapper: ColumnMapper<PositionDBModel> {
     override fun map(r: ResultSet, columnNumber: Int, ctx: StatementContext?): PositionDBModel? {
         val obj = r.getObject(columnNumber, PGobject::class.java)
-        return GameRepositoryJDBI.deserializePosition(obj.value)
+        val value = obj.value;
+        return if (value != null) GameRepositoryJDBI.deserializePosition(value)
+        else null
     }
 }

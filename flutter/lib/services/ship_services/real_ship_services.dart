@@ -25,8 +25,8 @@ import 'package:http/http.dart' as http;
 import '../../domain/tile/tile_list.dart';
 import '../input_models/ship_path_input_model.dart';
 
-const baseUri = "a8da-2001-8a0-6e2e-ba00-78d8-5bc8-dadc-3e33.ngrok-free.app";
-const lobbyId = "eIquTH";
+const baseUri = "e239-46-189-174-32.ngrok-free.app";
+const lobbyId = "018UtX";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;

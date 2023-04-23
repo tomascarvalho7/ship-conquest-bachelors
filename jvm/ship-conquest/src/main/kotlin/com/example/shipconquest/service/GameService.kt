@@ -7,6 +7,7 @@ import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.world.Horizon
+import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 //take these out of here
@@ -62,19 +64,26 @@ class GameService(
                 }) {
                 transaction.gameRepo.addVisitedPoint(tag, googleId, coord)
             }
-            val game = transaction.gameRepo.get(tag = tag)
 
             val islands = transaction.islandRepo.getAll(tag = tag)
             val nearIslands = getNearIslands(coordinate = coord, islands = islands)
 
-            if (game != null) right(
-                value = Horizon(
-                    tiles = game.map.pulse(origin = coord, radius = viewDistance),
-                    islands = nearIslands.map { island -> island.coordinate }
+            val game = transaction.gameRepo.get(tag = tag) // TODO: can be optimized
+            if (game != null) {
+                right(
+                    value = Horizon(
+                        tiles = game.inspectIslands(nearIslands),
+                        islands = nearIslands.map { island -> island.coordinate }
+                    )
                 )
-            )
+            }
             else left(GetChunksError.GameNotFound)
         }
+    }
+
+    fun Game.inspectIslands(nearIslands: List<Island>) = buildList {
+        for(island in nearIslands)
+            addAll(map.pulse(origin = island.coordinate, radius = (island.radius / 1.25).roundToInt()))
     }
 
     fun getMinimap(tag: String, uid: String): GetMinimapResult {

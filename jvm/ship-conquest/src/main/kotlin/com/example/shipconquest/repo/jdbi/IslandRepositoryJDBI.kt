@@ -33,7 +33,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-               select * from dbo.Game where tag = :tag
+               select * from dbo.Island where tag = :tag
             """
         )
             .bind("tag", tag)

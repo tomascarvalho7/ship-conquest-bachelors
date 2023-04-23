@@ -5,4 +5,4 @@ import com.example.shipconquest.domain.distanceTo
 
 fun getNearIslands(coordinate: Vector2, islands: List<Island>) =
     islands
-        .filter { island -> coordinate.distanceTo(island.coordinate) <= island.radius * 2 }
+        .filter { island -> coordinate.distanceTo(island.coordinate) <= island.radius / 1.5 }

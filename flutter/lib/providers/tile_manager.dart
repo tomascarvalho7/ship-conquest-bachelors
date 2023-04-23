@@ -42,12 +42,11 @@ class TileManager with ChangeNotifier {
     _newTiles = Sequence(data: []);
     _newTilesMap.clear();
 
-    // generate placeholder water tiles
-    _generateWaterTiles(coord);
     // fetch terrain tiles
     await _fetchTerrainTiles(coord, services);
+    // generate placeholder water tiles if no tiles were found
+    if (_newTiles.length == 0) _generateWaterTiles(coord);
     notifyListeners();
-    return;
   }
 
   void _generateWaterTiles(Coord2D origin) {
@@ -67,8 +66,8 @@ class TileManager with ChangeNotifier {
     TileList newChunk = await services.getNewChunk(chunkSize, coordinate);
     // update fetched tiles from existing ones
     for(var tile in newChunk.tiles) {
-      int? index = _newTilesMap[Coord2D(x: tile.x, y: tile.y)];
-      if(index != null) _newTiles = _newTiles.replace(index, tile);
+      _newTilesMap.putIfAbsent(Coord2D(x: tile.x, y: tile.y), () => _newTiles.length);
+      _newTiles = _newTiles.put(tile);
     }
   }
 
