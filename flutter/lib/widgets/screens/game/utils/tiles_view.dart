@@ -61,12 +61,14 @@ class _TilesViewState extends State<TilesView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) =>
-      CustomPaint(
-          painter: IsometricPainter(
+      RepaintBoundary(
+        child: CustomPaint(
+            painter: IsometricPainter(
               tileSize: tileSize,
               waveAnim: widget.animation,
               fadeAnim: animation,
               tilesOrder: widget.isoTiles,
-          )
+            )
+        )
       );
 }

@@ -1,18 +1,17 @@
 package com.example.shipconquest.service
 
-import com.example.shipconquest.controller.model.output.PositionOutputModel
+import com.example.shipconquest.controller.model.output.Vector2OutputModel
 import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
-import com.example.shipconquest.controller.model.output.ShipPathOutputModel
 import com.example.shipconquest.domain.*
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
+import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
-import com.example.shipconquest.repo.jdbi.dbmodel.PositionDBModel
 import com.example.shipconquest.repo.jdbi.dbmodel.toShipPath
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
@@ -28,7 +27,7 @@ import kotlin.math.roundToLong
 
 //take these out of here
 const val chunkSize = 20.0
-const val viewDistance = 15
+const val viewDistance = 10
 
 @Service
 class GameService(
@@ -65,15 +64,15 @@ class GameService(
                 transaction.gameRepo.addVisitedPoint(tag, googleId, coord)
             }
 
-            val islands = transaction.islandRepo.getAll(tag = tag)
-            val nearIslands = getNearIslands(coordinate = coord, islands = islands)
-
             val game = transaction.gameRepo.get(tag = tag) // TODO: can be optimized
             if (game != null) {
+                val islands = transaction.islandRepo.getAll(tag = tag)
+                val nearIslands = getNearIslands(coordinate = coord, islands = islands)
+
                 right(
                     value = Horizon(
                         tiles = game.inspectIslands(nearIslands),
-                        islands = nearIslands.map { island -> island.coordinate }
+                        islands = nearIslands
                     )
                 )
             }
@@ -83,7 +82,21 @@ class GameService(
 
     fun Game.inspectIslands(nearIslands: List<Island>) = buildList {
         for(island in nearIslands)
-            addAll(map.pulse(origin = island.coordinate, radius = (island.radius / 1.25).roundToInt()))
+            addAll(map.pulse(
+                origin = island.coordinate,
+                radius = (island.radius / 1.8).roundToInt(),
+                water = true
+            ))
+    }
+
+    fun getPlayerStats(tag: String, uid: String): GetPlayerStatsResult {
+        return transactionManager.run { transaction ->
+            val lobby = transaction.lobbyRepo.get(tag = tag) ?: return@run left(GetPlayerStatsError.GameNotFound)
+            val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
+                ?: return@run left(GetPlayerStatsError.StatisticsNotFound)
+
+            return@run right(value = playerStatistics)
+        }
     }
 
     fun getMinimap(tag: String, uid: String): GetMinimapResult {
@@ -92,7 +105,7 @@ class GameService(
             val game = transaction.gameRepo.get(tag) ?: return@run left(GetMinimapError.GameNotFound)
 
             val pointList = visitedPoints?.flatMap { point ->
-                val pulseResult = game.map.pulse(origin = point, radius = viewDistance)
+                val pulseResult = game.map.pulse(origin = point, radius = viewDistance, water = false)
                 pulseResult + Vector3(point.x, point.y, 0)
             }?.distinct()
                 ?: emptyList()
@@ -139,14 +152,14 @@ class GameService(
             if (position != null) {
                 right(
                     ShipLocationOutputModel(
-                        listOf(PositionOutputModel(position.x, position.y)),
+                        listOf(Vector2OutputModel(position.x, position.y)),
                         null,
                         null)
                 )
             } else if (path != null) {
                 right(
                     ShipLocationOutputModel(
-                        path.landmarks.map { PositionOutputModel(it.x, it.y) },
+                        path.landmarks.map { Vector2OutputModel(it.x, it.y) },
                         path.startTime.toString(),
                         formatDuration(path.duration)
                     )
@@ -154,6 +167,29 @@ class GameService(
             } else {
                 left(GetShipLocationError.ShipNotFound)
             }
+        }
+    }
+
+    fun conquestIsland(tag: String, uid: String, shipId: String, islandId: Int): ConquestIslandResult {
+        return transactionManager.run { transaction ->
+            val game = transaction.gameRepo.get(tag = tag)
+                ?: return@run left(ConquestIslandError.GameNotFound)
+            val island = transaction.islandRepo.get(tag = tag, islandId = islandId)
+                ?: return@run left(ConquestIslandError.IslandNotFound)
+            // TODO: update with canSightIsland
+            if (false) return@run left(ConquestIslandError.ShipTooFarAway)
+
+            val income = 25
+            transaction.islandRepo.addOwnerToIsland(tag, uid, income, island)
+            return@run right(
+                OwnedIsland(
+                    islandId = island.islandId,
+                    coordinate = island.coordinate,
+                    radius = island.radius,
+                    uid = uid,
+                    incomePerHour = income
+                )
+            )
         }
     }
 

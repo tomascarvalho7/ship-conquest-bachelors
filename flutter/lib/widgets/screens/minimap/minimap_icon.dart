@@ -6,13 +6,9 @@ class MinimapIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      top: 40,
-      child: FloatingActionButton(
+    return FloatingActionButton(
         onPressed: onClick,
         child: const SizedBox(width: 50, height: 50,)
-      )
     );
   }
 }

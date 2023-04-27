@@ -35,7 +35,10 @@ class MinimapEvent {
 
   void saveGameData() {
     state.updateGameData(
-      GameData(minimap: minimap.minimap, ships: shipManager.ships)
+      GameData(
+          minimap: minimap.minimap,
+          ships: shipManager.ships
+      )
     );
   }
 

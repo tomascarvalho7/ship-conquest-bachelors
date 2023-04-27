@@ -77,3 +77,13 @@ CREATE TABLE dbo.Island
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );
+
+CREATE TABLE dbo.PlayerStatistics(
+    tag varchar(6) NOT NULL,
+    uid varchar(30) NOT NULL,
+    currency INT NOT NULL,
+    maxCurrency INT NOT NULL,
+    PRIMARY KEY (tag, uid),
+    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
+    FOREIGN KEY (uid) REFERENCES dbo.User(id)
+)

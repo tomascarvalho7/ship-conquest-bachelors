@@ -21,6 +21,7 @@ class CameraControl extends StatelessWidget {
               Consumer<Camera>(
                 builder: (_, camera, __) =>
                     GestureDetector(
+                        onTapDown: (details) => onTap(camera, details, constraints),
                         onScaleStart: (details) => onStart(camera, details, constraints),
                         onScaleUpdate: (details) => onUpdate(camera, details),
                         onScaleEnd: onEnd,
@@ -44,6 +45,10 @@ class CameraControl extends StatelessWidget {
                     ),
               )
       );
+
+  void onTap(Camera camera, TapDownDetails details, BoxConstraints constraints) {
+    // do nothing
+  }
 
   void onStart(Camera camera, ScaleStartDetails details, BoxConstraints constraints) {
     camera.onStart();

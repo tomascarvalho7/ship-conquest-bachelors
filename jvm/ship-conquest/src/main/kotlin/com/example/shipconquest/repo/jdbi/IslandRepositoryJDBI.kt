@@ -57,9 +57,8 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
             .execute()
     }
 
-    override fun addOwnerToIsland(tag: String, islandId: Int, island: OwnedIsland) {
-        logger.info("User now owns the island with id = {} on game with tag = {}", islandId, tag)
-
+    override fun addOwnerToIsland(tag: String, uid: String, incomePerHour: Int, island: Island) {
+        logger.info("User now owns the island with id = {} on game with tag = {}", island.islandId, tag)
 
         handle.createUpdate(
             """
@@ -70,9 +69,9 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
             """
         )
             .bind("tag", tag)
-            .bind("id", islandId)
-            .bind("incomePerHour", island.incomePerHour)
-            .bind("uid", island.uid)
+            .bind("id", island.islandId)
+            .bind("incomePerHour", incomePerHour)
+            .bind("uid", uid)
             .execute()
     }
 }

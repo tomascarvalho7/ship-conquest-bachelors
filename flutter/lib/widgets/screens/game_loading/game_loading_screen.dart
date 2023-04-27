@@ -8,6 +8,7 @@ import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/ship/static_ship.dart';
 import 'package:ship_conquest/domain/space/position.dart';
+import 'package:ship_conquest/domain/space/sequence.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
@@ -33,6 +34,7 @@ class GameLoadingScreen extends StatelessWidget {
   Future<void> fetchGameData(ShipServices services, GlobalState globalState) async {
     final minimap = await services.getMinimap(globalState.colorGradient);
     final result = await services.getMainShipLocation();
+    final statistics = await services.getPlayerStatistics();
 
     late Ship ship;
     if(result is Position) {
@@ -44,8 +46,9 @@ class GameLoadingScreen extends StatelessWidget {
     globalState.updateGameData(
         GameData(
             minimap: minimap,
-            ships: [ship]
+            ships: Sequence(data: [ship])
         )
     );
+    globalState.updatePlayerStats(statistics);
   }
 }

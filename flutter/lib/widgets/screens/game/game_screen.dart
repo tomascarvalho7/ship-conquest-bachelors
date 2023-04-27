@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/game_data.dart';
+import 'package:ship_conquest/domain/stats/player_stats.dart';
+import 'package:ship_conquest/providers/statistics_state.dart';
 
 import '../../../domain/color/color_gradient.dart';
 import '../../../domain/color/color_mark.dart';
@@ -16,7 +18,8 @@ import 'game.dart';
 
 class GameScreen extends StatelessWidget {
   final GameData data;
-  const GameScreen({Key? key, required this.data}) : super(key: key);
+  final PlayerStats stats;
+  const GameScreen({Key? key, required this.data, required this.stats}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +28,8 @@ class GameScreen extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => Camera()),
           ChangeNotifierProvider(create: (_) => TileManager(chunkSize: chunkSize, tileSize: tileSize)),
           ChangeNotifierProvider(create: (_) => MinimapProvider(minimap: data.minimap)),
-          ChangeNotifierProvider(create: (_) => ShipManager(ships: data.ships))
+          ChangeNotifierProvider(create: (_) => ShipManager(ships: data.ships)),
+          ChangeNotifierProvider(create: (_) => StatisticsState(statistics: stats))
         ],
         child: Game(
             background: Colors.blueGrey,

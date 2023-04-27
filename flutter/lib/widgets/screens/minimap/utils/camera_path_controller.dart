@@ -6,9 +6,9 @@ import 'package:ship_conquest/domain/space/offset.dart';
 import 'package:ship_conquest/widgets/miscellaneous/camera_control.dart';
 import 'package:ship_conquest/widgets/screens/minimap/events/minimap_event.dart';
 
-import '../../../domain/space/position.dart';
-import '../../../providers/camera.dart';
-import '../../../providers/route_manager.dart';
+import '../../../../domain/space/position.dart';
+import '../../../../providers/camera.dart';
+import '../../../../providers/route_manager.dart';
 
 class CameraPathController extends CameraControl {
   final List<Position> nodes;

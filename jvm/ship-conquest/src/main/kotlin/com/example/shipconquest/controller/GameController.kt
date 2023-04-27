@@ -2,6 +2,7 @@ package com.example.shipconquest.controller
 
 import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
+import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.*
 import com.example.shipconquest.domain.user.User
@@ -24,9 +25,44 @@ class GameController(val service: GameService) {
             is Either.Left -> when (result.value) {
                 GetChunksError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
-
                 GetChunksError.ShipPositionNotFound ->
                     Problem.response(status = 404, problem = Problem.shipPositionNotFound())
+            }
+        }
+    }
+
+    @GetMapping("/{tag}/stats")
+    fun getStatistics(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        val result = service.getPlayerStats(tag = tag, uid = user.id)
+
+        return when (result) {
+            is Either.Right -> response(content = result.value.toPlayerStatsOutputModel())
+            is Either.Left -> when(result.value) {
+                GetPlayerStatsError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+                GetPlayerStatsError.StatisticsNotFound ->
+                    Problem.response(status = 404, problem = Problem.statisticsNotFound())
+            }
+        }
+    }
+
+    @PostMapping("/{tag}/conquest")
+    fun conquest(user: User, @PathVariable tag: String, @RequestBody input: ConquestInputModel): ResponseEntity<*> {
+        val result = service.conquestIsland(tag, user.id, input.shipId, input.islandId);
+
+        return when(result) {
+            is Either.Right -> response(content = result.value.toOwnedIslandOutputModel())
+            is Either.Left -> when (result.value) {
+                ConquestIslandError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+                ConquestIslandError.ShipNotFound ->
+                    Problem.response(status = 404, problem = Problem.shipNotFound())
+                ConquestIslandError.IslandNotFound ->
+                    Problem.response(status = 404, problem = Problem.islandNotFound())
+                ConquestIslandError.NotEnoughCurrency ->
+                    Problem.response(status = 400, problem = Problem.notEnoughCurrency())
+                ConquestIslandError.ShipTooFarAway ->
+                    Problem.response(status = 400, problem = Problem.shipTooFarAway())
             }
         }
     }
@@ -45,7 +81,6 @@ class GameController(val service: GameService) {
             is Either.Left -> when (result.value) {
                 GetMinimapError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
-
                 GetMinimapError.NoTrackedRecord ->
                     Problem.response(status = 400, problem = Problem.noTrackedRecord())
             }

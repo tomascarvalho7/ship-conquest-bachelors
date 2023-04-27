@@ -57,6 +57,26 @@ data class Problem(val title: String, val detail: String) {
             title = "Ship not found",
             detail = "The ship you looked for was not found."
         )
+
+        fun islandNotFound() = Problem(
+            title = "Island not found",
+            detail = "The island you provided was not found."
+        )
+
+        fun shipTooFarAway() = Problem(
+            title = "Ship too far away for action",
+            detail = "The ship you provided is too far away to perform this action."
+        )
+
+        fun notEnoughCurrency() = Problem(
+            title = "Not enough currency",
+            detail = "You do not have enough currency to perform this action."
+        )
+
+        fun statisticsNotFound() = Problem(
+            title = "Player Statistics not found",
+            detail = "This player statistics were not found."
+        )
     }
 }
 

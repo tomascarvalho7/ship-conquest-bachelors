@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
+import 'package:ship_conquest/domain/ship/static_ship.dart';
 import 'package:ship_conquest/domain/space/position.dart';
+import 'package:ship_conquest/domain/space/sequence.dart';
 import '../domain/ship/dynamic_ship.dart';
 import '../domain/ship/ship.dart';
 
@@ -9,21 +11,41 @@ import '../domain/ship/ship.dart';
 /// IMPORTANT: The number of ships must be always greater than 1
 ///
 class ShipManager with ChangeNotifier {
-  final List<Ship> ships;
+  Sequence<Ship> ships;
   // constructor
   ShipManager({required this.ships});
 
-  Ship getMainShip() => ships[0];
+  Ship getMainShip() => ships.get(0);
 
-  void setSail(int sId, ShipPath path) {
-    ships[sId] = DynamicShip(path: path);
+  void setSail(int sid, ShipPath path) {
+    ships = ships.replace(sid, DynamicShip(path: path));
     notifyListeners();
   }
 
-  List<Position> getShipPositions(double scale) {
-    return ships.map((e) => e.getPosition(scale)).toList();
+  List<Position> getShipPositions(double scale) =>
+      ships.map((e) => e.getPosition(scale)).data;
+
+  List<T> buildListFromShips<T>(T Function(Ship ship) block) {
+    updateFleetStatus();
+
+    return List.generate(
+        ships.length,
+            (index) => block(ships.get(index))
+    );
   }
 
-  List<T> buildListFromShips<T>(T Function(Ship ship) block) =>
-    List.generate(ships.length, (index) => block(ships[index]));
+  void updateFleetStatus() {
+    ships = ships.map((ship) => _updateShipStatus(ship));
+  }
+
+  Ship _updateShipStatus(Ship ship) {
+    if (ship is DynamicShip && ship.path.hasReachedDestiny()) {
+      return StaticShip(
+          position: ship.path.getPositionFromTime(),
+          orientation: ship.getOrientation()
+      );
+    }
+
+    return ship;
+  }
 }

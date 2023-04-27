@@ -24,8 +24,10 @@ class MyApp extends StatelessWidget {
 
   final ColorRamp colorRamp = ColorRamp(colors: [
     ColorMark(factor: Factor(0.0), color: waterColor),
-    ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(196, 195, 175, 1.0)),
-    ColorMark(factor: Factor(0.1), color: const Color.fromRGBO(210, 202, 151, 1.0)),
+    ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(
+        196, 190, 175, 1.0)),
+    ColorMark(factor: Factor(0.1), color: const Color.fromRGBO(
+        211, 168, 119, 1.0)),
     ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(116, 153, 72, 1.0)),
     ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 1.0)),
     ColorMark(factor: Factor(0.7), color: const Color.fromRGBO(177, 211, 114, 1.0)),
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
         providers: [
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider<UserStorage, ShipServices>(
-              update: (_, userStorage, __) => RealShipServices(userStorage: userStorage)
+              update: (_, userStorage, __) => FakeShipServices(userStorage: userStorage)
           ),
           Provider(create: (_) => GlobalState(
               colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))

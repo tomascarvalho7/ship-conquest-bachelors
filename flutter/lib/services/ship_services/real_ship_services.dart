@@ -4,17 +4,18 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/island/island.dart';
+import 'package:ship_conquest/domain/island/owned_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/position.dart';
-import 'package:ship_conquest/domain/space/coordinate.dart';
+import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/build_bezier.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
-import 'package:ship_conquest/services/input_models/chunk_input_model.dart';
-import 'package:ship_conquest/services/input_models/coord_2d_input_model.dart';
-import 'package:ship_conquest/services/input_models/cubic_bezier_input_model.dart';
+import 'package:ship_conquest/services/input_models/horizon_input_model.dart';
+import 'package:ship_conquest/services/input_models/island_input_model.dart';
 import 'package:ship_conquest/services/input_models/minimap_input_model.dart';
 import 'package:ship_conquest/services/input_models/ship_path_time_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
@@ -22,10 +23,11 @@ import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart'
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-import '../../domain/tile/tile_list.dart';
+import '../../domain/horizon.dart';
+import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship_path_input_model.dart';
 
-const baseUri = "e239-46-189-174-32.ngrok-free.app";
+const baseUri = "8503-46-189-211-105.ngrok-free.app";
 const lobbyId = "018UtX";
 
 class RealShipServices extends ShipServices {
@@ -34,23 +36,18 @@ class RealShipServices extends ShipServices {
   RealShipServices({required this.userStorage});
 
   @override
-  Future<TileList> getNewChunk(int chunkSize, Coord2D coordinates) async {
+  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates) async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
-
 
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/view", {'shipId': '1'}), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
-
     if (response.statusCode == 200) {
-      final res = ChunkInputModel.fromJson(jsonDecode(response.body));
-      final resTiles = res.tiles.map((e) {
-        return Coordinate(x: e.x, y: e.y, z: e.z);
-      }).toList();
-
-      return TileList(tiles: resTiles);
+      return HorizonInputModel
+          .fromJson(jsonDecode(response.body))
+          .toHorizon();
     } else {
       throw Exception("error fetching a new chunk");
     }
@@ -97,8 +94,8 @@ class RealShipServices extends ShipServices {
           .where((point) => point.z == 0)
           .map((coord) => Coord2D(x: coord.x, y: coord.y))
           .toList();
-
-      return addWaterPath(minimap, colorGradient, visitedPoints, 15);
+      // addWaterPath(minimap, colorGradient, visitedPoints, 15);
+      return minimap;
     } else {
       throw Exception("error fetching minimap");
     }
@@ -163,6 +160,53 @@ class RealShipServices extends ShipServices {
       return null;
     } else {
       throw Exception("error navigating with ship");
+    }
+  }
+
+  @override
+  Future<Island> conquestIsland(int sId, int islandId) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.post(
+        Uri.https(baseUri, "$lobbyId/conquest"),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode({
+          'shipId': sId,
+          'islandId': islandId
+        })
+    );
+
+    if (response.statusCode == 200) {
+      return IslandInputModel
+          .fromJson(jsonDecode(response.body))
+          .toIsland();
+    } else {
+      throw Exception("error conquesting island");
+    }
+  }
+
+  @override
+  Future<PlayerStats> getPlayerStatistics() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "$lobbyId/stats"),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      return PlayerStatsInputModel
+          .fromJson(jsonDecode(response.body))
+          .toPlayerStats();
+    } else {
+      throw Exception("error getting player statistics");
     }
   }
 }

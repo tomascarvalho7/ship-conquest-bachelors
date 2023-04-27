@@ -52,4 +52,6 @@ class ShipPath {
   }
 
   Duration getCurrentDuration() => endTime.difference(DateTime.now());
+
+  bool hasReachedDestiny() => endTime.isBefore(DateTime.now());
 }

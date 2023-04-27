@@ -19,4 +19,5 @@ class Coord2D {
 
   @override
   String toString() => 'x = $x, y = $y';
+  Position toPosition() => Position(x: x.toDouble(), y: y.toDouble());
 }

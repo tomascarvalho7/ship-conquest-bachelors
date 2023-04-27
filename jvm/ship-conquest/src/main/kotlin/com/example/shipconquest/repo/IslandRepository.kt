@@ -11,5 +11,5 @@ interface IslandRepository {
     fun get(tag: String, islandId: Int): Island?
     fun getAll(tag: String): List<Island>
     fun create(tag: String, island: WildIsland)
-    fun addOwnerToIsland(tag: String, islandId: Int, island: OwnedIsland)
+    fun addOwnerToIsland(tag: String, uid: String, incomePerHour: Int, island: Island)
 }

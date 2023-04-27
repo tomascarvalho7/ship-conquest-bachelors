@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/providers/global_state.dart';
+import 'package:ship_conquest/providers/statistics_state.dart';
 import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
@@ -42,6 +44,7 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
       tileManager: context.read<TileManager>(),
       shipManager: context.read<ShipManager>(),
       minimapProvider: context.read<MinimapProvider>(),
+      statisticsState: context.read<StatisticsState>(),
       services: context.read<ShipServices>(),
       colorGradient: widget.colorGradient,
     );
@@ -68,6 +71,8 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
         )
     );
   }
+
+
 
 }
 

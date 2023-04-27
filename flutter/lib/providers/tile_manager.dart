@@ -7,9 +7,10 @@ import 'package:ship_conquest/domain/space/sequence.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
+import '../domain/island/island.dart';
 import '../domain/space/coordinate.dart';
 import '../domain/space/position.dart';
-import '../domain/tile/tile_list.dart';
+import '../domain/horizon.dart';
 import '../domain/tile/tile_state.dart';
 import '../domain/tile/tiles_order.dart';
 
@@ -21,12 +22,24 @@ class TileManager with ChangeNotifier {
 
   // output
   TilesOrder<Coordinate> get tiles => _getTiles();
+  Sequence<Island> get islands => _islands;
 
   // variables
+  Sequence<Island> _islands = Sequence.empty();
   Sequence<Coordinate> _newTiles = Sequence.empty();
   Sequence<Coordinate> _oldTiles = Sequence.empty();
   final HashMap<Coord2D, int> _newTilesMap = HashMap();
   HashMap<Coord2D, int> _oldTilesMap = HashMap();
+
+  void updateIsland(Island island) {
+    for(var index = 0; index < _islands.length; index++) {
+      final curIsland = _islands.get(index);
+      // update island with same index
+      if (curIsland.id == island.id) _islands = _islands.replace(index, island);
+    }
+    // update widgets
+    notifyListeners();
+  }
 
   Future<Sequence<Coordinate>> lookForTiles(Position position, ShipServices services) async {
     await _updateTiles(Coord2D(x: position.x.round(), y: position.y.round()), services);
@@ -39,13 +52,14 @@ class TileManager with ChangeNotifier {
     _oldTiles = _newTiles;
     _oldTilesMap = HashMap.from(_newTilesMap);
     // clear new tiles
-    _newTiles = Sequence(data: []);
+    _newTiles = Sequence.empty();
     _newTilesMap.clear();
+    _islands = Sequence.empty();
 
     // fetch terrain tiles
     await _fetchTerrainTiles(coord, services);
-    // generate placeholder water tiles if no tiles were found
-    if (_newTiles.length == 0) _generateWaterTiles(coord);
+    // generate placeholder water tiles
+    _generateWaterTiles(coord);
     notifyListeners();
   }
 
@@ -55,24 +69,38 @@ class TileManager with ChangeNotifier {
           block: (coord) {
             final x = origin.x + coord.x;
             final y = origin.y + coord.y;
-            _newTilesMap.putIfAbsent(Coord2D(x: x, y: y), () => _newTiles.length);
-            _newTiles = _newTiles.put(Coordinate(x: x, y: y, z: 0));
+            final pos = Coord2D(x: x, y: y);
+            if (_newTilesMap[pos] == null) {
+              _newTilesMap[pos] = _newTiles.length;
+              _newTiles = _newTiles.put(Coordinate(x: x, y: y, z: 0));
+            }
           }
       );
   }
 
   Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services) async {
     // fetch tiles from services
-    TileList newChunk = await services.getNewChunk(chunkSize, coordinate);
+    Horizon horizon = await services.getNewChunk(chunkSize, coordinate);
     // update fetched tiles from existing ones
-    for(var tile in newChunk.tiles) {
+    for(var tile in horizon.tiles) {
       _newTilesMap.putIfAbsent(Coord2D(x: tile.x, y: tile.y), () => _newTiles.length);
       _newTiles = _newTiles.put(tile);
+    }
+    for(var island in horizon.islands) {
+      _islands = _islands.put(island);
     }
   }
 
   Sequence<Coordinate> _buildGlobalTiles() {
-    final list = [..._oldTiles.data, ..._newTiles.data];
+    final oldTiles = List<Coordinate>.empty(growable: true);
+    for(var index = 0; index < _oldTiles.length; index++) {
+      final tile = _oldTiles.get(index);
+      final coord = Coord2D(x: tile.x, y: tile.y);
+      if (_newTilesMap[coord] == null) {
+        oldTiles.add(tile);
+      }
+    }
+    final list = [...oldTiles, ..._newTiles.data];
     mergeSort(
         list,
         compare: (a, b) => (a.y - b.y) + ((a.x - b.x) / 2).round()

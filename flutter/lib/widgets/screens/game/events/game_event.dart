@@ -1,9 +1,11 @@
 import 'package:ship_conquest/domain/game_data.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/providers/ship_manager.dart';
+import 'package:ship_conquest/providers/statistics_state.dart';
 import 'package:ship_conquest/providers/tile_manager.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
+import '../../../../domain/island/island.dart';
 import '../../../../domain/isometric/isometric.dart';
 import '../../../../providers/camera.dart';
 import '../../../../providers/global_state.dart';
@@ -23,6 +25,7 @@ class GameEvent {
   final TileManager tileManager;
   final ShipManager shipManager;
   final MinimapProvider minimapProvider;
+  final StatisticsState statisticsState;
   final ShipServices services;
   final ColorGradient colorGradient;
   // constructor
@@ -32,8 +35,9 @@ class GameEvent {
     required this.tileManager,
     required this.shipManager,
     required this.minimapProvider,
+    required this.statisticsState,
     required this.services,
-    required this.colorGradient
+    required this.colorGradient,
   });
 
   // save game data
@@ -41,7 +45,7 @@ class GameEvent {
     state.updateGameData(
       GameData(
           minimap: minimapProvider.minimap,
-          ships: shipManager.ships
+          ships: shipManager.ships,
       )
     );
     state.updateCameraState(camera.coordinates, camera.scaleFactor);
@@ -72,5 +76,10 @@ class GameEvent {
               (tiles) => minimapProvider.update(tiles, colorGradient)
       );
     }
+  }
+
+  void conquestIsland(Island island) async {
+    final newIsland = await services.conquestIsland(1, island.id);
+    tileManager.updateIsland(newIsland);
   }
 }

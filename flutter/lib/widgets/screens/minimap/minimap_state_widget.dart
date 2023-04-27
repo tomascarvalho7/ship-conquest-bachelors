@@ -12,7 +12,7 @@ import '../../../providers/route_manager.dart';
 import '../../../providers/ship_manager.dart';
 import '../../../providers/tile_manager.dart';
 import '../../../services/ship_services/ship_services.dart';
-import '../../miscellaneous/path/camera_path_controller.dart';
+import 'utils/camera_path_controller.dart';
 import '../../miscellaneous/path/path_management_interface.dart';
 import '../../miscellaneous/path/path_view.dart';
 import '../../miscellaneous/path/route_view.dart';

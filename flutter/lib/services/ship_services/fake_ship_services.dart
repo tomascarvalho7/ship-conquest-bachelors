@@ -1,23 +1,55 @@
 import 'dart:collection';
+import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/island/island.dart';
+import 'package:ship_conquest/domain/island/owned_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
+import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 
 import '../../domain/space/coord_2d.dart';
-import '../../domain/tile/tile_list.dart';
+import '../../domain/horizon.dart';
 import '../../domain/utils/build_bezier.dart';
+import '../../providers/user_storage.dart';
+import '../input_models/horizon_input_model.dart';
 import 'ship_services.dart';
 
 class FakeShipServices extends ShipServices {
+  final UserStorage userStorage;
+  FakeShipServices({required this.userStorage});
+  bool _conquested = false;
+
   @override
-  Future<TileList> getNewChunk(int chunkSize, Coord2D coordinates) {
-    // return empty list, so only water tiles will be rendered
-    return Future(() => TileList(
-        tiles: List.empty()));
+  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates) async {
+    if (euclideanDistance(coordinates, Coord2D(x: 10, y: 10)) > 20) {
+      return Horizon(tiles: [], islands: []); // return empty list, so only water tiles will be rendered
+    }
+
+    final content = await rootBundle.loadString('assets/miscellaneous/fake_island.txt');
+
+    final res = HorizonInputModel
+        .fromJson(jsonDecode(content))
+        .toHorizon();
+
+    if (!_conquested) return res;
+
+    return Horizon(
+        tiles: res.tiles,
+        islands: res.islands.map((island) =>
+          OwnedIsland(
+              id: island.id,
+              coordinate: island.coordinate,
+              radius: island.radius,
+              incomePerHour: 25,
+              uid: 'FAKE-UID'
+          )
+        ).toList()
+    );
   }
 
   @override
@@ -51,7 +83,24 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<Position> getMainShipLocation() async {
-    return const Position(x: 30, y: 30);
+    return const Position(x: 22, y: 22);
+  }
+
+  @override
+  Future<Island> conquestIsland(int sId, int islandId) async {
+    _conquested = true;
+    return OwnedIsland(
+        id: sId,
+        coordinate: Coord2D(x: 10, y: 10),
+        radius: 30,
+        incomePerHour: 25,
+        uid: 'FAKE-UID'
+    );
+  }
+
+  @override
+  Future<PlayerStats> getPlayerStatistics() async {
+    return PlayerStats(currency: 125, maxCurrency: 600);
   }
 }
 

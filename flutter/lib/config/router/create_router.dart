@@ -26,8 +26,14 @@ GoRouter createRouter() =>
           ),
           GoRoute(
               path: '/game',
-              redirect: (context, _) => context.read<GlobalState>().gameData == null ? '/loading/game' : null,
-              builder: (BuildContext context, GoRouterState state) => GameScreen(data: context.read<GlobalState>().gameData!)
+              redirect: (context, _) => !context.read<GlobalState>().isPlayable ? '/loading/game' : null,
+              builder: (BuildContext context, GoRouterState state) {
+                final globalState = context.read<GlobalState>();
+                return GameScreen(
+                  data: globalState.gameData!,
+                  stats: globalState.playerStats!,
+                );
+              }
           ),
           GoRoute(
               path: '/minimap',

@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
 
 
 const val frequency = .1f
-const val seaLevel = 1
+const val seaLevel = 2
 
 class WorldGenerator(
     private val worldSize: Int
