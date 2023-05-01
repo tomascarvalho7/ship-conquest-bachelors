@@ -3,14 +3,14 @@ package com.example.shipconquest.domain.ship_navigation
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.toPosition
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 
 class ShipPath(
     val landmarks: List<CubicBezier>,
-    val startTime: LocalDateTime,
+    val startTime: Instant,
     val duration: Duration
 ) {
-    val endTime = startTime + duration
+    val endTime: Instant = startTime + duration
 
     fun getPosition(u: Double): Position {
         val index = u.toInt()
@@ -25,10 +25,10 @@ class ShipPath(
         return getPosition(percentage * landmarks.size)
     }
 
-    fun getCurrentDuration(): Duration = Duration.between(endTime, LocalDateTime.now())
+    fun getCurrentDuration(): Duration = Duration.between(endTime, Instant.now())
 
-    private fun getTimePercentage(startTime: LocalDateTime, endTime: LocalDateTime): Double {
-        val now = LocalDateTime.now()
+    private fun getTimePercentage(startTime: Instant, endTime: Instant): Double {
+        val now = Instant.now()
         val totalDuration = Duration.between(startTime, endTime).toMillis()
         val elapsedDuration = Duration.between(startTime, now).toMillis()
         return elapsedDuration.toDouble() / totalDuration.toDouble()

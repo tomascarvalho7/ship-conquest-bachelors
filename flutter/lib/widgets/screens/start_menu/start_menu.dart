@@ -29,8 +29,10 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
 
     lobbyId = await lobbyStorage.getLobbyId();
     if (lobbyId != null) {
-      lobby = await services.getLobby(lobbyId!);
-      setState(() {});
+      final lobbyRes = await services.getLobby(lobbyId!);
+      setState(() {
+        lobby = lobbyRes;
+      });
     }
   }
 

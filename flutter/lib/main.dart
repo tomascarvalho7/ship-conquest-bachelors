@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
           Provider<LobbyStorage>(create: (_) => LobbyStorage()),
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider2<UserStorage, LobbyStorage, ShipServices>(
-              update: (_, userStorage, lobbyStorage, __) => FakeShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
+              update: (_, userStorage, lobbyStorage, __) => RealShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
           ),
           Provider(create: (_) => GlobalState(
               colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))

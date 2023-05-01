@@ -2,16 +2,21 @@ package com.example.shipconquest.repo.jdbi.dbmodel
 
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.ShipPath
-import com.example.shipconquest.repo.jdbi.DurationDeserializer
-import com.example.shipconquest.repo.jdbi.LocalDateTimeDeserializer
+import com.example.shipconquest.repo.jdbi.serialization.DurationDeserializer
+import com.example.shipconquest.repo.jdbi.serialization.DurationSerializer
+import com.example.shipconquest.repo.jdbi.serialization.InstantDeserializer
+import com.example.shipconquest.repo.jdbi.serialization.InstantSerializer
 import com.example.shipconquest.service.buildBeziers
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class ShipPositionDBModel(
     val points: Array<PositionDBModel>,
-    @JsonDeserialize(using = LocalDateTimeDeserializer::class) val startTime: LocalDateTime?,
+    @JsonSerialize(using = InstantSerializer::class)
+    @JsonDeserialize(using = InstantDeserializer::class) val startTime: Instant?,
+    @JsonSerialize(using = DurationSerializer::class)
     @JsonDeserialize(using = DurationDeserializer::class) val duration: Duration?
 ) {
     override fun equals(other: Any?): Boolean {

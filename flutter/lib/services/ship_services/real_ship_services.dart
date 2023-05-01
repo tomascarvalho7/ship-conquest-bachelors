@@ -35,7 +35,7 @@ import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship_path_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "6d98-2001-8a0-6e2e-ba00-d039-37c0-e244-5c2b.ngrok-free.app";
+const baseUri = "a3a3-2001-8a0-6e2e-ba00-b851-7569-b2bf-dd60.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;

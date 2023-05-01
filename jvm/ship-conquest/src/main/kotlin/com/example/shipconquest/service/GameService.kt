@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -118,7 +118,7 @@ class GameService(
     }
 
     fun navigate(tag: String, uid: String, shipId: String, points: List<Vector2>): NavigationResult {
-        val startTime = LocalDateTime.now()
+        val startTime = Instant.now()
         var distance = 0.0;
         for (i in 0 until points.size - 1) {
             val a = points[i];

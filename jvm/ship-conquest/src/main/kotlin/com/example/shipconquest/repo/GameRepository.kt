@@ -5,7 +5,7 @@ import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.repo.jdbi.dbmodel.ShipPositionDBModel
 import org.slf4j.Logger
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 
 interface GameRepository {
     val logger: Logger
@@ -20,7 +20,7 @@ interface GameRepository {
         tag: String,
         uid: String,
         points: List<Vector2>,
-        startTime: LocalDateTime?,
+        startTime: Instant?,
         duration: Duration?
     )
 
@@ -29,7 +29,7 @@ interface GameRepository {
         uid: String,
         shipId: Int,
         points: List<Vector2>,
-        startTime: LocalDateTime?,
+        startTime: Instant?,
         duration: Duration?
     )
 

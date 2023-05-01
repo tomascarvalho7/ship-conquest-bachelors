@@ -12,8 +12,6 @@ import 'package:ship_conquest/domain/space/sequence.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
-import '../../../providers/user_storage.dart';
-
 class GameLoadingScreen extends StatelessWidget {
   final String dst;
   const GameLoadingScreen({super.key, required this.dst});

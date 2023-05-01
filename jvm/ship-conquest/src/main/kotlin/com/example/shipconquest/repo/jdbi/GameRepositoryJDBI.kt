@@ -3,8 +3,6 @@ package com.example.shipconquest.repo.jdbi
 import com.example.shipconquest.domain.Game
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
-import com.example.shipconquest.domain.ship_navigation.ShipPath
-import com.example.shipconquest.domain.user.statistics.PlayerStats
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
@@ -20,7 +18,7 @@ import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.Instant
 
 class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -128,7 +126,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         tag: String,
         uid: String,
         points: List<Vector2>,
-        startTime: LocalDateTime?,
+        startTime: Instant?,
         duration: Duration?
     ) {
         logger.info("Creating a ship of user {} in lobby {}", uid, tag)
@@ -155,19 +153,18 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         uid: String,
         shipId: Int,
         points: List<Vector2>,
-        startTime: LocalDateTime?,
+        startTime: Instant?,
         duration: Duration?
     ) {
         logger.info("Updating a ship's position of user {} in lobby {}", uid, tag)
 
         handle.createUpdate(
             """
-            update dbo.Ship SET gameTag = :tag, uid = :uid, pos_info = :positionInfo WHERE shipId = :shipId);
+            update dbo.Ship SET gameTag = :tag, uid = :uid, pos_info = :positionInfo WHERE shipId = :shipId;
         """
         )
             .bind("tag", tag)
             .bind("uid", uid)
-            .bind("shipId", shipId)
             .bind(
                 "positionInfo",
                 PGobject().apply {
@@ -175,6 +172,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
                     value = serializeShipPosition(points, startTime, duration)
                 }
             )
+            .bind("shipId", shipId)
             .execute()
     }
 
@@ -257,7 +255,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         fun deserializeCubicBezierList(json:String) =
             objectMapper.readValue<Array<CubicBezierDBModel>>(json)
 
-        fun serializeShipPosition(position: List<Vector2>, startTime: LocalDateTime?, duration: Duration?): String =
+        fun serializeShipPosition(position: List<Vector2>, startTime: Instant?, duration: Duration?): String =
             objectMapper.writeValueAsString(ShipPositionDBModel(position.map { PositionDBModel(it.x, it.y) }
                 .toTypedArray(), startTime, duration))
 
