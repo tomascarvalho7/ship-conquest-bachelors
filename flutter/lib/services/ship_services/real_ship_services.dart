@@ -13,6 +13,7 @@ import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/build_bezier.dart';
+import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/services/input_models/horizon_input_model.dart';
 import 'package:ship_conquest/services/input_models/island_input_model.dart';
@@ -24,21 +25,31 @@ import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
 import '../../domain/horizon.dart';
+import '../../domain/lobby.dart';
+import '../../domain/user_info.dart';
+import '../input_models/create_lobby_input_model.dart';
+import '../input_models/join_lobby_input_model.dart';
+import '../input_models/lobby_input_model.dart';
+import '../input_models/lobby_list_input_model.dart';
 import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship_path_input_model.dart';
+import '../input_models/user_info_input_model.dart';
 
-const baseUri = "8503-46-189-211-105.ngrok-free.app";
-const lobbyId = "018UtX";
+const baseUri = "6d98-2001-8a0-6e2e-ba00-d039-37c0-e244-5c2b.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
+  final LobbyStorage lobbyStorage;
 
-  RealShipServices({required this.userStorage});
+  RealShipServices({required this.userStorage, required this.lobbyStorage});
 
   @override
   Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates) async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/view", {'shipId': '1'}), headers: {
@@ -74,6 +85,9 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+
     final response =
     await http.get(Uri.https(baseUri, "$lobbyId/minimap"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -106,6 +120,9 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+
     Map<String, dynamic> jsonBody = {
       'points': landmarks.map((coord) => Coord2DOutputModel(x: coord.x, y: coord.y).toJson()).toList(),
     };
@@ -135,6 +152,9 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/ship/location", {'shipId': '1'}),
         headers: {
@@ -161,12 +181,126 @@ class RealShipServices extends ShipServices {
     } else {
       throw Exception("error navigating with ship");
     }
+    return null;
+  }
+
+  @override
+  Future<List<Lobby>> getAllLobbies() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "lobbies"),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      final res = LobbyListInputModel.fromJson(jsonDecode(response.body));
+
+      return List.generate(res.list.length, (index) => Lobby(tag: res.list[index].tag, name: res.list[index].name));
+    } else {
+      throw Exception("error navigating with ship");
+    }
+  }
+
+  @override
+  Future<Lobby> getLobby(String tag) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "get-lobby", {'tag': tag}),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      final res = LobbyInputModel.fromJson(jsonDecode(response.body));
+      return Lobby(tag: res.tag, name: res.name);
+    } else {
+      throw Exception("error getting lobby");
+    }
+  }
+
+  @override
+  Future<String> joinLobby(String tag) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.post(
+      Uri.https(baseUri, "$tag/join"),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final res = JoinLobbyInputModel.fromJson(jsonDecode(response.body));
+
+      return res.tag;
+    } else {
+      throw Exception("error navigating with ship");
+    }
+  }
+
+  @override
+  Future<String> createLobby(String name) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    Map<String, dynamic> jsonBody = {
+      'name': name,
+    };
+
+    final response = await http.post(
+        Uri.https(baseUri, "create-lobby"),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode(jsonBody)
+    );
+
+    if (response.statusCode == 200) {
+      final res = CreateLobbyInputModel.fromJson(jsonDecode(response.body));
+
+      return res.tag;
+    } else {
+      throw Exception("error navigating with ship");
+    }
+  }
+
+  @override
+  Future<UserInfo> getPersonalInfo() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final response = await http.get(
+        Uri.https(baseUri, "userinfo"),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        }
+    );
+
+    if (response.statusCode == 200) {
+      final res = UserInfoInputModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      return UserInfo(name: res.name, email: res.email, imageUrl: res.imageUrl);
+    } else {
+      throw Exception("error getting user info");
+    }
   }
 
   @override
   Future<Island> conquestIsland(int sId, int islandId) async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http.post(
         Uri.https(baseUri, "$lobbyId/conquest"),
@@ -193,6 +327,9 @@ class RealShipServices extends ShipServices {
   Future<PlayerStats> getPlayerStatistics() async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/stats"),

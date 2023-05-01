@@ -32,7 +32,7 @@ class StatisticsRepositoryJDBI(private val handle: Handle): StatisticsRepository
 
         return handle.createQuery(
             """
-                select * from PlayerStatistics where tag = :tag and uid = :uid
+                select * from dbo.PlayerStatistics where tag = :tag and uid = :uid
             """
         )
             .bind("tag", tag)

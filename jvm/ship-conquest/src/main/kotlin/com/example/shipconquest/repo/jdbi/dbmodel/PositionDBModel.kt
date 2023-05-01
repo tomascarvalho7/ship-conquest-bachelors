@@ -8,7 +8,7 @@ fun Vector2.toPositionDBModel(): PositionDBModel {
     return PositionDBModel(x, y)
 }
 
-fun PositionDBModel.toPosition(): Vector2 {
+fun PositionDBModel.toVector2(): Vector2 {
     return Vector2(x, y)
 }
 

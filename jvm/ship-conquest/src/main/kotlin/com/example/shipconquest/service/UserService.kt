@@ -8,6 +8,8 @@ import com.example.shipconquest.left
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.right
+import com.example.shipconquest.service.result.GetUserInfoError
+import com.example.shipconquest.service.result.GetUserInfoResult
 import com.example.shipconquest.service.result.ProcessUserError
 import com.example.shipconquest.service.result.ProcessUserResult
 import org.slf4j.Logger
@@ -27,14 +29,14 @@ class UserService(
         }
     }
 
-    fun processUser(googleId: String, name: String, email: String): ProcessUserResult {
+    fun processUser(googleId: String, name: String, email: String, imageUrl: String): ProcessUserResult {
         //add verification logic, maybe check name size?
 
         return transactionManager.run { transaction ->
 
             if(!transaction.userRepo.checkUserExists(googleId)) {
                 //user doesn't exist, create one
-                transaction.userRepo.createUser(googleId, name, email)
+                transaction.userRepo.createUser(googleId, name, email, imageUrl)
             }
             val userToken = generateValidToken(googleId, transaction)
 
@@ -42,6 +44,17 @@ class UserService(
                 return@run right(userToken)
             } else {
                 return@run left(ProcessUserError.TokenCreationFailed)
+            }
+        }
+    }
+
+    fun getUserInfo(userId: String): GetUserInfoResult {
+        return transactionManager.run { transaction ->
+            val userInfo = transaction.userRepo.getUserInfo(userId)
+            if (userInfo != null) {
+                right(userInfo)
+            } else {
+                left(GetUserInfoError.UserNotFound)
             }
         }
     }

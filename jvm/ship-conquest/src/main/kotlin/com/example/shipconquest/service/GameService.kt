@@ -13,6 +13,7 @@ import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.repo.jdbi.dbmodel.toShipPath
+import com.example.shipconquest.repo.jdbi.dbmodel.toVector2
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
@@ -37,16 +38,16 @@ class GameService(
 
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val staticPosition = transaction.gameRepo.getShipStaticPosition(tag, shipId, googleId)
-            val coord: Vector2 = if (staticPosition != null) {
-                staticPosition.toPosition().toVector2()
+            val positionInfo = transaction.gameRepo.getShipPosition(tag, shipId.toInt(), googleId)
+                ?: return@run left(GetChunksError.ShipPositionNotFound)
+            val coord: Vector2 = if (positionInfo.points.size == 1) {
+                positionInfo.points[0].toVector2()
             } else {
-                val path = transaction.gameRepo.getShipPath(tag, shipId, googleId)?.toShipPath()
+                val path = positionInfo.toShipPath()
                     ?: return@run left(GetChunksError.ShipPositionNotFound)
                 val pos = path.getPositionFromTime().toVector2()
                 if (pos == path.landmarks.last().p3) {
-                    transaction.gameRepo.deleteShipEntry(tag, shipId, googleId) // vou mudar para um update depois
-                    transaction.gameRepo.createShipStaticPosition(tag, shipId, googleId, pos)
+                    transaction.gameRepo.updateShipPosition(tag, googleId, shipId.toInt(), listOf(pos), null, null)
                 }
                 pos
             }
@@ -75,18 +76,19 @@ class GameService(
                         islands = nearIslands
                     )
                 )
-            }
-            else left(GetChunksError.GameNotFound)
+            } else left(GetChunksError.GameNotFound)
         }
     }
 
     fun Game.inspectIslands(nearIslands: List<Island>) = buildList {
-        for(island in nearIslands)
-            addAll(map.pulse(
-                origin = island.coordinate,
-                radius = (island.radius / 1.8).roundToInt(),
-                water = true
-            ))
+        for (island in nearIslands)
+            addAll(
+                map.pulse(
+                    origin = island.coordinate,
+                    radius = (island.radius / 1.8).roundToInt(),
+                    water = true
+                )
+            )
     }
 
     fun getPlayerStats(tag: String, uid: String): GetPlayerStatsResult {
@@ -109,8 +111,9 @@ class GameService(
                 pulseResult + Vector3(point.x, point.y, 0)
             }?.distinct()
                 ?: emptyList()
-            if (pointList.isEmpty()) return@run left(GetMinimapError.NoTrackedRecord)
-            else right(pointList)
+            // if (pointList.isEmpty()) return@run left(GetMinimapError.NoTrackedRecord)
+            // else
+            right(pointList)
         }
     }
 
@@ -131,14 +134,12 @@ class GameService(
         }
 
         return transactionManager.run { transaction ->
-            transaction.gameRepo.deleteShipEntry(tag, shipId, uid)
-            transaction.gameRepo.createShipPath(
+            transaction.gameRepo.updateShipPosition(
                 tag,
-                shipId,
                 uid,
+                shipId.toInt(),
                 points,
-                startTime,
-                duration
+                startTime, duration
             )
             right(ShipPathTime(startTime.toString(), formattedDuration))
         }
@@ -146,22 +147,24 @@ class GameService(
 
     fun getShipLocation(tag: String, uid: String, shipId: String): GetShipLocationResult {
         return transactionManager.run { transaction ->
-            val position = transaction.gameRepo.getShipStaticPosition(tag, shipId, uid)
-            val path = transaction.gameRepo.getShipPath(tag, shipId, uid)
+            val positionInfo = transaction.gameRepo.getShipPosition(tag, shipId.toInt(), uid)
+                ?: return@run left(GetShipLocationError.ShipNotFound)
 
-            if (position != null) {
+            if (positionInfo.points.size == 1) {
+                val point = positionInfo.points.first()
                 right(
                     ShipLocationOutputModel(
-                        listOf(Vector2OutputModel(position.x, position.y)),
+                        listOf(Vector2OutputModel(point.x, point.y)),
                         null,
-                        null)
+                        null
+                    )
                 )
-            } else if (path != null) {
+            } else if (positionInfo.startTime != null && positionInfo.duration != null) {
                 right(
                     ShipLocationOutputModel(
-                        path.landmarks.map { Vector2OutputModel(it.x, it.y) },
-                        path.startTime.toString(),
-                        formatDuration(path.duration)
+                        positionInfo.points.map { Vector2OutputModel(it.x, it.y) },
+                        positionInfo.startTime.toString(),
+                        formatDuration(positionInfo.duration)
                     )
                 )
             } else {

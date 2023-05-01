@@ -14,3 +14,17 @@ sealed class CreateLobbyError {
 }
 
 typealias CreateLobbyResult = Either<CreateLobbyError, String>
+
+
+sealed class JoinLobbyError {
+    object LobbyNotFound: JoinLobbyError()
+}
+
+typealias JoinLobbyResult = Either<JoinLobbyError, String>
+
+sealed class GetAllLobbiesError {
+    object InvalidSkipParameter: GetAllLobbiesError()
+    object InvalidLimitParameter: GetAllLobbiesError()
+}
+
+typealias GetAllLobbiesResult = Either<GetAllLobbiesError, List<Lobby>>

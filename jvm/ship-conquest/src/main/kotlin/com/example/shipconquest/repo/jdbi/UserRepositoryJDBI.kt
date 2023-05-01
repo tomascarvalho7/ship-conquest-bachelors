@@ -2,7 +2,10 @@ package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.user.Token
 import com.example.shipconquest.domain.user.User
+import com.example.shipconquest.domain.user.UserInfo
 import com.example.shipconquest.repo.UserRepository
+import com.example.shipconquest.repo.jdbi.dbmodel.UserInfoDBModel
+import com.example.shipconquest.repo.jdbi.dbmodel.toUserInfo
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
@@ -21,12 +24,13 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
         return userCount != 0
     }
 
-    override fun createUser(googleId: String, name: String, email: String) {
+    override fun createUser(googleId: String, name: String, email: String, imageUrl: String) {
         logger.info("Creating a user from googleId = {}", googleId)
-        handle.createUpdate("INSERT into dbo.user values (:gid, :name, :email);")
+        handle.createUpdate("INSERT into dbo.user values (:gid, :name, :email, :imageUrl);")
             .bind("gid", googleId)
             .bind("name", name)
             .bind("email", email)
+            .bind("imageUrl", imageUrl)
             .execute()
     }
 
@@ -55,5 +59,14 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
         ).bind("token", token)
             .mapTo<User>()
             .singleOrNull()
+    }
+
+    override fun getUserInfo(userId: String): UserInfo? {
+        logger.info("Getting user info from user with id = {}", userId)
+        return handle.createQuery("SELECT name, email, imageUrl from dbo.User where id = :uid;")
+            .bind("uid", userId)
+            .mapTo<UserInfoDBModel>()
+            .singleOrNull()
+            ?.toUserInfo()
     }
 }

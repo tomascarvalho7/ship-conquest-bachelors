@@ -12,7 +12,7 @@ class InitialLoadingScreen extends StatelessWidget {
     return Consumer<UserStorage>(
         builder: (context, userStorage, _) {
           userStorage.getToken().then(
-                  (value) => value == null ? context.go("/signIn") : context.go("/game")
+                  (value) => value == null ? context.go("/signIn") : context.go("/start")
           );
 
           return const CircularProgressIndicator();

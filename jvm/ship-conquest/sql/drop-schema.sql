@@ -1,12 +1,11 @@
 DROP TABLE IF EXISTS dbo.Island;
 DROP TABLE IF EXISTS dbo.PlayerStatistics;
-
-drop table dbo.user cascade;
-drop table dbo.token cascade;
-drop table dbo.lobby cascade;
-drop table dbo.game cascade;
-drop table dbo.visitedpoints cascade;
-drop table dbo.ShipPath cascade;
-drop table dbo.ShipPosition cascade;
+DROP TABLE IF EXISTS dbo.Ship;
+DROP TABLE IF EXISTS dbo.VisitedPoints;
+DROP TABLE IF EXISTS dbo.Game;
+DROP TABLE IF EXISTS dbo.Lobby_User;
+DROP TABLE IF EXISTS dbo.Lobby;
+DROP TABLE IF EXISTS dbo.Token;
+DROP TABLE IF EXISTS dbo.User;
 
 drop schema dbo;

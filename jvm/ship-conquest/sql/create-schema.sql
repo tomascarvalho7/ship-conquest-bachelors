@@ -5,6 +5,7 @@ CREATE TABLE dbo.User
     id varchar(30) NOT NULL,
     name VARCHAR(24) NOT NULL,
     email varchar(60) CHECK(email LIKE '%@%') NOT null UNIQUE,
+    imageUrl varchar(500),
     PRIMARY KEY (id)
 );
 
@@ -40,30 +41,16 @@ CREATE TABLE dbo.VisitedPoints
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
 
-CREATE TABLE dbo.ShipPath
+CREATE TABLE dbo.Ship
 (
+    shipId serial NOT null,
     gameTag varchar(6) NOT NULL,
     uid varchar(30) NOT NULL,
-    shipId varchar(30) NOT null,
-    landmarks jsonb,
-    startTime timestamp,
-    duration interval,
+    pos_info jsonb,
     PRIMARY KEY (gameTag, uid, shipId),
     FOREIGN KEY (uid) REFERENCES dbo.User(id),
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
-
-CREATE TABLE dbo.ShipPosition
-(
-    gameTag varchar(6) NOT NULL,
-    uid varchar(30) NOT NULL,
-    shipId varchar(30) NOT null,
-    static_position jsonb,
-    PRIMARY KEY (gameTag, uid, shipId),
-    FOREIGN KEY (uid) REFERENCES dbo.User(id),
-    FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
-);
-
 CREATE TABLE dbo.Island
 (
     tag varchar(6) NOT NULL,

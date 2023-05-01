@@ -11,9 +11,12 @@ import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
+import 'package:ship_conquest/providers/lobby_storage.dart';
 
+import '../../domain/lobby.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
+import '../../domain/user_info.dart';
 import '../../domain/utils/build_bezier.dart';
 import '../../providers/user_storage.dart';
 import '../input_models/horizon_input_model.dart';
@@ -21,7 +24,8 @@ import 'ship_services.dart';
 
 class FakeShipServices extends ShipServices {
   final UserStorage userStorage;
-  FakeShipServices({required this.userStorage});
+  final LobbyStorage lobbyStorage;
+  FakeShipServices({required this.userStorage, required this.lobbyStorage});
   bool _conquested = false;
 
   @override
@@ -83,7 +87,32 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<Position> getMainShipLocation() async {
-    return const Position(x: 22, y: 22);
+    return const Position(x: 30, y: 30);
+  }
+
+  @override
+  Future<List<Lobby>> getAllLobbies() async {
+    return List<Lobby>.generate(10, (index) => Lobby(tag: "asd", name: "TestLobby"));
+  }
+
+  @override
+  Future<String> joinLobby(String tag) async {
+    return "Joined";
+  }
+
+  @override
+  Future<String> createLobby(String name) async {
+    return "Created";
+  }
+
+  @override
+  Future<Lobby> getLobby(String tag) async {
+    return Lobby(tag: "fake_tag", name: "lobby_name");
+  }
+
+  @override
+  Future<UserInfo> getPersonalInfo() async {
+    return UserInfo(name: "name", email: "email", imageUrl: "imageUrl");
   }
 
   @override

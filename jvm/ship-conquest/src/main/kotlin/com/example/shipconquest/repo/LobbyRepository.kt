@@ -8,4 +8,7 @@ interface LobbyRepository {
 
     fun get(tag: String): Lobby?
     fun createLobby(lobby: Lobby)
+    fun joinLobby(uid: String, tag: String)
+    fun checkUserInLobby(uid: String, tag: String): Boolean
+    fun getAll(skip: Int, limit: Int): List<Lobby>
 }

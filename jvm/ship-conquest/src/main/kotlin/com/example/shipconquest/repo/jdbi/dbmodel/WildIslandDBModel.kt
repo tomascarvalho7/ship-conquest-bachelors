@@ -17,12 +17,13 @@ data class IslandDBModel(
 fun IslandDBModel.toIsland(): Island {
     return if (incomePerHour != null && uid != null) {
         OwnedIsland(
+            islandId = islandId,
             coordinate = Vector2(x = x, y = y),
             radius = radius,
             incomePerHour = incomePerHour,
             uid = uid
         )
     } else {
-        WildIsland(coordinate = Vector2(x = x, y = y), radius = radius)
+        WildIsland(islandId = islandId, coordinate = Vector2(x = x, y = y), radius = radius)
     }
 }

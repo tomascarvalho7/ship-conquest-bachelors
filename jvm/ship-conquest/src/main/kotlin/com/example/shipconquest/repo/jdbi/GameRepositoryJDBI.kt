@@ -9,6 +9,7 @@ import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
 import com.example.shipconquest.repo.jdbi.mapper.PositionMapper
+import com.example.shipconquest.repo.jdbi.mapper.ShipPositionMapper
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -75,7 +76,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         )
             .bind("gameTag", tag)
             .bind("uid", uid)
-            .bindJson("point", point, ::serializePosition)
+            .bindJson("point", listOf(point), ::serializePositionList)
             .execute()
     }
 
@@ -89,7 +90,7 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         )
             .bind("gameTag", tag)
             .bind("uid", uid)
-            .bindJson("point", point, ::serializePosition)
+            .bindJson("point", listOf(point), ::serializePositionList)
             .execute()
     }
 
@@ -108,39 +109,72 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
         return count == 0
     }
 
-    override fun getShipPath(tag: String, shipId: String, uid: String): ShipPathDBModel? {
+    override fun getShipPosition(tag: String, shipId: Int, uid: String): ShipPositionDBModel? {
         logger.info("Getting ship {} path of user {} in lobby {}", shipId, uid, tag)
 
-        return handle.createQuery("""
-            select landmarks, startTime, duration from dbo.shippath where gameTag = :tag and uid = :uid and shipId = :shipId;
+        return handle.createQuery(
+            """
+            select pos_info from dbo.ship where gameTag = :tag and uid = :uid and shipId = :shipId;
             """
         )
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .mapTo<ShipPathDBModel>()
+            .map(ShipPositionMapper())
             .singleOrNull()
     }
 
-    override fun createShipPath(
+    override fun createShipPosition(
         tag: String,
-        shipId: String,
         uid: String,
-        landmarks: List<Vector2>,
-        startTime: LocalDateTime,
-        duration: Duration
+        points: List<Vector2>,
+        startTime: LocalDateTime?,
+        duration: Duration?
     ) {
-        logger.info("Creating a ship path of ship {} of user {} in lobby {}", shipId, uid, tag)
+        logger.info("Creating a ship of user {} in lobby {}", uid, tag)
 
-        handle.createUpdate("""
-            insert into dbo.ShipPath values(:tag, :uid, :shipId, :landmarks, :startTime, :duration);
-        """)
+        handle.createUpdate(
+            """
+            insert into dbo.Ship (gameTag, uid, pos_info) values(:tag, :uid, :positionInfo);
+        """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind(
+                "positionInfo",
+                PGobject().apply {
+                    type = "jsonb"
+                    value = serializeShipPosition(points, startTime, duration)
+                }
+            )
+            .execute()
+    }
+
+    override fun updateShipPosition(
+        tag: String,
+        uid: String,
+        shipId: Int,
+        points: List<Vector2>,
+        startTime: LocalDateTime?,
+        duration: Duration?
+    ) {
+        logger.info("Updating a ship's position of user {} in lobby {}", uid, tag)
+
+        handle.createUpdate(
+            """
+            update dbo.Ship SET gameTag = :tag, uid = :uid, pos_info = :positionInfo WHERE shipId = :shipId);
+        """
+        )
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .bindJson("landmarks", landmarks, ::serializePositionList)
-            .bind("startTime", startTime)
-            .bind("duration", duration)
+            .bind(
+                "positionInfo",
+                PGobject().apply {
+                    type = "jsonb"
+                    value = serializeShipPosition(points, startTime, duration)
+                }
+            )
             .execute()
     }
 
@@ -161,34 +195,6 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .execute()
-    }
-
-    override fun getShipStaticPosition(tag: String, shipId: String, uid: String): Vector2? {
-        logger.info("Getting static ship position of ship {} of user {} in lobby {}", shipId, uid, tag)
-
-        return handle.createQuery("""
-            select static_position from dbo.shipposition where gameTag = :tag and uid = :uid and shipId = :shipId;
-            """
-        )
-            .bind("tag", tag)
-            .bind("uid", uid)
-            .bind("shipId", shipId)
-            .map(PositionMapper())
-            .singleOrNull()
-            ?.toPosition()
-    }
-
-    override fun createShipStaticPosition(tag: String, shipId: String, uid: String, staticPosition: Vector2) {
-        logger.info("Creating a ship static position of ship {} of user {} in lobby {}", shipId, uid, tag)
-
-        handle.createUpdate("""
-            insert into dbo.ShipPosition values(:tag, :uid, :shipId, :static_pos);
-        """)
-            .bind("tag", tag)
-            .bind("uid", uid)
-            .bind("shipId", shipId)
-            .bindJson("static_pos", staticPosition, ::serializePosition)
             .execute()
     }
 
@@ -250,5 +256,12 @@ class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
 
         fun deserializeCubicBezierList(json:String) =
             objectMapper.readValue<Array<CubicBezierDBModel>>(json)
+
+        fun serializeShipPosition(position: List<Vector2>, startTime: LocalDateTime?, duration: Duration?): String =
+            objectMapper.writeValueAsString(ShipPositionDBModel(position.map { PositionDBModel(it.x, it.y) }
+                .toTypedArray(), startTime, duration))
+
+        fun deserializeShipPosition(json: String) =
+            objectMapper.readValue<ShipPositionDBModel>(json)
     }
 }

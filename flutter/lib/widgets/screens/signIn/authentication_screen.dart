@@ -30,7 +30,7 @@ class AuthenticationScreen extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: GoogleAuthButton(
-              onClick: () => signIn(services, userStorage).then((_) => context.go("/game"))
+              onClick: () => signIn(services, userStorage).then((_) => context.go("/start"))
             )
     );
   }

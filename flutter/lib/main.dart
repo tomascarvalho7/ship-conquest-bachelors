@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/global_state.dart';
+import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/config/router/create_router.dart';
@@ -41,9 +42,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [
+          Provider<LobbyStorage>(create: (_) => LobbyStorage()),
           Provider<UserStorage>(create: (_) => UserStorage()),
-          ProxyProvider<UserStorage, ShipServices>(
-              update: (_, userStorage, __) => FakeShipServices(userStorage: userStorage)
+          ProxyProvider2<UserStorage, LobbyStorage, ShipServices>(
+              update: (_, userStorage, lobbyStorage, __) => FakeShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
           ),
           Provider(create: (_) => GlobalState(
               colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))
