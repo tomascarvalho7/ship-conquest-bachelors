@@ -1,6 +1,6 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.Game
+import com.example.shipconquest.domain.game.Game
 
 data class GameDBModel(val tag: String, val map: HeightMapDBModel)
 

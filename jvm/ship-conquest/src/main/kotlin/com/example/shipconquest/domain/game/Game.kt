@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain
+package com.example.shipconquest.domain.game
 
 import com.example.shipconquest.domain.world.HeightMap
 

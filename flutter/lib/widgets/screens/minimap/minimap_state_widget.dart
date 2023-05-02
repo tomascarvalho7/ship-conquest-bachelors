@@ -74,6 +74,7 @@ class MinimapScreenState extends State<MinimapStateWidget> {
                           eventHandler: eventHandler,
                           nodes: shipManager.getShipPositions(eventHandler.scale),
                           child: MinimapView(
+                              gradient: eventHandler.state.colorGradient,
                               minimap: minimapProvider.minimap,
                               child: RouteView(
                                   hooks: shipManager.getShipPositions(eventHandler.scale),

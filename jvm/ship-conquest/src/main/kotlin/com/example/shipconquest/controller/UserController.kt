@@ -62,6 +62,8 @@ class UserController(val service: UserService) {
         }
     }
 
+
+
     //ta repetido em varios controllers, melhorar
     private fun <T> response(content: T) = ResponseEntity
         .status(200)

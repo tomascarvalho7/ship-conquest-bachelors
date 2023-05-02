@@ -12,7 +12,7 @@ import 'package:ship_conquest/utils/constants.dart';
 class PathBuilder {
   static List<Coord2D> build(Minimap map, Coord2D start, Coord2D mid, Coord2D end, int step, int radius, int maxIterations) {
     if (end.x >= map.length || end.y >= map.length || end.x < 0 || end.y < 0) return [];
-    if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y)?.value != waterColor.value) {
+    if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y) != 0) {
       return [];
     }
     final newNodes = HashMap<Coord2D, Node>(); // map of nodes to be evaluated

@@ -31,6 +31,14 @@ CREATE TABLE dbo.Game
   FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
 
+CREATE TABLE dbo.Lobby_User (
+  lobby_tag varchar(6),
+  uid varchar(30),
+  PRIMARY KEY (lobby_tag, uid),
+  FOREIGN KEY (uid) REFERENCES dbo.User(id),
+  FOREIGN KEY (lobby_tag) REFERENCES dbo.Lobby(tag)
+);
+
 CREATE TABLE dbo.VisitedPoints
 (
     gameTag varchar(6) NOT NULL,
@@ -51,15 +59,28 @@ CREATE TABLE dbo.Ship
     FOREIGN KEY (uid) REFERENCES dbo.User(id),
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
-CREATE TABLE dbo.Island
+
+CREATE TABLE dbo.WildIsland
 (
     tag varchar(6) NOT NULL,
     islandId INT GENERATED ALWAYS AS IDENTITY,
     x INT NOT NULL,
     y INT NOT NULL,
     radius INT NOT NULL,
-    incomePerHour INT,
-    uid varchar(30),
+    PRIMARY KEY (tag, islandId),
+    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.OwnedIsland
+(
+    tag varchar(6) NOT NULL,
+    islandId INT NOT NULL,
+    x INT NOT NULL,
+    y INT NOT NULL,
+    radius INT NOT NULL,
+    incomePerHour INT NOT NULL,
+    uid varchar(30) NOT NULL,
+    instant INT NOT NULL,
     PRIMARY KEY (tag, islandId),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
@@ -68,9 +89,8 @@ CREATE TABLE dbo.Island
 CREATE TABLE dbo.PlayerStatistics(
     tag varchar(6) NOT NULL,
     uid varchar(30) NOT NULL,
-    currency INT NOT NULL,
-    maxCurrency INT NOT NULL,
+    staticCurrency INT NOT NULL,
     PRIMARY KEY (tag, uid),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
-)
+);

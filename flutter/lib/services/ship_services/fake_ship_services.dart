@@ -65,7 +65,7 @@ class FakeShipServices extends ShipServices {
   Future<Minimap> getMinimap(ColorGradient colorGradient) async {
     return Minimap(
       length: 500,
-      pixels: HashMap() // empty map
+      data: HashMap() // empty map
     );
   }
 

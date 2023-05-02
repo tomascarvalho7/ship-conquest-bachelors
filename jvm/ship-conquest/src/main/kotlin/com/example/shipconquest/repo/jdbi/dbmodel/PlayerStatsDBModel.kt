@@ -1,8 +1,17 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.user.statistics.PlayerStats
+import com.example.shipconquest.domain.user.statistics.IslandIncome
+import com.example.shipconquest.domain.user.statistics.PlayerIncome
+import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 
-data class PlayerStatsDBModel(val tag: String, val uid: String, val currency: Int, val maxCurrency: Int)
+data class PlayerStatsDBModel(val tag: String, val uid: String, val staticCurrency: Int)
 
-fun PlayerStatsDBModel.toPlayerStats() =
-    PlayerStats(tag = tag, uid = uid, currency = currency, maxCurrency = maxCurrency)
+fun PlayerStatsDBModel.toPlayerStats(islandsIncome: List<IslandIncome>) =
+    PlayerStatsBuilder(
+        tag = tag,
+        uid = uid,
+        income = PlayerIncome(
+            staticCurrency = staticCurrency,
+            passiveIncome = islandsIncome
+        )
+    )

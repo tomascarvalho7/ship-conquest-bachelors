@@ -1,7 +1,7 @@
 package com.example.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.Game
 import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository

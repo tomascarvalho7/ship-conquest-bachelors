@@ -35,7 +35,7 @@ import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship_path_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "a3a3-2001-8a0-6e2e-ba00-b851-7569-b2bf-dd60.ngrok-free.app";
+const baseUri = "82d2-89-114-69-1.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -95,13 +95,12 @@ class RealShipServices extends ShipServices {
 
     if (response.statusCode == 200) {
       final res = MinimapInputModel.fromJson(jsonDecode(response.body));
-
-      final minimap =
-      Minimap(length: res.length, pixels: HashMap<Coord2D, Color>());
+      // TODO use .toMinimap
+      final minimap = Minimap(length: res.length, data: HashMap<Coord2D, int>());
       for (var point in res.points) {
-        if (minimap.pixels[Coord2D(x: point.x, y: point.y)] == null) {
+        if (minimap.data[Coord2D(x: point.x, y: point.y)] == null) {
           minimap.add(
-              x: point.x, y: point.y, color: colorGradient.get(point.z));
+              x: point.x, y: point.y, height: point.z);
         }
       }
       List<Coord2D> visitedPoints = res.points
@@ -332,7 +331,7 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/stats"),
+        Uri.https(baseUri, "$lobbyId/statistics"),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         }
@@ -356,7 +355,7 @@ Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
     List<Coord2D> visitedPoints, int radius) {
   List<Coord2D> points = [];
   if(visitedPoints.length == 1) {
-    return pulseAndFill(minimap, visitedPoints.first, radius, colorGradient.get(0));
+    return pulseAndFill(minimap, visitedPoints.first, radius);
   }
   for (int idx = 0; idx < visitedPoints.length; idx++) {
     final currPoint = visitedPoints[idx];
@@ -379,13 +378,13 @@ Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
         points.add(Coord2D(x: x.floor(), y: y.floor()));
       }
       minimap = fillEllipse(
-          points, minimap, colorGradient.get(0), [currPoint, nextPoint], a);
+          points, minimap, [currPoint, nextPoint], a);
     }
   }
   return minimap;
 }
 
-Minimap fillEllipse(List<Coord2D> points, Minimap minimap, Color color,
+Minimap fillEllipse(List<Coord2D> points, Minimap minimap,
     List<Coord2D> focusPoints, double major) {
   // find the ellipse's bounding box
   int minX = points.map((p) => p.x).reduce(min);
@@ -398,9 +397,9 @@ Minimap fillEllipse(List<Coord2D> points, Minimap minimap, Color color,
     for (int y = minY; y <= maxY; y++) {
       final currCoord = Coord2D(x: x, y: y);
       if (isInsideEllipse(currCoord, focusPoints, major) &&
-          minimap.pixels[currCoord] == null
+          minimap.data[currCoord] == null
       ) {
-        minimap.add(x: x, y: y, color: color);
+        minimap.add(x: x, y: y, height: 0);
       }
     }
   }
@@ -414,7 +413,7 @@ bool isInsideEllipse(Coord2D point, List<Coord2D> focusPoints, double a) {
   return l1 + l2 <= a;
 }
 
-Minimap pulseAndFill(Minimap minimap, Coord2D center, int radius, Color color) {
+Minimap pulseAndFill(Minimap minimap, Coord2D center, int radius) {
   for (var y = -radius; y <= radius; y++) {
     final yF = y.toDouble();
     for (var x = -radius; x <= radius; x++) {
@@ -425,7 +424,7 @@ Minimap pulseAndFill(Minimap minimap, Coord2D center, int radius, Color color) {
         final pos = center + Coord2D(x: x, y: y);
 
         if (minimap.get(x: pos.x, y: pos.y) == null) {
-          minimap.add(x: pos.x, y: pos.y, color: color);
+          minimap.add(x: pos.x, y: pos.y, height: 0);
         }
       }
     }

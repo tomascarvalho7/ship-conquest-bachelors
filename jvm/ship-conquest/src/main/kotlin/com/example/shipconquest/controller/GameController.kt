@@ -31,12 +31,12 @@ class GameController(val service: GameService) {
         }
     }
 
-    @GetMapping("/{tag}/stats")
+    @GetMapping("/{tag}/statistics")
     fun getStatistics(user: User, @PathVariable tag: String): ResponseEntity<*> {
         val result = service.getPlayerStats(tag = tag, uid = user.id)
 
         return when (result) {
-            is Either.Right -> response(content = result.value.toPlayerStatsOutputModel())
+            is Either.Right -> response(content = result.value.toPlayerStatisticsOutputModel())
             is Either.Left -> when(result.value) {
                 GetPlayerStatsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
@@ -59,6 +59,8 @@ class GameController(val service: GameService) {
                     Problem.response(status = 404, problem = Problem.shipNotFound())
                 ConquestIslandError.IslandNotFound ->
                     Problem.response(status = 404, problem = Problem.islandNotFound())
+                ConquestIslandError.PlayerStatisticsNotFound ->
+                    Problem.response(status = 404, problem = Problem.statisticsNotFound())
                 ConquestIslandError.NotEnoughCurrency ->
                     Problem.response(status = 400, problem = Problem.notEnoughCurrency())
                 ConquestIslandError.ShipTooFarAway ->
@@ -77,7 +79,7 @@ class GameController(val service: GameService) {
         val result = service.getMinimap(tag = tag, uid = user.id)
 
         return when (result) {
-            is Either.Right -> response(content = MinimapOutputModel(points = result.value, size = result.value.size))
+            is Either.Right -> response(content = result.value.toOutputModel())
             is Either.Left -> when (result.value) {
                 GetMinimapError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())

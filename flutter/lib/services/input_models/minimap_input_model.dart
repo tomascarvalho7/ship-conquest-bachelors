@@ -18,14 +18,14 @@ class MinimapInputModel {
 }
 
 extension Convert on MinimapInputModel {
-  Minimap toMinimap(ColorGradient colorGradient) =>
+  Minimap toMinimap() =>
       Minimap(
         length: length,
-        pixels: HashMap
+        data: HashMap
             .fromIterable(
             points,
             key: (i) => Coord2D(x: points[i].x, y: points[i].y),
-            value: (i) => colorGradient.get(points[i].z)
+            value: (i) => points[i].z
         )
       );
 }

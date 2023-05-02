@@ -48,9 +48,9 @@ List<Node> calculateNeighbours(
       pulse(
         radius: safetyRadius,
         block: (coord) {
-          Color? value = map.get(x: coord.x + i, y: coord.y + j);
+          final value = map.get(x: coord.x + i, y: coord.y + j);
 
-          if (value != null && value.value != waterColor.value) { // if there is an obstacle then it's not safe
+          if (value != null && value != 0) { // if there is an obstacle then it's not safe
             isSafe = false;
           }
         }

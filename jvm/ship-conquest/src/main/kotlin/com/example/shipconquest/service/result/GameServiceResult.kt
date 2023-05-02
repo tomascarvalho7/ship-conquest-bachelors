@@ -2,9 +2,11 @@ package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
+import com.example.shipconquest.domain.Minimap
 import com.example.shipconquest.domain.ShipPathTime
 import com.example.shipconquest.domain.Vector3
-import com.example.shipconquest.domain.user.statistics.PlayerStats
+import com.example.shipconquest.domain.user.statistics.PlayerStatistics
+import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 
@@ -20,14 +22,14 @@ sealed class GetPlayerStatsError {
     object GameNotFound: GetPlayerStatsError()
 }
 
-typealias GetPlayerStatsResult = Either<GetPlayerStatsError, PlayerStats>
+typealias GetPlayerStatsResult = Either<GetPlayerStatsError, PlayerStatistics>
 
 sealed class GetMinimapError {
     object GameNotFound: GetMinimapError()
     object NoTrackedRecord: GetMinimapError()
 }
 
-typealias GetMinimapResult = Either<GetMinimapError, List<Vector3>>
+typealias GetMinimapResult = Either<GetMinimapError, Minimap>
 
 sealed class NavigationError {
     object InvalidNavigationPath: NavigationError()
@@ -41,6 +43,7 @@ sealed class ConquestIslandError {
     object ShipNotFound: ConquestIslandError()
     object IslandNotFound: ConquestIslandError()
     object ShipTooFarAway: ConquestIslandError()
+    object PlayerStatisticsNotFound: ConquestIslandError()
 }
 
 typealias ConquestIslandResult = Either<ConquestIslandError, OwnedIsland>

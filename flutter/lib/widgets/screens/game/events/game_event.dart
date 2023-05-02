@@ -73,7 +73,7 @@ class GameEvent {
     for(var shipPosition in shipPositions) {
       // add new tiles near every ship to minimap
       tileManager.lookForTiles(shipPosition, services).then(
-              (tiles) => minimapProvider.update(tiles, colorGradient)
+              (tiles) => minimapProvider.update(tiles)
       );
     }
   }

@@ -30,6 +30,9 @@ class ShipConquestApplication {
 
 		return Jdbi.create(dataSource).configure()
 	}
+
+	@Bean
+	fun getClock() = RealClock
 }
 
 fun main(args: Array<String>) {

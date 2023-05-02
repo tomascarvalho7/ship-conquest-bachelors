@@ -1,13 +1,11 @@
 package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.Game
-import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.lobby.Lobby
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.toLobbyName
-import com.example.shipconquest.domain.user.statistics.PlayerStats
 import com.example.shipconquest.domain.world.WorldGenerator
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.left
@@ -41,7 +39,11 @@ class LobbyService(
             // create island from world map
             for (origin in origins) {
                 val island = WildIsland(coordinate = origin, radius = generator.islandSize, islandId = 0) // TODO mudar isto
-                transaction.islandRepo.create(tag = tag, island = island)
+                transaction.islandRepo.create(
+                    tag = tag,
+                    origin = origin,
+                    radius = generator.islandSize
+                )
             }
             // add player to the lobby
             addPlayerToLobby(transaction, tag, uid)
@@ -90,9 +92,9 @@ class LobbyService(
     }
 
     fun addPlayerToLobby(transaction: Transaction,tag: String, uid: String ) {
-        transaction.lobbyRepo.joinLobby(uid, tag)
+        transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
         transaction.gameRepo.createShipPosition(tag, uid, generateRandomSpawnPoint(), null, null)
-        transaction.statsRepo.createPlayerStats(tag, uid, PlayerStats(tag, uid, 0, 3000)) // change this
+        transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
 
     private fun generateRandomSpawnPoint() = listOf(Vector2(50, 50)) //TODO generate it randomly

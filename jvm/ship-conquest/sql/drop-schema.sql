@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS dbo.Island;
+DROP TABLE IF EXISTS dbo.WildIsland;
+DROP TABLE IF EXISTS dbo.OwnedIsland;
 DROP TABLE IF EXISTS dbo.PlayerStatistics;
 DROP TABLE IF EXISTS dbo.Ship;
 DROP TABLE IF EXISTS dbo.VisitedPoints;

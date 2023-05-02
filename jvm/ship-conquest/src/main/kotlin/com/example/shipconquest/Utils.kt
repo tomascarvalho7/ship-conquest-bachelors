@@ -10,6 +10,7 @@ fun Jdbi.configure(): Jdbi {
     installPlugin(KotlinPlugin())
     installPlugin(PostgresPlugin())
 
+    registerColumnMapper(InstantMapper())
     registerColumnMapper(HeightMapMapper())
     registerColumnMapper(PositionListMapper())
     registerColumnMapper(PositionMapper())

@@ -14,7 +14,6 @@ class StartMenuScreen extends StatefulWidget {
 }
 
 class _StartMenuScreenState extends State<StartMenuScreen> {
-  String? lobbyId;
   Lobby? lobby;
 
   @override
@@ -27,9 +26,9 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
     final lobbyStorage = Provider.of<LobbyStorage>(context, listen: false);
     final services = Provider.of<ShipServices>(context, listen: false);
 
-    lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId != null) {
-      final lobbyRes = await services.getLobby(lobbyId!);
+    final lid = await lobbyStorage.getLobbyId();
+    if (lid != null) {
+      final lobbyRes = await services.getLobby(lid);
       setState(() {
         lobby = lobbyRes;
       });

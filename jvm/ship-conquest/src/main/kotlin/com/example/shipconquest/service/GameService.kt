@@ -3,8 +3,11 @@ package com.example.shipconquest.service
 import com.example.shipconquest.controller.model.output.Vector2OutputModel
 import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
 import com.example.shipconquest.domain.*
+import com.example.shipconquest.domain.game.Game
+import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
+import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
@@ -21,7 +24,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.Instant
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -32,7 +35,8 @@ const val viewDistance = 10
 
 @Service
 class GameService(
-    override val transactionManager: TransactionManager
+    override val transactionManager: TransactionManager,
+    val gameLogic: GameLogic
 ) : ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -69,7 +73,6 @@ class GameService(
             if (game != null) {
                 val islands = transaction.islandRepo.getAll(tag = tag)
                 val nearIslands = getNearIslands(coordinate = coord, islands = islands)
-
                 right(
                     value = Horizon(
                         tiles = game.inspectIslands(nearIslands),
@@ -97,7 +100,7 @@ class GameService(
             val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
                 ?: return@run left(GetPlayerStatsError.StatisticsNotFound)
 
-            return@run right(value = playerStatistics)
+            return@run right(value = gameLogic.buildPlayerStatistics(playerStatistics))
         }
     }
 
@@ -111,37 +114,27 @@ class GameService(
                 pulseResult + Vector3(point.x, point.y, 0)
             }?.distinct()
                 ?: emptyList()
-            // if (pointList.isEmpty()) return@run left(GetMinimapError.NoTrackedRecord)
-            // else
-            right(pointList)
+
+            right(value = Minimap(visitedPoints = pointList, size = game.map.size))
         }
     }
 
     fun navigate(tag: String, uid: String, shipId: String, points: List<Vector2>): NavigationResult {
-        val startTime = Instant.now()
-        var distance = 0.0;
-        for (i in 0 until points.size - 1) {
-            val a = points[i];
-            val b = points[i + 1];
-            distance += calculateEuclideanDistance(a, b)
-        }
-        val duration = Duration.ofSeconds((distance * 10).roundToLong())
-
-        val formattedDuration = formatDuration(duration)
-
         if (!validateNavigationPath(buildBeziers(points))) {
             return left(NavigationError.InvalidNavigationPath)
         }
 
         return transactionManager.run { transaction ->
+            val (startTime, duration) = gameLogic.buildShipPath(points)
             transaction.gameRepo.updateShipPosition(
                 tag,
                 uid,
                 shipId.toInt(),
                 points,
-                startTime, duration
+                startTime,
+                duration
             )
-            right(ShipPathTime(startTime.toString(), formattedDuration))
+            right(ShipPathTime(startTime.toString(), formatDuration(duration)))
         }
     }
 
@@ -179,18 +172,45 @@ class GameService(
                 ?: return@run left(ConquestIslandError.GameNotFound)
             val island = transaction.islandRepo.get(tag = tag, islandId = islandId)
                 ?: return@run left(ConquestIslandError.IslandNotFound)
+            val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
+                ?: return@run left(ConquestIslandError.PlayerStatisticsNotFound)
             // TODO: update with canSightIsland
             if (false) return@run left(ConquestIslandError.ShipTooFarAway)
 
-            val income = 25
-            transaction.islandRepo.addOwnerToIsland(tag, uid, income, island)
             return@run right(
-                OwnedIsland(
-                    islandId = island.islandId,
-                    coordinate = island.coordinate,
-                    radius = island.radius,
+                value = gameLogic.conquestIsland(
                     uid = uid,
-                    incomePerHour = income
+                    island = island,
+                    onWild = { _, newIsland ->
+                        // add ownership of island and take cost from currency
+                        transaction.islandRepo.wildToOwnedIsland(tag = tag, island = newIsland)
+                        transaction.statsRepo.updatePlayerCurrency(
+                            tag = tag,
+                            uid = uid,
+                            instant = newIsland.conquestDate,
+                            newStaticCurrency = playerStatistics.income.staticCurrency - 100
+                        )
+                    },
+                    onOwned = { oldIsland, newIsland ->
+                        // update previous owner of island currency
+                        val oldOwner = transaction.statsRepo.getPlayerStats(tag = tag, uid = oldIsland.uid)
+                        if (oldOwner != null)
+                            transaction.statsRepo.updatePlayerCurrency(
+                                tag = tag,
+                                uid = oldOwner.uid,
+                                instant = newIsland.conquestDate,
+                                newStaticCurrency = oldOwner.income.getCurrency(newIsland.conquestDate)
+                            )
+
+                        // add ownership of island and take cost from currency
+                        transaction.islandRepo.updateOwnedIsland(tag = tag, island = newIsland)
+                        transaction.statsRepo.updatePlayerCurrency(
+                            tag = tag,
+                            uid = uid,
+                            instant = newIsland.conquestDate,
+                            newStaticCurrency = playerStatistics.income.getCurrency(newIsland.conquestDate) - 200
+                        )
+                    }
                 )
             )
         }

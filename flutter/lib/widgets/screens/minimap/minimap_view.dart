@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
@@ -9,9 +10,10 @@ import '../../canvas/image_painter.dart';
 
 class MinimapView extends StatelessWidget {
   final Minimap minimap;
+  final ColorGradient gradient;
   final Color background = const Color.fromRGBO(0, 0, 0, 0.1);
   final Widget? child;
-  const MinimapView({super.key, required this.minimap, this.child});
+  const MinimapView({super.key, required this.minimap, required this.gradient, this.child});
 
   @override
   Widget build(BuildContext context) =>
@@ -59,9 +61,10 @@ class MinimapView extends StatelessWidget {
     for(var x = 0; x < size; x++) {
       for(var y = 0; y < size; y++) {
         int index = y * size + x;
-        Color? color = minimap.get(x: x, y: y);
+        final height = minimap.get(x: x, y: y);
+        Color color = height != null ? gradient.get(height) : background;
 
-        pixels[index] = color?.value ?? background.value;
+        pixels[index] = color.value;
       }
     }
 
