@@ -8,10 +8,7 @@ import com.example.shipconquest.left
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.right
-import com.example.shipconquest.service.result.GetUserInfoError
-import com.example.shipconquest.service.result.GetUserInfoResult
-import com.example.shipconquest.service.result.ProcessUserError
-import com.example.shipconquest.service.result.ProcessUserResult
+import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -29,21 +26,36 @@ class UserService(
         }
     }
 
-    fun processUser(googleId: String, name: String, email: String, imageUrl: String): ProcessUserResult {
-        //add verification logic, maybe check name size?
-
+    fun createUser(username: String, googleId: String, name: String, email: String, imageUrl: String?, description: String?): CreateUserResult {
         return transactionManager.run { transaction ->
 
             if(!transaction.userRepo.checkUserExists(googleId)) {
-                //user doesn't exist, create one
-                transaction.userRepo.createUser(googleId, name, email, imageUrl)
+                transaction.userRepo.createUser(username, googleId, name, email, imageUrl, description)
+            } else {
+                return@run left(CreateUserError.UserAlreadyExists)
             }
             val userToken = generateValidToken(googleId, transaction)
 
             if(userToken != null) {
                 return@run right(userToken)
             } else {
-                return@run left(ProcessUserError.TokenCreationFailed)
+                return@run left(CreateUserError.TokenCreationFailed)
+            }
+        }
+    }
+
+    fun loginUser(googleId: String, name: String, email: String): LoginUserResult {
+        return transactionManager.run { transaction ->
+
+            if(!transaction.userRepo.checkUserExists(googleId)) {
+                return@run left(LoginUserError.UserNotFound)
+            }
+            val userToken = generateValidToken(googleId, transaction)
+
+            if(userToken != null) {
+                return@run right(userToken)
+            } else {
+                return@run left(LoginUserError.TokenCreationFailed)
             }
         }
     }

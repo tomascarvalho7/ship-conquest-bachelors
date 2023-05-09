@@ -23,8 +23,7 @@ sealed class JoinLobbyError {
 typealias JoinLobbyResult = Either<JoinLobbyError, String>
 
 sealed class GetAllLobbiesError {
-    object InvalidSkipParameter: GetAllLobbiesError()
-    object InvalidLimitParameter: GetAllLobbiesError()
+    object InvalidOrderParameter: GetAllLobbiesError()
 }
 
 typealias GetAllLobbiesResult = Either<GetAllLobbiesError, List<Lobby>>

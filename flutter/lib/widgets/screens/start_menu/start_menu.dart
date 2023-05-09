@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
-import 'package:ship_conquest/widgets/screens/bottom_navigation_bar/bottom_bar.dart';
-
-import '../../../domain/lobby.dart';
 
 class StartMenuScreen extends StatefulWidget {
   const StartMenuScreen({Key? key}) : super(key: key);
@@ -14,105 +10,162 @@ class StartMenuScreen extends StatefulWidget {
 }
 
 class _StartMenuScreenState extends State<StartMenuScreen> {
-  Lobby? lobby;
+  String? userName;
+  String? patchNotes;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _getUserName();
+    _getPatchNotes();
   }
 
-  Future<void> _loadData() async {
-    final lobbyStorage = Provider.of<LobbyStorage>(context, listen: false);
+  Future<void> _getUserName() async {
     final services = Provider.of<ShipServices>(context, listen: false);
 
-    final lid = await lobbyStorage.getLobbyId();
-    if (lid != null) {
-      final lobbyRes = await services.getLobby(lid);
-      setState(() {
-        lobby = lobbyRes;
-      });
-    }
+    final userInfo = await services.getPersonalInfo();
+    setState(() {
+      userName = userInfo.name.split(' ').first;
+    });
+  }
+
+  Future<void> _getPatchNotes() async {
+    final services = Provider.of<ShipServices>(context, listen: false);
+
+    const notes = "patch notes bem fake 😹";
+    //await services.getPatchNotes();
+    setState(() {
+      patchNotes = notes;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: const BottomBar(),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromRGBO(60, 180, 135, 1.0),
-        onPressed: () {
-          //TODO open settings
-        },
-        child: const Icon(Icons.settings),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        body: Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Theme.of(context).colorScheme.background,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'Ship Conquest',
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-              shadows: [
-                Shadow(
-                  offset: const Offset(2, 2),
-                  blurRadius: 5,
-                  color: Colors.grey.withOpacity(0.8),
-                ),
-              ],
-            ),
-          ),
-          Align(
-            child: Column(
-              children: [
-                const Text(
-                  'Lobby History',
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.black,
-                  ),
-                ),
-                Container(
-                  width: 200,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(60, 180, 135, 1.0),
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
+          Expanded(
+              child: Stack(children: [
+            if (userName != null && patchNotes != null) ...[
+              Container(
+                  padding: const EdgeInsets.fromLTRB(39, 60, 75, 9),
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.only(bottom: 50),
+                          width: double.infinity,
+                          child: RichText(
+                              text: TextSpan(
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                  children: [
+                                const TextSpan(text: "Welcome back\n"),
+                                TextSpan(
+                                  text: userName,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                )
+                              ]))),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Text('Patch Notes',
+                            style: Theme.of(context).textTheme.titleMedium),
                       ),
                     ],
-                  ),
-                  child: Center(
-                    child: lobby?.name != null
-                        ? Text(
-                      lobby!.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                        : const Text(
-                      'No record',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  )),
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FractionallySizedBox(
+                    heightFactor: 0.3,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                  )),
+              LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final double height = constraints.maxHeight * 0.25;
+                  final double width = constraints.maxWidth * 0.9;
+
+                  return Align(
+                    alignment: const Alignment(0, -0.15),
+                    child: SizedBox(
+                      width: width,
+                      height: height,
+                      child: Container(
+                          padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: const LinearGradient(
+                              begin: Alignment(-0, 1),
+                              end: Alignment(-0, -1),
+                              colors: [Color(0xffe65f57), Color(0x33e77271)],
+                            ),
+                          ),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: RichText(
+                              text: TextSpan(
+                                text: patchNotes,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(color: Colors.white),
+                              ),
+                            ),
+                          )),
+                    ),
+                  );
+                },
+              ),
+              Align(
+                alignment: const Alignment(0, 0.5),
+                child: SizedBox(
+                    child: Image.asset('assets/images/menu_mountains.png',
+                        fit: BoxFit.fill)),
+              ),
+            ] else ...[
+              const WaitForAsyncScreen(mountainsPath: 'assets/images/menu_mountains.png',)
+            ]
+          ])),
         ],
       ),
-    );
+    ));
+  }
+}
+
+class WaitForAsyncScreen extends StatelessWidget {
+  final String mountainsPath;
+  const WaitForAsyncScreen({super.key, required this.mountainsPath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+          children: [
+            const Center(child: CircularProgressIndicator(),),
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: FractionallySizedBox(
+                  heightFactor: 0.3,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                )),
+            Align(
+              alignment: const Alignment(0, 0.5),
+              child: SizedBox(
+                  child: Image.asset(mountainsPath,
+                      fit: BoxFit.fill)),
+            ),
+          ],
+        );
   }
 }

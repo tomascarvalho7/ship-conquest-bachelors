@@ -1,4 +1,4 @@
-import 'package:ship_conquest/domain/token.dart';
+import 'package:ship_conquest/domain/user/token.dart';
 
 class TokenInputModel {
   final String value;

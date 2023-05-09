@@ -3,9 +3,8 @@ package com.example.shipconquest.service
 import com.example.shipconquest.domain.Factor
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.lobby.Lobby
 import com.example.shipconquest.domain.generators.RandomString
-import com.example.shipconquest.domain.lobby.toLobbyName
+import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.domain.world.WorldGenerator
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.left
@@ -16,6 +15,7 @@ import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class LobbyService(
@@ -33,12 +33,23 @@ class LobbyService(
         return transactionManager.run { transaction ->
             // generate tag
             val tag = generateTag(transaction.lobbyRepo::get)
+            // get creator info
+            val user = transaction.userRepo.getUserInfo(uid)
             // create lobby & game
-            transaction.lobbyRepo.createLobby(lobby = Lobby(tag = tag, name = lobbyName.name))
+            transaction.lobbyRepo.createLobby(
+                lobby = Lobby(
+                    tag = tag,
+                    name = lobbyName.name,
+                    uid = uid,
+                    username = user!!.username,
+                    creationTime = Instant.now().toEpochMilli()
+                )
+            )
             transaction.gameRepo.createGame(game = Game(tag = tag, map = world))
             // create island from world map
             for (origin in origins) {
-                val island = WildIsland(coordinate = origin, radius = generator.islandSize, islandId = 0) // TODO mudar isto
+                val island =
+                    WildIsland(coordinate = origin, radius = generator.islandSize, islandId = 0) // TODO mudar isto
                 transaction.islandRepo.create(
                     tag = tag,
                     origin = origin,
@@ -74,12 +85,18 @@ class LobbyService(
         }
     }
 
-    fun getAllLobbies(skip: Int, limit: Int): GetAllLobbiesResult {
-        if (skip < 0) return left(GetAllLobbiesError.InvalidSkipParameter)
-        if (limit < 1) return left(GetAllLobbiesError.InvalidLimitParameter)
+    fun getLobbies(skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
+        val newSkip = skip.toSkip()
+        val newLimit = limit.toLimit()
+        val newOrder = order.toOrderOrNull() ?: return left(GetAllLobbiesError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
-            val lobbies = transaction.lobbyRepo.getAll(skip, limit)
+
+            val lobbies = if(name?.isEmpty() == true || name == null) {
+                transaction.lobbyRepo.getList(newSkip, newLimit, newOrder)
+            } else {
+                transaction.lobbyRepo.getListByName(newSkip, newLimit, newOrder, name)
+            }
             right(lobbies)
         }
     }
@@ -91,7 +108,7 @@ class LobbyService(
         }
     }
 
-    fun addPlayerToLobby(transaction: Transaction,tag: String, uid: String ) {
+    fun addPlayerToLobby(transaction: Transaction, tag: String, uid: String) {
         transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
         transaction.gameRepo.createShipPosition(tag, uid, generateRandomSpawnPoint(), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)

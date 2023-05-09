@@ -9,7 +9,7 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,20 +18,22 @@ class _BottomBarState extends State<BottomBar> {
     // Navigate to the selected screen
     switch (index) {
       case 0:
-        GoRouter.of(context).go('/profile');
+        GoRouter.of(context).push('/profile');
         break;
       case 1:
-        GoRouter.of(context).go('/start');
+        GoRouter.of(context).push('/start');
         break;
       case 2:
-        GoRouter.of(context).go('/lobby');
+        GoRouter.of(context).push('/lobby');
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -48,6 +50,7 @@ class _BottomBarState extends State<BottomBar> {
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-      );
+      ),
+    );
   }
 }

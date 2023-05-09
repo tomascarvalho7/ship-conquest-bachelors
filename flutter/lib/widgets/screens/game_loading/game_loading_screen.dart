@@ -12,20 +12,31 @@ import 'package:ship_conquest/domain/space/sequence.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
+import '../game/game_screen.dart';
+
 class GameLoadingScreen extends StatelessWidget {
   final String dst;
   const GameLoadingScreen({super.key, required this.dst});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ShipServices>(
-        builder: (context, services, _) {
-          fetchGameData(services, context.read<GlobalState>()).then(
-                  (_) => context.go("/$dst")
-          );
+    final globalState = context.read<GlobalState>();
+    final services = context.watch<ShipServices>();
 
+    return FutureBuilder<void>(
+      future: fetchGameData(services, globalState),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          return GameScreen(
+            data: globalState.gameData!,
+            stats: globalState.playerStats!,
+          );
+        } else {
+          return const Text('Failed to fetch game data.');
         }
+      },
     );
   }
 

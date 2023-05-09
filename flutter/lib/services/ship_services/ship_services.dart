@@ -7,8 +7,8 @@ import '../../domain/lobby.dart';
 import '../../domain/minimap.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
-import '../../domain/token.dart';
-import '../../domain/user_info.dart';
+import '../../domain/user/token.dart';
+import '../../domain/user/user_info.dart';
 
 //all of them need to use the lobby id
 abstract class ShipServices {
@@ -16,7 +16,9 @@ abstract class ShipServices {
 
   Future<PlayerStats> getPlayerStatistics();
 
-  Future<Token> signIn(String idToken);
+  Future<Token> signIn(String idToken, String username, String? description);
+
+  Future<Token> logIn(String idToken);
 
   Future<Minimap> getMinimap(ColorGradient colorGradient);
 
@@ -24,7 +26,7 @@ abstract class ShipServices {
 
   Future<Object?> getMainShipLocation();
 
-  Future<List<Lobby>> getAllLobbies();
+  Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby);
 
   Future<String> joinLobby(String tag);
 

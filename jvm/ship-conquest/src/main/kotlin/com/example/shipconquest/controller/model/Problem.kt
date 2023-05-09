@@ -78,17 +78,19 @@ data class Problem(val title: String, val detail: String) {
             detail = "This player statistics were not found."
         )
 
-        fun invalidSkipParameter() = Problem(
-            title = "Invalid skip parameter",
-            detail = "The given query parameter skip is invalid."
+        fun invalidOrderParameter() = Problem(
+            title = "Invalid order parameter",
+            detail = "The given query parameter order is invalid."
         )
-        fun invalidLimitParameter() = Problem(
-            title = "Invalid limit parameter",
-            detail = "The given query parameter limit is invalid."
-        )
+
         fun userNotFound() = Problem(
             title = "User does not exist",
             detail = "The user you looked for doesn't exist."
+        )
+
+        fun userAlreadyExists() = Problem(
+            title = "User already exists",
+            detail = "The given user already exists in the system."
         )
     }
 }

@@ -2,16 +2,15 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/island/island.dart';
-import 'package:ship_conquest/domain/island/owned_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
-import 'package:ship_conquest/domain/token.dart';
+import 'package:ship_conquest/domain/user/token.dart';
+import 'package:ship_conquest/domain/user/user_cacheable.dart';
 import 'package:ship_conquest/domain/utils/build_bezier.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
@@ -26,7 +25,7 @@ import 'package:http/http.dart' as http;
 
 import '../../domain/horizon.dart';
 import '../../domain/lobby.dart';
-import '../../domain/user_info.dart';
+import '../../domain/user/user_info.dart';
 import '../input_models/create_lobby_input_model.dart';
 import '../input_models/join_lobby_input_model.dart';
 import '../input_models/lobby_input_model.dart';
@@ -35,7 +34,7 @@ import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship_path_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "82d2-89-114-69-1.ngrok-free.app";
+const baseUri = "75b5-194-210-194-148.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -51,26 +50,43 @@ class RealShipServices extends ShipServices {
     final String? lobbyId = await lobbyStorage.getLobbyId();
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
-    final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/view", {'shipId': '1'}), headers: {
+    final response = await http
+        .get(Uri.https(baseUri, "$lobbyId/view", {'shipId': '1'}), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
     if (response.statusCode == 200) {
-      return HorizonInputModel
-          .fromJson(jsonDecode(response.body))
-          .toHorizon();
+      return HorizonInputModel.fromJson(jsonDecode(response.body)).toHorizon();
     } else {
       throw Exception("error fetching a new chunk");
     }
   }
 
   @override
-  Future<Token> signIn(String idToken) async {
-    final response = await http.post(
-        Uri.https(baseUri, "get-token"),
-        headers: { "Content-Type": "application/x-www-form-urlencoded"},
-        body: "idtoken=$idToken"
-    );
+  Future<Token> signIn(
+      String idToken, String username, String? description) async {
+    Map<String, dynamic> jsonBody = {
+      'idtoken': idToken,
+      'username': username,
+      'description': description
+    };
+
+    final response = await http.post(Uri.https(baseUri, "create-user"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(jsonBody));
+
+    if (response.statusCode == 200) {
+      final res = TokenInputModel.fromJson(jsonDecode(response.body));
+      return res.toToken();
+    } else {
+      throw Exception("error creating user token");
+    }
+  }
+
+  @override
+  Future<Token> logIn(String idToken) async {
+    final response = await http.post(Uri.https(baseUri, "get-token"),
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "idtoken=$idToken");
 
     if (response.statusCode == 200) {
       final res = TokenInputModel.fromJson(jsonDecode(response.body));
@@ -89,18 +105,18 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response =
-    await http.get(Uri.https(baseUri, "$lobbyId/minimap"), headers: {
+        await http.get(Uri.https(baseUri, "$lobbyId/minimap"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
     if (response.statusCode == 200) {
       final res = MinimapInputModel.fromJson(jsonDecode(response.body));
       // TODO use .toMinimap
-      final minimap = Minimap(length: res.length, data: HashMap<Coord2D, int>());
+      final minimap =
+          Minimap(length: res.length, data: HashMap<Coord2D, int>());
       for (var point in res.points) {
         if (minimap.data[Coord2D(x: point.x, y: point.y)] == null) {
-          minimap.add(
-              x: point.x, y: point.y, height: point.z);
+          minimap.add(x: point.x, y: point.y, height: point.z);
         }
       }
       List<Coord2D> visitedPoints = res.points
@@ -123,7 +139,9 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     Map<String, dynamic> jsonBody = {
-      'points': landmarks.map((coord) => Coord2DOutputModel(x: coord.x, y: coord.y).toJson()).toList(),
+      'points': landmarks
+          .map((coord) => Coord2DOutputModel(x: coord.x, y: coord.y).toJson())
+          .toList(),
     };
 
     final response = await http.post(
@@ -132,13 +150,13 @@ class RealShipServices extends ShipServices {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
-        body: jsonEncode(jsonBody)
-    );
+        body: jsonEncode(jsonBody));
 
     if (response.statusCode == 200) {
       final res = ShipPathTimeInputModel.fromJson(jsonDecode(response.body));
 
-      return ShipPath(landmarks: buildBeziers(landmarks),
+      return ShipPath(
+          landmarks: buildBeziers(landmarks),
           startTime: res.startTime,
           duration: res.duration);
     } else {
@@ -158,24 +176,26 @@ class RealShipServices extends ShipServices {
         Uri.https(baseUri, "$lobbyId/ship/location", {'shipId': '1'}),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
+        });
 
     if (response.statusCode == 200) {
       final res = ShipPathInputModel.fromJson(jsonDecode(response.body));
       final startTime = res.startTime;
       final duration = res.duration;
 
-
-      if(res.landmarks.length == 1) {
-          return Position(x: res.landmarks.first.x.toDouble(), y: res.landmarks.first.y.toDouble());
-      } else if(startTime != null && duration != null){
-          return ShipPath(landmarks: buildBeziers(res.landmarks.map((coord) => Coord2D(x: coord.x, y: coord.y)).toList()),
-              startTime: startTime,
-              duration: duration);
+      if (res.landmarks.length == 1) {
+        return Position(
+            x: res.landmarks.first.x.toDouble(),
+            y: res.landmarks.first.y.toDouble());
+      } else if (startTime != null && duration != null) {
+        return ShipPath(
+            landmarks: buildBeziers(res.landmarks
+                .map((coord) => Coord2D(x: coord.x, y: coord.y))
+                .toList()),
+            startTime: startTime,
+            duration: duration);
       }
-
-    } else if(response.statusCode == 404) {
+    } else if (response.statusCode == 404) {
       return null;
     } else {
       throw Exception("error navigating with ship");
@@ -184,21 +204,33 @@ class RealShipServices extends ShipServices {
   }
 
   @override
-  Future<List<Lobby>> getAllLobbies() async {
+  Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby) async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
-    final response = await http.get(
-        Uri.https(baseUri, "lobbies"),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
+    final Map<String, String> queryParams = {
+      'skip': skip.toString(),
+      'limit': limit.toString(),
+      'order': order,
+      'name': searchedLobby
+    };
+
+    final response =
+        await http.get(Uri.https(baseUri, "lobbies", queryParams), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
 
     if (response.statusCode == 200) {
       final res = LobbyListInputModel.fromJson(jsonDecode(response.body));
 
-      return List.generate(res.list.length, (index) => Lobby(tag: res.list[index].tag, name: res.list[index].name));
+      return List.generate(
+          res.list.length,
+          (index) => Lobby(
+              tag: res.list[index].tag,
+              name: res.list[index].name,
+              uid: res.list[index].uid,
+              username: res.list[index].username,
+              creationTime: res.list[index].creationTime));
     } else {
       throw Exception("error navigating with ship");
     }
@@ -209,16 +241,15 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
-    final response = await http.get(
-        Uri.https(baseUri, "get-lobby", {'tag': tag}),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
+    final response =
+        await http.get(Uri.https(baseUri, "get-lobby", {'tag': tag}), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
 
     if (response.statusCode == 200) {
       final res = LobbyInputModel.fromJson(jsonDecode(response.body));
-      return Lobby(tag: res.tag, name: res.name);
+      return Lobby(
+          tag: res.tag, name: res.name, uid: res.uid, username: res.username, creationTime: res.creationTime);
     } else {
       throw Exception("error getting lobby");
     }
@@ -255,14 +286,12 @@ class RealShipServices extends ShipServices {
       'name': name,
     };
 
-    final response = await http.post(
-        Uri.https(baseUri, "create-lobby"),
+    final response = await http.post(Uri.https(baseUri, "create-lobby"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
-        body: jsonEncode(jsonBody)
-    );
+        body: jsonEncode(jsonBody));
 
     if (response.statusCode == 200) {
       final res = CreateLobbyInputModel.fromJson(jsonDecode(response.body));
@@ -278,16 +307,26 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
-    final response = await http.get(
-        Uri.https(baseUri, "userinfo"),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
+    final UserInfoCache? user = await userStorage.getUser();
+    if (user != null && DateTime.now().isBefore(user.expiryTime)) {
+      return user.toUserInfo();
+    }
+
+    final response = await http.get(Uri.https(baseUri, "userinfo"), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
 
     if (response.statusCode == 200) {
-      final res = UserInfoInputModel.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
-      return UserInfo(name: res.name, email: res.email, imageUrl: res.imageUrl);
+      final res = UserInfoInputModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes)));
+      final userInfo = UserInfo(
+          username: res.username,
+          name: res.name,
+          email: res.email,
+          imageUrl: res.imageUrl,
+          description: res.description);
+      userStorage.setUser(userInfo, const Duration(minutes: 5));
+      return userInfo;
     } else {
       throw Exception("error getting user info");
     }
@@ -301,22 +340,15 @@ class RealShipServices extends ShipServices {
     final String? lobbyId = await lobbyStorage.getLobbyId();
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
-    final response = await http.post(
-        Uri.https(baseUri, "$lobbyId/conquest"),
+    final response = await http.post(Uri.https(baseUri, "$lobbyId/conquest"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
-        body: jsonEncode({
-          'shipId': sId,
-          'islandId': islandId
-        })
-    );
+        body: jsonEncode({'shipId': sId, 'islandId': islandId}));
 
     if (response.statusCode == 200) {
-      return IslandInputModel
-          .fromJson(jsonDecode(response.body))
-          .toIsland();
+      return IslandInputModel.fromJson(jsonDecode(response.body)).toIsland();
     } else {
       throw Exception("error conquesting island");
     }
@@ -330,16 +362,13 @@ class RealShipServices extends ShipServices {
     final String? lobbyId = await lobbyStorage.getLobbyId();
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
-    final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/statistics"),
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-        }
-    );
+    final response =
+        await http.get(Uri.https(baseUri, "$lobbyId/statistics"), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
 
     if (response.statusCode == 200) {
-      return PlayerStatsInputModel
-          .fromJson(jsonDecode(response.body))
+      return PlayerStatsInputModel.fromJson(jsonDecode(response.body))
           .toPlayerStats();
     } else {
       throw Exception("error getting player statistics");
@@ -354,7 +383,7 @@ double calcDistance(Coord2D p1, Coord2D p2) {
 Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
     List<Coord2D> visitedPoints, int radius) {
   List<Coord2D> points = [];
-  if(visitedPoints.length == 1) {
+  if (visitedPoints.length == 1) {
     return pulseAndFill(minimap, visitedPoints.first, radius);
   }
   for (int idx = 0; idx < visitedPoints.length; idx++) {
@@ -363,8 +392,8 @@ Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
       final nextPoint = visitedPoints[idx + 1];
       final phi = atan((nextPoint.y - currPoint.y) /
           (nextPoint.x - currPoint.x)); // rotation angle of the ellipse
-      double distance = calcDistance(
-          currPoint, nextPoint); //distance between focus points
+      double distance =
+          calcDistance(currPoint, nextPoint); //distance between focus points
       final a = distance + (2 * radius); // major
       final b = 2 * radius; //minor
 
@@ -377,8 +406,7 @@ Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
 
         points.add(Coord2D(x: x.floor(), y: y.floor()));
       }
-      minimap = fillEllipse(
-          points, minimap, [currPoint, nextPoint], a);
+      minimap = fillEllipse(points, minimap, [currPoint, nextPoint], a);
     }
   }
   return minimap;
@@ -397,8 +425,7 @@ Minimap fillEllipse(List<Coord2D> points, Minimap minimap,
     for (int y = minY; y <= maxY; y++) {
       final currCoord = Coord2D(x: x, y: y);
       if (isInsideEllipse(currCoord, focusPoints, major) &&
-          minimap.data[currCoord] == null
-      ) {
+          minimap.data[currCoord] == null) {
         minimap.add(x: x, y: y, height: 0);
       }
     }

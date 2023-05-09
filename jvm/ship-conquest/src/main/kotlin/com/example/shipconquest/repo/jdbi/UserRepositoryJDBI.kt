@@ -24,13 +24,15 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
         return userCount != 0
     }
 
-    override fun createUser(googleId: String, name: String, email: String, imageUrl: String) {
+    override fun createUser(username: String, googleId: String, name: String, email: String, imageUrl: String?, description: String?) {
         logger.info("Creating a user from googleId = {}", googleId)
-        handle.createUpdate("INSERT into dbo.user values (:gid, :name, :email, :imageUrl);")
+        handle.createUpdate("INSERT into dbo.user values (:gid, :username, :name, :email, :imageUrl, :description);")
             .bind("gid", googleId)
+            .bind("username", username)
             .bind("name", name)
             .bind("email", email)
             .bind("imageUrl", imageUrl)
+            .bind("description", description)
             .execute()
     }
 
@@ -63,7 +65,7 @@ class UserRepositoryJDBI(private val handle: Handle): UserRepository {
 
     override fun getUserInfo(userId: String): UserInfo? {
         logger.info("Getting user info from user with id = {}", userId)
-        return handle.createQuery("SELECT name, email, imageUrl from dbo.User where id = :uid;")
+        return handle.createQuery("SELECT username, name, email, imageUrl, description from dbo.User where id = :uid;")
             .bind("uid", userId)
             .mapTo<UserInfoDBModel>()
             .singleOrNull()

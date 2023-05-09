@@ -58,29 +58,30 @@ class LobbyController(val service: LobbyService) {
     }
 
     @GetMapping("/lobbies")
-    fun getAllLobbies(
+    fun getLobbies(
         user: User,
         @RequestParam(required = false) skip: Int?,
-        @RequestParam(required = false) limit: Int?
+        @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) order: String?,
+        @RequestParam(required = false) name: String?,
     ): ResponseEntity<*> {
-        val newSkip = skip?:0
-        val newLimit = limit?:10
-        val result = service.getAllLobbies(newSkip, newLimit)
+        val result = service.getLobbies(skip, limit, order, name)
 
         return when (result) {
             is Either.Right -> response(content = LobbyListOutputModel(lobbies = result.value.map { lobby ->
                 LobbyOutputModel(
                     lobby.tag,
-                    lobby.name
+                    lobby.name,
+                    lobby.uid,
+                    lobby.username,
+                    lobby.creationTime
                 )
             }))
 
             is Either.Left -> when (result.value) {
-                GetAllLobbiesError.InvalidSkipParameter ->
-                    Problem.response(status = 400, problem = Problem.invalidSkipParameter())
+                GetAllLobbiesError.InvalidOrderParameter ->
+                    Problem.response(status = 400, problem = Problem.invalidOrderParameter())
 
-                GetAllLobbiesError.InvalidLimitParameter ->
-                    Problem.response(status = 400, problem = Problem.invalidLimitParameter())
             }
         }
     }

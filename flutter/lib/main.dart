@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/app_theme.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/minimap_provider.dart';
@@ -37,7 +38,6 @@ class MyApp extends StatelessWidget {
     ColorMark(factor: Factor(1.0), color: const Color.fromRGBO(255, 255, 255, 1.0)),
   ]);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -53,10 +53,10 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp.router(
             title: 'Ship Conquest',
-            theme: ThemeData(primarySwatch: Colors.blue),
+            theme: shipConquestLightTheme,
+            darkTheme: shipConquestDarkTheme,
             routerConfig: createRouter()
         )
     );
   }
-
 }

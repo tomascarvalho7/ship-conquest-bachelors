@@ -59,7 +59,7 @@ class MinimapScreenState extends State<MinimapStateWidget> {
       pathManagementInterfaceHolder(eventHandler),
       closeButton(() {
         eventHandler.saveGameData(); // save game data
-        context.go('/game'); // return to game screen
+        context.go('/game-home'); // return to game screen
       })
     ],
   );

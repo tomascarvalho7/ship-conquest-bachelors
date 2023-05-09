@@ -9,14 +9,14 @@ import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
-import 'package:ship_conquest/domain/token.dart';
+import 'package:ship_conquest/domain/user/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 
 import '../../domain/lobby.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
-import '../../domain/user_info.dart';
+import '../../domain/user/user_info.dart';
 import '../../domain/utils/build_bezier.dart';
 import '../../providers/user_storage.dart';
 import '../input_models/horizon_input_model.dart';
@@ -57,7 +57,7 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Token> signIn(String idToken) async {
+  Future<Token> signIn(String idToken, String username, String? description) async {
     return Token(token: "FAKE-ID");
   }
 
@@ -91,8 +91,8 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<List<Lobby>> getAllLobbies() async {
-    return List<Lobby>.generate(10, (index) => Lobby(tag: "asd", name: "TestLobby"));
+  Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby) async {
+    return List<Lobby>.generate(10, (index) => Lobby(tag: "asd", name: "TestLobby", uid: "1", username: "gui17", creationTime: 234324));
   }
 
   @override
@@ -107,12 +107,12 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<Lobby> getLobby(String tag) async {
-    return Lobby(tag: "fake_tag", name: "lobby_name");
+    return Lobby(tag: "fake_tag", name: "lobby_name", uid: "1", username: "gui17", creationTime: 832231);
   }
 
   @override
   Future<UserInfo> getPersonalInfo() async {
-    return UserInfo(name: "name", email: "email", imageUrl: "imageUrl");
+    return UserInfo(username: "cenas", name: "name", email: "email", imageUrl: null, description: null);
   }
 
   @override
@@ -130,6 +130,11 @@ class FakeShipServices extends ShipServices {
   @override
   Future<PlayerStats> getPlayerStatistics() async {
     return PlayerStats(currency: 125, maxCurrency: 600);
+  }
+
+  @override
+  Future<Token> logIn(String idToken) async {
+    return Token(token: "FAKE-ID");
   }
 }
 

@@ -25,7 +25,7 @@ class GlobalState {
     _playerStats = playerStats;
   }
 
-  void updateGameData(GameData data) {
+  void updateGameData(GameData? data) {
     _gameData = data;
   }
 

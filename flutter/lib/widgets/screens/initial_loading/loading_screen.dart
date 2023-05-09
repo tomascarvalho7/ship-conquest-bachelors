@@ -9,14 +9,11 @@ class InitialLoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserStorage>(
-        builder: (context, userStorage, _) {
-          userStorage.getToken().then(
-                  (value) => value == null ? context.go("/signIn") : context.go("/start")
-          );
+    return Consumer<UserStorage>(builder: (context, userStorage, _) {
+      userStorage.getToken().then((value) =>
+          value == null ? context.go("/signIn") : context.go("/home"));
 
-          return const CircularProgressIndicator();
-        }
-    );
+      return const CircularProgressIndicator();
+    });
   }
 }
