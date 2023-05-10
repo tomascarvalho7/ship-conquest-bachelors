@@ -81,6 +81,7 @@ flutter:
     - assets/images/lobby_mountains.png
     - assets/images/profile_back_mountain.png
     - assets/images/profile_front_mountains.png
+    - assets/images/default_user_image.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware

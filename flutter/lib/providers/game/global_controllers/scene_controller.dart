@@ -45,10 +45,11 @@ class SceneController with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Sequence<Coordinate>> getScene(Position position, ShipServices services) async {
-    final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
+  Future<Sequence<Coordinate>> getScene(Position position, ShipServices services, int sId) async {
+    //final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
+    final shouldFetch = true;
 
-    return shouldFetch ? fetchScene(position, services) : buildEmptyScene(position);
+    return shouldFetch ? fetchScene(position, services, sId) : buildEmptyScene(position);
   }
 
   Future<Sequence<Coordinate>> buildEmptyScene(Position position) async {
@@ -61,12 +62,12 @@ class SceneController with ChangeNotifier {
     return _newTiles;
   }
 
-  Future<Sequence<Coordinate>> fetchScene(Position position, ShipServices services) async {
+  Future<Sequence<Coordinate>> fetchScene(Position position, ShipServices services, int sId) async {
     // save & clear previous scene
     _savePreviousScene();
     // fetch terrain tiles
     final coord = position.toCoord2D();
-    await _fetchTerrainTiles(coord, services);
+    await _fetchTerrainTiles(coord, services, sId);
     // generate placeholder scene
     _generateWaterScene(coord);
 
@@ -99,9 +100,9 @@ class SceneController with ChangeNotifier {
       );
   }
 
-  Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services) async {
+  Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services, int sId) async {
     // fetch tiles from services
-    Horizon horizon = await services.getNewChunk(chunkSize, coordinate);
+    Horizon horizon = await services.getNewChunk(chunkSize, coordinate, sId);
     // update fetched tiles from existing ones
     for(var tile in horizon.tiles) {
       _newTilesMap.putIfAbsent(Coord2D(x: tile.x, y: tile.y), () => _newTiles.length);

@@ -492,13 +492,13 @@ class LobbyTile extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleLarge,
                     children: [
                       TextSpan(
-                          text: "10\n" /*lobby.players*/,
+                          text: "1\n" /*lobby.players*/,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
                               ?.copyWith(fontSize: 40)),
                       TextSpan(
-                        text: "players",
+                        text: "player",
                         style: Theme.of(context).textTheme.bodyMedium,
                       )
                     ]))

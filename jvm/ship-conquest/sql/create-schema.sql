@@ -3,9 +3,11 @@ create schema dbo;
 CREATE TABLE dbo.User
 (
     id varchar(30) NOT NULL,
+    username varchar(16) not null,
     name VARCHAR(24) NOT NULL,
     email varchar(60) CHECK(email LIKE '%@%') NOT null UNIQUE,
     imageUrl varchar(500),
+    description varchar(100),
     PRIMARY KEY (id)
 );
 
@@ -20,7 +22,11 @@ CREATE TABLE dbo.Lobby
 (
   tag VARCHAR(6) NOT NULL,
   name VARCHAR(26) NOT NULL,
-  PRIMARY KEY (tag)
+  uid varchar(30) not null,
+  username varchar(16) not null,
+  creationTime bigint not null,
+  PRIMARY KEY (tag),
+  FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );
 
 CREATE TABLE dbo.Game

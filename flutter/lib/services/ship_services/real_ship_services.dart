@@ -36,7 +36,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "75b5-194-210-194-148.ngrok-free.app";
+const baseUri = "c976-2001-8a0-6e2e-ba00-ec73-b1b6-24ee-a2c1.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -45,7 +45,7 @@ class RealShipServices extends ShipServices {
   RealShipServices({required this.userStorage, required this.lobbyStorage});
 
   @override
-  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates) async {
+  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId) async {
     final String? token = await userStorage.getToken();
     if (token == null) throw Exception("couldn't find token");
 
@@ -53,7 +53,7 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http
-        .get(Uri.https(baseUri, "$lobbyId/view", {'shipId': '1'}), headers: {
+        .get(Uri.https(baseUri, "$lobbyId/view", {'shipId': sId.toString()}), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
     if (response.statusCode == 200) {
@@ -145,7 +145,7 @@ class RealShipServices extends ShipServices {
     };
 
     final response = await http.post(
-        Uri.https(baseUri, "$lobbyId/navigate", {'shipId': '1'}),
+        Uri.https(baseUri, "$lobbyId/navigate", {'shipId': sId.toString()}),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',

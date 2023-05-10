@@ -8,12 +8,14 @@ import '../../../domain/minimap.dart';
 import '../../../domain/space/position.dart';
 
 class RouteController with ChangeNotifier {
+  // variables
   Sequence<Position> _hooks = Sequence.empty();
-  int? _startIndex;
+  int _startIndex = 0;
   PathPoints? _pathPoints;
   PathSegment? _pathSegment;
   Sequence<Coord2D> _routePoints = Sequence.empty();
 
+  int get selectedShipIndex => _startIndex;
   PathPoints? get pathPoints => _pathPoints;
   PathSegment? get pathSegment => _pathSegment;
 

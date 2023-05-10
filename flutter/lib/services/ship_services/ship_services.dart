@@ -14,7 +14,7 @@ import '../../domain/user/user_info.dart';
 
 //all of them need to use the lobby id
 abstract class ShipServices {
-  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates);
+  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId);
 
   Future<PlayerStats> getPlayerStatistics();
 

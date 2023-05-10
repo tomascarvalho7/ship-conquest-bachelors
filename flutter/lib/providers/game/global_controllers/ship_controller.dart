@@ -21,6 +21,8 @@ class ShipController with ChangeNotifier {
 
   Ship getMainShip() => ships.get(shipIds.get(selectedShip));
 
+  Ship getShip(int index) => ships.get(shipIds.get(index));
+
   void setFleet(Sequence<Ship> fleet) {
     ships = Grid(
         data: { for (var ship in fleet.data) ship.getSid() : ship }

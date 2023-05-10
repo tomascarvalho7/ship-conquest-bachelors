@@ -50,6 +50,9 @@ class IslandElement extends StatelessWidget {
                 ],
               ),
               ElevatedButton(
+                style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                    backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primary)
+                ),
                 onPressed: () => GameEvent.conquestIsland(context, island),
                 child: const Text('Conquest'),
               ),

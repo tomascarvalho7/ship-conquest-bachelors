@@ -68,7 +68,8 @@ class MinimapEvent {
     final shipController = context.read<ShipController>();
     final landmarks = routeController.routePoints;
     if (landmarks.length > 0) {
-      Ship ship = await services.navigateTo(0, landmarks);
+      final sId = shipController.getShip(routeController.selectedShipIndex).getSid();
+      Ship ship = await services.navigateTo(sId, landmarks);
       shipController.setSail(ship);
     }
     routeController.confirm();

@@ -50,7 +50,7 @@ class GameController {
     // load visited islands & get scene for current ship
     sceneController.load(Sequence.empty());
     final position = shipController.getMainShip().getPosition(globalScale);
-    sceneController.getScene(position, services);
+    sceneController.getScene(position, services, shipController.getMainShip().getSid());
     // fetch player minimap
     minimapController.load(await services.getMinimap());
 
@@ -59,9 +59,10 @@ class GameController {
   }
 
   Future<void> update() async {
+    final ship = shipController.getMainShip();
     // get scene for current ship
-    final position = shipController.getMainShip().getPosition(globalScale);
-    final tiles = await sceneController.getScene(position, services);
+    final position = ship.getPosition(globalScale);
+    final tiles = await sceneController.getScene(position, services, ship.getSid());
     // add scene to minimap
     minimapController.update(tiles);
   }

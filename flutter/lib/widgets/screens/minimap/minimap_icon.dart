@@ -8,7 +8,10 @@ class MinimapIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton(
         onPressed: onClick,
-        child: const SizedBox(width: 50, height: 50,)
+        child: Icon(
+            Icons.map,
+            color: Theme.of(context).colorScheme.background
+        )
     );
   }
 }

@@ -30,15 +30,13 @@ class ShipElement extends StatelessWidget {
               children: [
                 Text(
                   "Ship nrº ${index + 1}",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.0,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium
                 ),
                 const SizedBox(height: 5.0),
                 ElevatedButton.icon(
+                  style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                    backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primary)
+                  ),
                   onPressed: () => GameEvent.selectShip(context, index),
                   icon: const Icon(
                       Icons.assistant_navigation,

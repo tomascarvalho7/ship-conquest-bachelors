@@ -32,7 +32,7 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
   Future<void> _getPatchNotes() async {
     final services = Provider.of<ShipServices>(context, listen: false);
 
-    const notes = "patch notes bem fake 😹";
+    const notes = "Combat update!";
     //await services.getPatchNotes();
     setState(() {
       patchNotes = notes;

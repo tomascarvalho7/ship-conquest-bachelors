@@ -33,7 +33,7 @@ class FakeShipServices extends ShipServices {
   bool _conquested = false;
 
   @override
-  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates) async {
+  Future<Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId) async {
     if (euclideanDistance(coordinates, Coord2D(x: 10, y: 10)) > 20) {
       return Horizon(tiles: [], islands: []); // return empty list, so only water tiles will be rendered
     }
@@ -96,7 +96,7 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby) async {
-    return List<Lobby>.generate(10, (index) => Lobby(tag: "asd", name: "TestLobby", uid: "1", username: "gui17", creationTime: 234324));
+    return List<Lobby>.generate(5, (index) => Lobby(tag: "asd", name: "TestLobby", uid: "1", username: "franciscobarreiras", creationTime: 234324));
   }
 
   @override
@@ -116,7 +116,7 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<UserInfo> getPersonalInfo() async {
-    return UserInfo(username: "cenas", name: "name", email: "email", imageUrl: null, description: null);
+    return UserInfo(username: "cenas", name: "tomascarvalho", email: "email", imageUrl: null, description: null);
   }
 
   @override
@@ -143,13 +143,13 @@ class FakeShipServices extends ShipServices {
 
   @override
   Future<Ship?> getShip(int sid) async {
-    return StaticShip(sid: sid, coordinate: Coord2D(x: 50, y: 50));
+    return StaticShip(sid: sid, coordinate: Coord2D(x: 25, y: 25));
   }
 
   @override
   Future<Sequence<Ship>> getUserShips() async {
     return Sequence(data: [
-      StaticShip(sid: 0, coordinate: Coord2D(x: 50, y: 50)),
+      StaticShip(sid: 0, coordinate: Coord2D(x: 30, y: 30)),
       StaticShip(sid: 1, coordinate: Coord2D(x: 200, y: 75)),
     ]
     );
