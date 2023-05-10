@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 
 import '../../domain/path/path_points.dart';
 import '../../domain/space/position.dart';
 
 class RoutePainter extends CustomPainter {
-  final List<Position> hooks;
+  final Sequence<Position> hooks;
   final PathPoints? points;
   final double scale;
   final Color start;
@@ -26,7 +27,7 @@ class RoutePainter extends CustomPainter {
 
     final length = hooks.length;
     for(var i = 0; i < length; i++) {
-      drawPoint(canvas, hooks[i], start);
+      drawPoint(canvas, hooks.get(i), start);
     }
   }
 

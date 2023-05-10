@@ -1,12 +1,11 @@
 package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
-import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
 import com.example.shipconquest.domain.Minimap
 import com.example.shipconquest.domain.ShipPathTime
-import com.example.shipconquest.domain.Vector3
+import com.example.shipconquest.domain.ship_navigation.ship.Fleet
+import com.example.shipconquest.domain.ship_navigation.ship.Ship
 import com.example.shipconquest.domain.user.statistics.PlayerStatistics
-import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 
@@ -35,7 +34,7 @@ sealed class NavigationError {
     object InvalidNavigationPath: NavigationError()
 }
 
-typealias NavigationResult = Either<NavigationError, ShipPathTime>
+typealias NavigationResult = Either<NavigationError, Ship>
 
 sealed class ConquestIslandError {
     object GameNotFound: ConquestIslandError()
@@ -48,8 +47,11 @@ sealed class ConquestIslandError {
 
 typealias ConquestIslandResult = Either<ConquestIslandError, OwnedIsland>
 
-sealed class GetShipLocationError {
-    object ShipNotFound: GetShipLocationError()
+sealed class GetShipError {
+    object ShipNotFound: GetShipError()
 }
 
-typealias GetShipLocationResult = Either<GetShipLocationError, ShipLocationOutputModel>
+typealias GetShipResult = Either<GetShipError, Ship>
+
+// TODO: give more errors
+typealias GetShipsResult = Either<Nothing, Fleet>

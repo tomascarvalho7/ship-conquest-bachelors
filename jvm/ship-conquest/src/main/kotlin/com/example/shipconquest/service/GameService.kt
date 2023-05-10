@@ -1,22 +1,20 @@
 package com.example.shipconquest.service
 
-import com.example.shipconquest.controller.model.output.Vector2OutputModel
-import com.example.shipconquest.controller.model.output.ShipLocationOutputModel
 import com.example.shipconquest.domain.*
+import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
+import com.example.shipconquest.domain.ship_navigation.ship.Fleet
+import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
-import com.example.shipconquest.repo.jdbi.dbmodel.toShipPath
-import com.example.shipconquest.repo.jdbi.dbmodel.toVector2
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
@@ -24,10 +22,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 //take these out of here
 const val chunkSize = 20.0
@@ -42,19 +38,9 @@ class GameService(
 
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val positionInfo = transaction.gameRepo.getShipPosition(tag, shipId.toInt(), googleId)
+            val builder = transaction.shipRepo.getShipBuilder(tag, shipId.toInt(), googleId, gameLogic.getInstant())
                 ?: return@run left(GetChunksError.ShipPositionNotFound)
-            val coord: Vector2 = if (positionInfo.points.size == 1) {
-                positionInfo.points[0].toVector2()
-            } else {
-                val path = positionInfo.toShipPath()
-                    ?: return@run left(GetChunksError.ShipPositionNotFound)
-                val pos = path.getPositionFromTime().toVector2()
-                if (pos == path.landmarks.last().p3) {
-                    transaction.gameRepo.updateShipPosition(tag, googleId, shipId.toInt(), listOf(pos), null, null)
-                }
-                pos
-            }
+            val coord = gameLogic.getCoordFromMovement(builder.movement)
 
             val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, googleId)
             if (visitedPoints == null) {
@@ -119,50 +105,53 @@ class GameService(
         }
     }
 
-    fun navigate(tag: String, uid: String, shipId: String, points: List<Vector2>): NavigationResult {
-        if (!validateNavigationPath(buildBeziers(points))) {
+    fun navigate(tag: String, uid: String, shipId: Int, points: List<Vector2>): NavigationResult {
+        val movement = gameLogic.buildShipMovement(points)
+        if (!validateNavigationPath(movement.landmarks)) {
             return left(NavigationError.InvalidNavigationPath)
         }
 
         return transactionManager.run { transaction ->
-            val (startTime, duration) = gameLogic.buildShipPath(points)
-            transaction.gameRepo.updateShipPosition(
+            // delete future events since ship path has changed
+            transaction.eventRepo.deleteShipEventsAfterInstant(tag = tag, sid = shipId, instant = movement.startTime)
+            transaction.shipRepo.updateShipPosition(
                 tag,
                 uid,
-                shipId.toInt(),
+                shipId,
                 points,
-                startTime,
-                duration
+                movement.startTime,
+                movement.duration
             )
-            right(ShipPathTime(startTime.toString(), formatDuration(duration)))
+            // get all islands
+            val islands = transaction.islandRepo.getAll(tag)
+            val islandEvents = gameLogic.findIslandEvents(movement, islands) { instant, islandId ->
+                transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, islandId))
+            }
+            val shipBuilder = ShipBuilder(id = shipId, movement = movement, events = islandEvents)
+            right(gameLogic.buildShip(shipBuilder))
         }
     }
 
-    fun getShipLocation(tag: String, uid: String, shipId: String): GetShipLocationResult {
+    fun getShip(tag: String, uid: String, shipId: Int): GetShipResult {
         return transactionManager.run { transaction ->
-            val positionInfo = transaction.gameRepo.getShipPosition(tag, shipId.toInt(), uid)
-                ?: return@run left(GetShipLocationError.ShipNotFound)
+            val builder = transaction.shipRepo.getShipBuilder(tag, shipId, uid, gameLogic.getInstant())
+                ?: return@run left(GetShipError.ShipNotFound)
 
-            if (positionInfo.points.size == 1) {
-                val point = positionInfo.points.first()
-                right(
-                    ShipLocationOutputModel(
-                        listOf(Vector2OutputModel(point.x, point.y)),
-                        null,
-                        null
-                    )
+            return@run right(
+                value = gameLogic.buildShip(builder = builder)
+            )
+        }
+    }
+
+    fun getShips(tag: String, uid: String): GetShipsResult {
+        return transactionManager.run { transaction ->
+            val shipsBuilder = transaction.shipRepo.getShipsBuilder(tag = tag, uid = uid, gameLogic.getInstant())
+
+            return@run right(
+                value = Fleet(
+                    ships = shipsBuilder.map { builder -> gameLogic.buildShip(builder = builder) }
                 )
-            } else if (positionInfo.startTime != null && positionInfo.duration != null) {
-                right(
-                    ShipLocationOutputModel(
-                        positionInfo.points.map { Vector2OutputModel(it.x, it.y) },
-                        positionInfo.startTime.toString(),
-                        formatDuration(positionInfo.duration)
-                    )
-                )
-            } else {
-                left(GetShipLocationError.ShipNotFound)
-            }
+            )
         }
     }
 

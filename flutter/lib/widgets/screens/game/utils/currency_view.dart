@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/providers/statistics_state.dart';
+import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
 
 class CurrencyView extends StatelessWidget {
   // constructor
@@ -8,7 +8,7 @@ class CurrencyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<StatisticsState>(
+      Consumer<StatisticsController>(
         builder: (_, state, __) =>
             Container(
               width: 120,

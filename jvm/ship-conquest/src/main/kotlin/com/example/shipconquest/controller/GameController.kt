@@ -5,6 +5,8 @@ import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.*
+import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
+import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.GameService
 import com.example.shipconquest.service.result.*
@@ -94,18 +96,12 @@ class GameController(val service: GameService) {
         user: User,
         @PathVariable tag: String,
         @RequestBody bodyObj: NavigationPathInputModel,
-        @RequestParam shipId: String
+        @RequestParam shipId: Int
     ): ResponseEntity<*> {
         val result = service.navigate(tag, user.id, shipId, bodyObj.points)
 
         return when (result) {
-            is Either.Right -> response(
-                content = ShipPathTimeOutputModel(
-                    result.value.startTime,
-                    result.value.duration
-                )
-            )
-
+            is Either.Right -> response(content = result.value.toShipOutputModel())
             is Either.Left -> when (result.value) {
                 NavigationError.InvalidNavigationPath ->
                     Problem.response(status = 404, problem = Problem.invalidNavigation())
@@ -113,20 +109,30 @@ class GameController(val service: GameService) {
         }
     }
 
-    @GetMapping("/{tag}/ship/location")
-    fun getShipLocation(
+    @GetMapping("/{tag}/ship")
+    fun getShip(
         user: User,
         @PathVariable tag: String,
-        @RequestParam shipId: String
+        @RequestParam shipId: Int
     ): ResponseEntity<*> {
-        val result = service.getShipLocation(tag = tag, uid = user.id, shipId = shipId)
+        val result = service.getShip(tag = tag, uid = user.id, shipId = shipId)
 
         return when (result) {
-            is Either.Right -> response(content = result.value)
+            is Either.Right -> response(content = result.value.toShipOutputModel())
             is Either.Left -> when (result.value) {
-                GetShipLocationError.ShipNotFound ->
+                GetShipError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
             }
+        }
+    }
+
+    @GetMapping("/{tag}/ships")
+    fun getShips(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        val result = service.getShips(tag = tag, uid = user.id)
+
+        return when (result) {
+            is Either.Right -> response(content = result.value.toFleetOutputModel())
+            is Either.Left -> TODO("bruh")
         }
     }
 

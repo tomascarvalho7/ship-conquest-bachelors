@@ -60,6 +60,29 @@ CREATE TABLE dbo.Ship
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
 );
 
+CREATE TABLE dbo.FightEvent
+(
+    tag varchar(6) NOT NULL,
+    eid int GENERATED ALWAYS AS IDENTITY,
+    instant int NOT NULL,
+    sidA serial NOT NULL,
+    sidB serial NOT NULL,
+    winner INT NOT NULL,
+    PRIMARY KEY (tag, eid),
+    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.IslandEvent
+(
+    tag varchar(6) NOT NULL,
+    eid INT GENERATED ALWAYS AS IDENTITY,
+    instant INT NOT NULL,
+    sid INT NOT NULL,
+    islandId INT NOT NULL,
+    PRIMARY KEY (tag, eid),
+    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
 CREATE TABLE dbo.WildIsland
 (
     tag varchar(6) NOT NULL,

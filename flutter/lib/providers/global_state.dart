@@ -7,13 +7,12 @@ import '../domain/game_data.dart';
 
 /// holds Application global state
 class GlobalState {
-  final ColorGradient colorGradient;
   Position? _cameraPos;
   double? _cameraScale;
   GameData? _gameData;
   PlayerStats? _playerStats;
   // constructor
-  GlobalState({required this.colorGradient});
+  GlobalState();
   // getters
   bool get isPlayable => _playerStats != null && _gameData != null;
   PlayerStats? get playerStats => _playerStats;

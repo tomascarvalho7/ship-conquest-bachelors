@@ -1,36 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
-import 'package:ship_conquest/domain/ship/dynamic_ship.dart';
+import 'package:ship_conquest/domain/ship/mobile_ship.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/dynamic_ship_widget.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/islands_view.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/tiles_view.dart';
-import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
+import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/fleet.dart';
-import '../../../providers/tile_manager.dart';
+import '../../../providers/game/global_controllers/scene_controller.dart';
 import '../../../utils/constants.dart';
 import '../../miscellaneous/camera_control.dart';
 import '../../miscellaneous/ship/ship_widget.dart';
 
 class GameView extends StatelessWidget {
   final Animation<double> animation;
-  final Color background;
   final ColorGradient colorGradient;
-  final GameEvent gameEvent;
   // constructor
   const GameView({
     super.key,
     required this.animation,
-    required this.background,
-    required this.colorGradient,
-    required this.gameEvent
+    required this.colorGradient
   });
 
   @override
   Widget build(BuildContext context) =>
       CameraControl(
-          background: background,
-          child: Consumer<TileManager>(
+          background: Theme.of(context).colorScheme.background,
+          child: Consumer<SceneController>(
             builder: (_, tileManager, child) =>
                 Stack(
                   children: [
@@ -44,7 +40,7 @@ class GameView extends StatelessWidget {
                     ),
                     Fleet(
                         widget: (ship) {
-                          if (ship is DynamicShip) {
+                          if (ship is MobileShip) {
                             return DynamicShipWidget(
                               ship: ship,
                               waveAnim: animation,

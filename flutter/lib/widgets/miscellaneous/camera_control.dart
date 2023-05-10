@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../providers/camera.dart';
+import '../../providers/camera_controller.dart';
 
 class CameraControl extends StatelessWidget {
   final Color background;
@@ -18,7 +18,7 @@ class CameraControl extends StatelessWidget {
   Widget build(BuildContext context) =>
       LayoutBuilder(
           builder: (_, constraints) =>
-              Consumer<Camera>(
+              Consumer<CameraController>(
                 builder: (_, camera, __) =>
                     GestureDetector(
                         onTapDown: (details) => onTap(camera, details, constraints),
@@ -46,15 +46,15 @@ class CameraControl extends StatelessWidget {
               )
       );
 
-  void onTap(Camera camera, TapDownDetails details, BoxConstraints constraints) {
+  void onTap(CameraController camera, TapDownDetails details, BoxConstraints constraints) {
     // do nothing
   }
 
-  void onStart(Camera camera, ScaleStartDetails details, BoxConstraints constraints) {
+  void onStart(CameraController camera, ScaleStartDetails details, BoxConstraints constraints) {
     camera.onStart();
   }
 
-  void onUpdate(Camera camera, ScaleUpdateDetails details) {
+  void onUpdate(CameraController camera, ScaleUpdateDetails details) {
     camera.onUpdate(details.scale, details.focalPointDelta);
   }
 

@@ -1,5 +1,5 @@
 import 'package:ship_conquest/domain/tile/tile_state.dart';
-import 'package:ship_conquest/domain/space/sequence.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 
 import '../space/coord_2d.dart';
 

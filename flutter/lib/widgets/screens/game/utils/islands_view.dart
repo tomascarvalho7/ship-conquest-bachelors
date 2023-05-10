@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/island/island_presentation.dart';
-import 'package:ship_conquest/domain/space/sequence.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import '../../../../domain/island/island.dart';
 import '../../../../domain/isometric/isometric.dart';
 

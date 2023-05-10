@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/ship/ship.dart';
-import '../../../providers/ship_manager.dart';
+import '../../../providers/game/global_controllers/ship_controller.dart';
 
 class Fleet extends StatelessWidget {
   final Widget Function(Ship ship) widget;
@@ -10,7 +10,7 @@ class Fleet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<ShipManager>(
+      Consumer<ShipController>(
           builder: (_, shipManager, __) =>
               Stack(
                 children: shipManager.buildListFromShips(widget),

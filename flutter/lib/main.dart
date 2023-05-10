@@ -1,10 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/app_theme.dart';
+import 'package:ship_conquest/providers/game/game_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/schedule_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
-import 'package:ship_conquest/providers/minimap_provider.dart';
+import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/config/router/create_router.dart';
 import 'package:ship_conquest/services/ship_services/fake_ship_services.dart';
@@ -18,26 +22,13 @@ import 'domain/color/color_ramp.dart';
 import 'domain/utils/factor.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
-  final ColorRamp colorRamp = ColorRamp(colors: [
-    ColorMark(factor: Factor(0.0), color: waterColor),
-    ColorMark(factor: Factor(0.01), color: const Color.fromRGBO(
-        196, 190, 175, 1.0)),
-    ColorMark(factor: Factor(0.1), color: const Color.fromRGBO(
-        211, 168, 119, 1.0)),
-    ColorMark(factor: Factor(0.15), color: const Color.fromRGBO(116, 153, 72, 1.0)),
-    ColorMark(factor: Factor(0.3), color: const Color.fromRGBO(77, 130, 40, 1.0)),
-    ColorMark(factor: Factor(0.7), color: const Color.fromRGBO(177, 211, 114, 1.0)),
-    ColorMark(factor: Factor(0.71), color: const Color.fromRGBO(170, 145, 107, 1.0)),
-    ColorMark(factor: Factor(0.85), color: const Color.fromRGBO(157, 117, 64, 1.0)),
-    ColorMark(factor: Factor(1.0), color: const Color.fromRGBO(255, 255, 255, 1.0)),
-  ]);
-
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -47,9 +38,22 @@ class MyApp extends StatelessWidget {
           ProxyProvider2<UserStorage, LobbyStorage, ShipServices>(
               update: (_, userStorage, lobbyStorage, __) => FakeShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
           ),
-          Provider(create: (_) => GlobalState(
-              colorGradient: ColorGradient(colorRamp: colorRamp, step: Factor(0.01)))
-          )
+          Provider(create: (_) => GlobalState()),
+          Provider(create: (_) => ScheduleController()),
+          ChangeNotifierProvider(create: (_) => ShipController()),
+          ChangeNotifierProvider(create: (_) => SceneController()),
+          ChangeNotifierProvider(create: (_) => MinimapController()),
+          ChangeNotifierProvider(create: (_) => StatisticsController()),
+          Provider<GameController>(create: (gameContext) =>
+              GameController(
+                  shipController: gameContext.read<ShipController>(),
+                  statisticsController: gameContext.read<StatisticsController>(),
+                  minimapController: gameContext.read<MinimapController>(),
+                  sceneController: gameContext.read<SceneController>(),
+                  services: gameContext.read<ShipServices>(),
+                  scheduleController: gameContext.read<ScheduleController>()
+              )
+          ),
         ],
         child: MaterialApp.router(
             title: 'Ship Conquest',

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/widgets/screens/leave_game/leave_game_screen.dart';
 
+import '../game/game.dart';
+import '../game/game_screen.dart';
 import '../game_loading/game_loading_screen.dart';
 
 class GameUI extends StatefulWidget {
@@ -26,7 +28,7 @@ class _GameUIState extends State<GameUI> {
         controller: _pc,
         children: const [
           LeaveGameScreen(),
-          GameLoadingScreen(dst: "game"),
+          GameScreen(),
           LeaveGameScreen(),
         ],
         onPageChanged: (page) {

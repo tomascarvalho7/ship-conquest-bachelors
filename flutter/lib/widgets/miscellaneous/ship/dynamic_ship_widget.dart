@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
 import '../../../domain/isometric/isometric.dart';
 import '../../../domain/ship/direction.dart';
-import '../../../domain/ship/dynamic_ship.dart';
+import '../../../domain/ship/mobile_ship.dart';
 import '../../../domain/space/position.dart';
 
 class DynamicShipWidget extends StatefulWidget {
   final Animation<double> waveAnim;
-  final DynamicShip ship;
+  final MobileShip ship;
   final double tileSize;
   // constructor
   const DynamicShipWidget({super.key, required this.ship, required this.waveAnim, required this.tileSize});

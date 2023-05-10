@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:ship_conquest/domain/stats/player_stats.dart';
-import 'package:ship_conquest/providers/tile_manager.dart';
-import 'package:ship_conquest/widgets/screens/game/events/game_event.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/currency_view.dart';
-import 'package:ship_conquest/widgets/screens/game/utils/game_details_scrollable.dart';
+import 'package:ship_conquest/widgets/screens/game/utils/game_details_slider.dart';
 
 import '../minimap/minimap_icon.dart';
 
 class GameInterface extends StatelessWidget {
   final Widget gameView;
-  final GameEvent eventHandler;
-  const GameInterface({super.key, required this.eventHandler, required this.gameView});
+  const GameInterface({super.key, required this.gameView});
 
   @override
   Widget build(BuildContext context) =>
@@ -20,7 +15,7 @@ class GameInterface extends StatelessWidget {
         children: [
           gameView,
           topBar(context),
-          GameDetailsScrollable(eventHandler: eventHandler)
+          const GameDetailsSlider()
         ]
       );
 
@@ -32,7 +27,6 @@ class GameInterface extends StatelessWidget {
             children: [
               MinimapIcon(
                   onClick: () {
-                    eventHandler.saveGameData();
                     context.go('/minimap'); // go to minimap screen
                   }
               ),

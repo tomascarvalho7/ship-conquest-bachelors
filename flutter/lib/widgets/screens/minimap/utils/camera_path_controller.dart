@@ -1,30 +1,29 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/path/path_segment.dart';
 import 'package:ship_conquest/domain/space/offset.dart';
 import 'package:ship_conquest/widgets/miscellaneous/camera_control.dart';
-import 'package:ship_conquest/widgets/screens/minimap/events/minimap_event.dart';
+import 'package:ship_conquest/providers/game/event_handlers/minimap_event.dart';
 
 import '../../../../domain/space/position.dart';
-import '../../../../providers/camera.dart';
-import '../../../../providers/route_manager.dart';
+import '../../../../providers/camera_controller.dart';
+import '../../../../providers/game/minimap_controllers/route_controller.dart';
 
 class CameraPathController extends CameraControl {
-  final List<Position> nodes;
-  final MinimapEvent eventHandler;
-  late final RouteManager routeManager = eventHandler.route;
+  final Sequence<Position> nodes;
+  final RouteController routeController;
+  final BuildContext context;
   // constructor
-  CameraPathController({
+  const CameraPathController({
     super.key,
     required super.background,
     required super.child,
-    required this.eventHandler,
+    required this.routeController,
+    required this.context,
     required this.nodes,
-  }) {
-    // everytime this widget is inserted in the widget tree, setup eventHandler
-    eventHandler.setup();
-  }
+  });
 
   static const radius = 50;
 
@@ -32,7 +31,7 @@ class CameraPathController extends CameraControl {
   double _distance(Position a, Position b) => sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
 
   @override
-  void onStart(Camera camera, ScaleStartDetails details, BoxConstraints constraints) {
+  void onStart(CameraController camera, ScaleStartDetails details, BoxConstraints constraints) {
     final Position screenPosition = details.localFocalPoint.toPosition() - camera.coordinates * camera.scaleFactor;
     final Position constraintOffset = Position(
         x: constraints.maxWidth / 2,
@@ -49,28 +48,28 @@ class CameraPathController extends CameraControl {
   }
 
   @override
-  void onUpdate(Camera camera, ScaleUpdateDetails details) {
-    if (routeManager.pathSegment == null) {
+  void onUpdate(CameraController camera, ScaleUpdateDetails details) {
+    if (routeController.pathSegment == null) {
       super.onUpdate(camera, details);
     } else {
       final Position position = details.focalPointDelta.toPosition() * (1 / camera.scaleFactor);
 
-      eventHandler.moveNode(position);
+      routeController.moveNode(position);
     }
   }
 
   @override
   void onEnd(ScaleEndDetails details) {
-    eventHandler.deselectAndBuildPath();
+    MinimapEvent.deselectAndBuildPath(context);
     super.onEnd(details);
   }
 
   bool selectMainNodes(Position position, double scale) {
     final int length = nodes.length;
     for(var i = 0; i < length; i++) {
-      final Position hook = nodes[i];
+      final Position hook = nodes.get(i);
       if (_distance(hook, position) < radius / scale) {
-        routeManager.selectMainNode(i);
+        routeController.selectMainNode(i);
         return true; // selected a main node !
       }
     }
@@ -79,14 +78,14 @@ class CameraPathController extends CameraControl {
   }
 
   bool selectSecondaryNodes(Position position, double scale) {
-    final pathPoints = routeManager.pathPoints;
+    final pathPoints = routeController.pathPoints;
     if (pathPoints == null) return false; // there are no secondary points
 
     if (_distance(pathPoints.mid, position) < radius / scale) {
-      routeManager.selectSecondaryNode(PathSegment.mid);
+      routeController.selectSecondaryNode(PathSegment.mid);
       return true; // selected the mid node
     } else if (_distance(pathPoints.end, position) < radius / scale) {
-      routeManager.selectSecondaryNode(PathSegment.end);
+      routeController.selectSecondaryNode(PathSegment.end);
       return true; // selected the end node
     }
 

@@ -1,17 +1,23 @@
 import 'package:ship_conquest/domain/ship/ship.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 
 import '../space/position.dart';
 import 'direction.dart';
 
 class StaticShip extends Ship {
-  final Position position;
-  final Direction orientation;
+  final int sid;
+  final Coord2D coordinate;
   // constructor
-  StaticShip({required this.position, required this.orientation});
+  StaticShip({required this.sid, required this.coordinate});
+
+  static const direction = Direction.up;
 
   @override
-  Position getPosition(double scale) => position * scale;
+  int getSid() => sid;
 
   @override
-  Direction getOrientation() => orientation;
+  Position getPosition(double scale) => coordinate * scale;
+
+  @override
+  Direction getDirection() => direction;
 }

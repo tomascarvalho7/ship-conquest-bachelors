@@ -1,7 +1,5 @@
 class Factor {
-  late final double value;
-
-  Factor(double fraction) {
-    value = fraction % 1.01;
-  }
+  final double value;
+  //constructor
+  const Factor({required this.value});
 }

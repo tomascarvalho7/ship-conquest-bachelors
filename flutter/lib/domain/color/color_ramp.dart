@@ -6,7 +6,7 @@ import '../utils/factor.dart';
 class ColorRamp {
   final List<ColorMark> colors;
 
-  ColorRamp({required this.colors});
+  const ColorRamp({required this.colors});
 
   Color getColor(Factor factor) {
     int n = 0;
@@ -14,7 +14,7 @@ class ColorRamp {
       ColorMark start = colors[n];
       ColorMark end = colors[n + 1];
 
-      Factor scopedFactor = Factor(
+      Factor scopedFactor = Factor(value:
           (factor.value - start.factor.value) / (end.factor.value - start.factor.value)
       );
 

@@ -12,8 +12,8 @@ class Coord2DInputModel {
 }
 
 extension ConvertList on List<Coord2DInputModel> {
-  toCoord2DList() {
-    return map((coord) => Coord2D(x: coord.x, y: coord.y));
+  List<Coord2D> toCoord2DList() {
+    return map((coord) => Coord2D(x: coord.x, y: coord.y)).toList();
   }
 }
 

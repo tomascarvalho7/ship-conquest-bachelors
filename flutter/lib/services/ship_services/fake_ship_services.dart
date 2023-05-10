@@ -3,9 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/owned_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
@@ -14,6 +16,8 @@ import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 
 import '../../domain/lobby.dart';
+import '../../domain/ship/mobile_ship.dart';
+import '../../domain/ship/static_ship.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
 import '../../domain/user/user_info.dart';
@@ -62,7 +66,7 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Minimap> getMinimap(ColorGradient colorGradient) async {
+  Future<Minimap> getMinimap() async {
     return Minimap(
       length: 500,
       data: HashMap() // empty map
@@ -70,24 +74,24 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<ShipPath> navigateTo(int sId, List<Coord2D> landmarks) async {
+  Future<Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
     double distance = 0.0;
     for(int i = 0; i < landmarks.length - 1; i++) {
-      final a = landmarks[i];
-      final b = landmarks[i + 1];
+      final a = landmarks.get(i);
+      final b = landmarks.get(i + 1);
       distance += euclideanDistance(a, b);
     }
 
-    return ShipPath(
-        landmarks: buildBeziers(landmarks),
-        startTime: DateTime.now(),
-        duration: Duration(seconds: (distance * 10).round())
+    return MobileShip(
+        sid: sId,
+        path: ShipPath(
+            landmarks: buildBeziers(landmarks.data),
+            startTime: DateTime.now(),
+            duration: Duration(seconds: (distance * 10).round())
+        ),
+        completedEvents: Sequence.empty(),
+        futureEvents: Sequence.empty()
     );
-  }
-
-  @override
-  Future<Position> getMainShipLocation() async {
-    return const Position(x: 30, y: 30);
   }
 
   @override
@@ -135,6 +139,20 @@ class FakeShipServices extends ShipServices {
   @override
   Future<Token> logIn(String idToken) async {
     return Token(token: "FAKE-ID");
+  }
+
+  @override
+  Future<Ship?> getShip(int sid) async {
+    return StaticShip(sid: sid, coordinate: Coord2D(x: 50, y: 50));
+  }
+
+  @override
+  Future<Sequence<Ship>> getUserShips() async {
+    return Sequence(data: [
+      StaticShip(sid: 0, coordinate: Coord2D(x: 50, y: 50)),
+      StaticShip(sid: 1, coordinate: Coord2D(x: 200, y: 75)),
+    ]
+    );
   }
 }
 

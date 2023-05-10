@@ -16,7 +16,7 @@ class ShipWidget extends StatelessWidget {
 
   // optimizations
   late final position = toIsometric(ship.getPosition(globalScale));
-  late final orientation = ship.getOrientation();
+  late final orientation = ship.getDirection();
   late final shipScale = tileSize * 4;
   late final double waveOffset = (position.x + position.y) / -3;
 

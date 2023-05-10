@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/widgets/canvas/route_painter.dart';
 
 import '../../../domain/space/position.dart';
-import '../../../providers/camera.dart';
-import '../../../providers/route_manager.dart';
+import '../../../providers/camera_controller.dart';
+import '../../../providers/game/minimap_controllers/route_controller.dart';
 
 class RouteView extends StatelessWidget {
-  final List<Position> hooks;
+  final Sequence<Position> hooks;
   final Widget child;
   // constructor
   const RouteView({super.key, required this.hooks, required this.child});
@@ -19,9 +20,9 @@ class RouteView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Consumer<Camera>(
+      Consumer<CameraController>(
           builder: (_, camera, __) =>
-              Consumer<RouteManager>(
+              Consumer<RouteController>(
                   builder: (_, pathManager, __) =>
                       CustomPaint(
                           painter: RoutePainter(

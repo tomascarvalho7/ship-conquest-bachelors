@@ -110,7 +110,7 @@ class LobbyService(
 
     fun addPlayerToLobby(transaction: Transaction, tag: String, uid: String) {
         transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
-        transaction.gameRepo.createShipPosition(tag, uid, generateRandomSpawnPoint(), null, null)
+        transaction.shipRepo.createShipPosition(tag, uid, generateRandomSpawnPoint(), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
 

@@ -56,20 +56,8 @@ GoRouter createRouter() => GoRouter(initialLocation: "/", routes: [
               GameLoadingScreen(dst: state.params['dst']!)),
       GoRoute(
           path: '/game',
-          redirect: (context, _) =>
-              !context.read<GlobalState>().isPlayable ? '/loading/game' : null,
-          builder: (BuildContext context, GoRouterState state) {
-            final globalState = context.read<GlobalState>();
-            return GameScreen(
-              data: globalState.gameData!,
-              stats: globalState.playerStats!,
-            );
-          }),
+          builder: (BuildContext context, GoRouterState state) => const GameScreen()),
       GoRoute(
           path: '/minimap',
-          redirect: (context, _) => context.read<GlobalState>().gameData == null
-              ? '/loading/minimap'
-              : null,
-          builder: (BuildContext context, GoRouterState state) =>
-              MinimapScreen(data: context.read<GlobalState>().gameData!)),
+          builder: (BuildContext context, GoRouterState state) => const MinimapScreen()),
     ]);

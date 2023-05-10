@@ -1,10 +1,12 @@
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 
 import '../../domain/lobby.dart';
 import '../../domain/minimap.dart';
+import '../../domain/ship/ship.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
 import '../../domain/user/token.dart';
@@ -20,18 +22,17 @@ abstract class ShipServices {
 
   Future<Token> logIn(String idToken);
 
-  Future<Minimap> getMinimap(ColorGradient colorGradient);
+  Future<Minimap> getMinimap();
 
-  Future<ShipPath> navigateTo(int sId, List<Coord2D> landmarks);
+  // Ship related routes
+  Future<Ship> navigateTo(int sId, Sequence<Coord2D> landmarks);
+  Future<Ship?> getShip(int sId);
+  Future<Sequence<Ship>> getUserShips();
 
-  Future<Object?> getMainShipLocation();
-
+  // Lobby related routes
   Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby);
-
   Future<String> joinLobby(String tag);
-
   Future<String> createLobby(String name);
-
   Future<Lobby> getLobby(String tag);
 
   Future<UserInfo> getPersonalInfo();
