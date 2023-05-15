@@ -18,6 +18,7 @@ import com.example.shipconquest.domain.user.statistics.build
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.WildIsland
+import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.service.buildBeziers
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -57,27 +58,51 @@ class GameLogic(private val clock: Clock) {
 
     fun buildPlayerStatistics(builder: PlayerStatsBuilder) = builder.build(clock.now())
 
+    fun getShipBuilder(tag: String, uid: String, sid: Int, transaction: Transaction): ShipBuilder? {
+        val info = transaction.shipRepo.getShipInfo(tag = tag, uid = uid, shipId = sid) ?: return null
+
+        val events = if (info.movement is Mobile) {
+            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, instant = info.movement.startTime)
+        } else emptyList()
+
+        return ShipBuilder(info = info, events = events)
+    }
+
+    fun getShipsBuilder(tag: String, uid: String, transaction: Transaction): List<ShipBuilder> {
+        val fleetInfo = transaction.shipRepo.getShipsInfo(tag = tag, uid = uid)
+
+        return List(fleetInfo.size) { index ->
+            val info = fleetInfo[index]
+
+            val events = if (info.movement is Mobile) {
+                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, instant = info.movement.startTime)
+            } else emptyList()
+
+            return@List ShipBuilder(info = info, events = events)
+        }
+    }
+
     fun buildShip(builder: ShipBuilder) = builder.build(clock.now())
 
     fun findIslandEvents(
         pathMovement: Mobile,
         islands: List<Island>,
-        onIslandEvent: (instant: Instant, islandId: Int) -> Event
+        onIslandEvent: (instant: Instant, island: Island) -> Event
     ): List<Event> {
-        val intersection = findIntersectionPoints(pathMovement.getPoints(), islands) ?: return emptyList()
+        val intersection = findIntersectionPoints(pathMovement.getUniquePoints(), islands) ?: return emptyList()
         val u = findNearestU(intersection, pathMovement)
-        return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.islandId))
+        return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.island))
     }
 
     fun findFightEvents(pathMovement: Mobile, shipBuilders: List<ShipBuilder>) = buildList {
-        val pathOutline = buildOutlinePlanes(pathMovement.getPoints(), thickness = 5.0)
-        val shipsInMovement = shipBuilders.filter { it.movement is Mobile && it.events == null }
+        val pathOutline = buildOutlinePlanes(pathMovement.getUniquePoints(), thickness = 5.0)
+        val shipsInMovement = shipBuilders.filter { it.info.movement is Mobile }
 
         // for every ship in movement
         for (ship in shipsInMovement) {
-            val movement = ship.movement as Mobile
+            val movement = ship.info.movement as Mobile
             val index = (movement.getU(clock.now()) * 3).toInt() // plane index
-            val otherOutline = buildOutlinePlanes(movement.getPoints(), thickness = 5.0)
+            val otherOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
 
             // check every plane for an intersection with other planes
             for (i in pathOutline.indices) {
@@ -106,7 +131,7 @@ class GameLogic(private val clock: Clock) {
             val b = points[i + 1];
             distance += calculateEuclideanDistance(a, b)
         }
-        val duration = Duration.ofSeconds((distance * 10).roundToLong())
+        val duration = Duration.ofSeconds((distance * 2.5).roundToLong()) // was 10 before
 
         return Mobile(landmarks = buildBeziers(points), startTime = clock.now(), duration = duration)
     }

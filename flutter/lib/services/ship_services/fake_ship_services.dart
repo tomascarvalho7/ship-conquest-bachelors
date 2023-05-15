@@ -2,22 +2,19 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/owned_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
-import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 
 import '../../domain/lobby.dart';
-import '../../domain/ship/mobile_ship.dart';
-import '../../domain/ship/static_ship.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
 import '../../domain/user/user_info.dart';
@@ -89,8 +86,8 @@ class FakeShipServices extends ShipServices {
             startTime: DateTime.now(),
             duration: Duration(seconds: (distance * 10).round())
         ),
-        completedEvents: Sequence.empty(),
-        futureEvents: Sequence.empty()
+        completedEvents: Grid.empty(),
+        futureEvents: Grid.empty()
     );
   }
 
@@ -142,15 +139,30 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future<Ship?> getShip(int sid) async {
-    return StaticShip(sid: sid, coordinate: Coord2D(x: 25, y: 25));
+  Future<Ship?> getShip(int sId) async {
+    return StaticShip(
+        sid: sId,
+        coordinate: Coord2D(x: 25, y: 25),
+        completedEvents: Grid.empty(),
+        futureEvents: Grid.empty()
+    );
   }
 
   @override
   Future<Sequence<Ship>> getUserShips() async {
     return Sequence(data: [
-      StaticShip(sid: 0, coordinate: Coord2D(x: 30, y: 30)),
-      StaticShip(sid: 1, coordinate: Coord2D(x: 200, y: 75)),
+      StaticShip(
+          sid: 0,
+          coordinate: Coord2D(x: 25, y: 25),
+          completedEvents: Grid.empty(),
+          futureEvents: Grid.empty()
+      ),
+      StaticShip(
+          sid: 1,
+          coordinate: Coord2D(x: 50, y: 120),
+          completedEvents: Grid.empty(),
+          futureEvents: Grid.empty()
+      ),
     ]
     );
   }

@@ -1,7 +1,5 @@
-import 'package:ship_conquest/domain/color/color_gradient.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
-import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 
 import '../../domain/lobby.dart';

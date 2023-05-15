@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/ship/static_ship.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import '../../../domain/immutable_collections/grid.dart';
 import '../../../domain/immutable_collections/sequence.dart';
-import '../../../domain/ship/mobile_ship.dart';
 import '../../../domain/ship/ship.dart';
 
 ///
@@ -25,18 +23,18 @@ class ShipController with ChangeNotifier {
 
   void setFleet(Sequence<Ship> fleet) {
     ships = Grid(
-        data: { for (var ship in fleet.data) ship.getSid() : ship }
+        data: { for (var ship in fleet) ship.sid : ship }
     );
-    shipIds = Sequence(data: fleet.map((ship) => ship.getSid()).data);
+    shipIds = Sequence(data: fleet.map((ship) => ship.sid).data);
+  }
+
+  void updateShip(Ship ship) {
+    ships = ships.put(ship.sid, ship);
+    notifyListeners();
   }
 
   void selectShip(int index) {
     selectedShip = index;
-  }
-
-  void setSail(Ship ship) {
-    ships = ships.put(ship.getSid(), ship);
-    notifyListeners();
   }
 
   void updateFleetStatus() {
@@ -57,6 +55,8 @@ class ShipController with ChangeNotifier {
       return StaticShip(
           sid: ship.sid,
           coordinate: ship.path.getPositionFromTime().toCoord2D(),
+          completedEvents: ship.completedEvents,
+          futureEvents: ship.futureEvents
       );
     }
 

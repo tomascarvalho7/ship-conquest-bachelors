@@ -29,10 +29,9 @@ class RouteController with ChangeNotifier {
 
   void setupHooks(Sequence<Position> hooks) {
     _hooks = hooks;
-    final index = _startIndex;
     final path = pathPoints;
-    if (index != null && path != null) {
-      _updatePoints(points: PathPoints(start: hooks.get(index), mid: path.mid, end: path.end));
+    if (path != null) {
+      _updatePoints(points: PathPoints(start: hooks.get(_startIndex), mid: path.mid, end: path.end));
     }
   }
 
@@ -54,9 +53,8 @@ class RouteController with ChangeNotifier {
   void moveNode(Position delta) {
     if (_pathSegment == null) return; // no nodes to move
 
-    final index = _startIndex;
-    if (_pathSegment == PathSegment.start && index != null) {
-      draw(_hooks.get(index), delta);
+    if (_pathSegment == PathSegment.start) {
+      draw(_hooks.get(_startIndex), delta);
     } else if (_pathSegment == PathSegment.mid) {
       updateMid(delta);
     } else {

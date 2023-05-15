@@ -8,12 +8,14 @@ import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.ship_navigation.ship.Fleet
 import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
+import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
+import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
@@ -38,9 +40,9 @@ class GameService(
 
     fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val builder = transaction.shipRepo.getShipBuilder(tag, shipId.toInt(), googleId, gameLogic.getInstant())
+            val shipInfo = transaction.shipRepo.getShipInfo(tag, shipId.toInt(), googleId)
                 ?: return@run left(GetChunksError.ShipPositionNotFound)
-            val coord = gameLogic.getCoordFromMovement(builder.movement)
+            val coord = gameLogic.getCoordFromMovement(shipInfo.movement)
 
             val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, googleId)
             if (visitedPoints == null) {
@@ -114,7 +116,7 @@ class GameService(
         return transactionManager.run { transaction ->
             // delete future events since ship path has changed
             transaction.eventRepo.deleteShipEventsAfterInstant(tag = tag, sid = shipId, instant = movement.startTime)
-            transaction.shipRepo.updateShipPosition(
+            transaction.shipRepo.updateShipInfo(
                 tag,
                 uid,
                 shipId,
@@ -124,17 +126,19 @@ class GameService(
             )
             // get all islands
             val islands = transaction.islandRepo.getAll(tag)
-            val islandEvents = gameLogic.findIslandEvents(movement, islands) { instant, islandId ->
-                transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, islandId))
+            val islandEvents = gameLogic.findIslandEvents(movement, islands) { instant, island ->
+                val duration = Duration.between(gameLogic.getInstant(), instant)
+                logger.info("minutes: {}, seconds: {}", duration.toMinutes(), duration.seconds)
+                transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, island))
             }
-            val shipBuilder = ShipBuilder(id = shipId, movement = movement, events = islandEvents)
+            val shipBuilder = ShipBuilder(info = ShipInfo(id = shipId, movement = movement), events = islandEvents)
             right(gameLogic.buildShip(shipBuilder))
         }
     }
 
     fun getShip(tag: String, uid: String, shipId: Int): GetShipResult {
         return transactionManager.run { transaction ->
-            val builder = transaction.shipRepo.getShipBuilder(tag, shipId, uid, gameLogic.getInstant())
+            val builder = gameLogic.getShipBuilder(tag = tag, uid = uid, sid = shipId, transaction)
                 ?: return@run left(GetShipError.ShipNotFound)
 
             return@run right(
@@ -145,7 +149,7 @@ class GameService(
 
     fun getShips(tag: String, uid: String): GetShipsResult {
         return transactionManager.run { transaction ->
-            val shipsBuilder = transaction.shipRepo.getShipsBuilder(tag = tag, uid = uid, gameLogic.getInstant())
+            val shipsBuilder = gameLogic.getShipsBuilder(tag = tag, uid = uid, transaction)
 
             return@run right(
                 value = Fleet(
@@ -202,25 +206,6 @@ class GameService(
                     }
                 )
             )
-        }
-    }
-
-    fun printMap(tag: String) {
-        return transactionManager.run { transaction ->
-            val game = transaction.gameRepo.get(tag = tag) ?: return@run
-
-            for (y in 0 until game.map.size) {
-                for (x in 0 until game.map.size) {
-                    val pos = Vector2(x = x, y = y)
-                    val tile = game.map.data[pos]?.div(10)
-
-                    if (tile == null)
-                        print("---")
-                    else
-                        print(tile.toString().padStart(2, '0') + '-')
-                }
-                println()
-            }
         }
     }
 }

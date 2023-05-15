@@ -3,6 +3,7 @@ package com.example.shipconquest.repo.jdbi.dbmodel
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.EventDetails
 import com.example.shipconquest.domain.event.event_details.IslandEvent
+import com.example.shipconquest.domain.world.islands.Island
 import java.time.Instant
 
 data class IslandEventDBModel(
@@ -13,12 +14,12 @@ data class IslandEventDBModel(
     val islandId: Int,
 )
 
-fun IslandEventDBModel.toEvent() =
+fun IslandEventDBModel.toEvent(island: Island) =
     Event(
         eid = eid,
         instant = instant,
         details = IslandEvent(
             sid = sid,
-            islandId = islandId
+            island = island
         )
     )

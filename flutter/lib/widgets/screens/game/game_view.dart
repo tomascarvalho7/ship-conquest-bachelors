@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
-import 'package:ship_conquest/domain/ship/mobile_ship.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/dynamic_ship_widget.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/islands_view.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/tiles_view.dart';
-import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/fleet.dart';
+import '../../../domain/ship/ship.dart';
 import '../../../providers/game/global_controllers/scene_controller.dart';
 import '../../../utils/constants.dart';
 import '../../miscellaneous/camera_control.dart';

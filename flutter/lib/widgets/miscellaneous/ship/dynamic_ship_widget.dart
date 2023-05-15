@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
 import '../../../domain/isometric/isometric.dart';
 import '../../../domain/ship/direction.dart';
-import '../../../domain/ship/mobile_ship.dart';
+import '../../../domain/ship/ship.dart';
 import '../../../domain/space/position.dart';
 
 class DynamicShipWidget extends StatefulWidget {
@@ -53,7 +53,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
           builder: (context, _) {
             Position position = toIsometric(path.getPosition(animation.value));
             double angle = path.getAngle(animation.value);
-            Direction direction = widget.ship.getOrientationFromAngle(angle);
+            Direction direction = getOrientationFromAngle(angle);
             double waveOffset = (position.x + position.y) / -3;
             return Transform.translate(
                 offset: Offset(

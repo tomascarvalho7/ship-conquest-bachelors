@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/config/notification/custom_notifications.dart';
+import 'package:ship_conquest/config/notification/notification_service.dart';
 import 'package:ship_conquest/domain/path_builder/path_builder.dart';
+import 'package:ship_conquest/providers/game/game_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -51,28 +54,36 @@ class MinimapEvent {
           invertScale(points.start),
           invertScale(points.mid),
           invertScale(points.end),
-          10,
-          3,
+          5,
+          15,
           500
       );
-      routeController.setRoutePoints(Sequence(data: PathBuilder.normalize(path, 2)));
+      final nrOfBeziers = (path.length > 20) ? (path.length / 20).round() : 1;
+      routeController.setRoutePoints(Sequence(data: PathBuilder.normalize(path, nrOfBeziers)));
       routeController.deselect();
     }
   }
 
   // confirm route
-  static void confirm(BuildContext context) async {
+  static void confirmAndNavigateTo(BuildContext context) async {
     // get controllers
     final routeController = context.read<RouteController>();
     final services = context.read<ShipServices>();
     final shipController = context.read<ShipController>();
+    final gameController = context.read<GameController>();
     final landmarks = routeController.routePoints;
-    if (landmarks.length > 0) {
-      final sId = shipController.getShip(routeController.selectedShipIndex).getSid();
-      Ship ship = await services.navigateTo(sId, landmarks);
-      shipController.setSail(ship);
-    }
     routeController.confirm();
+    if (landmarks.isNotEmpty) {
+      // get old ship and delete it's events
+      final oldShip = shipController.getShip(routeController.selectedShipIndex);
+      gameController.deleteShipEvent(oldShip);
+      // post & fetch sailing ship, then schedule new ship tasks and update ship
+      Ship ship = await services.navigateTo(oldShip.sid, landmarks);
+      // build ship notification's
+      if (ship is MobileShip) buildShipNotification(ship);
+      gameController.scheduleShipEvent(ship);
+      shipController.updateShip(ship);
+    }
   }
 
   // cancel route

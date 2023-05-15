@@ -12,5 +12,5 @@ abstract class Island {
 
 extension Utils on Island {
   bool isCloseTo(Position position) =>
-    distance(coordinate.toPosition(), position) <= radius;
+    distance(coordinate.toPosition(), position) <= radius * 1.5;
 }

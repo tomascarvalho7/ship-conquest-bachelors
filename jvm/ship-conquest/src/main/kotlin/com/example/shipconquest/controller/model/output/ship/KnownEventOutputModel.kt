@@ -1,5 +1,7 @@
 package com.example.shipconquest.controller.model.output.ship
 
+import com.example.shipconquest.controller.model.output.IslandOutputModel
+import com.example.shipconquest.controller.model.output.toIslandOutputModel
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.event_details.IslandEvent
@@ -9,7 +11,7 @@ interface KnownEventOutputModel
 
 data class FightEventOutputModel(val eid: Int, val instant: String, val won: Boolean): KnownEventOutputModel
 
-data class IslandEventOutputModel(val eid: Int, val instant: String, val islandId: Int): KnownEventOutputModel
+data class IslandEventOutputModel(val eid: Int, val instant: String, val island: IslandOutputModel): KnownEventOutputModel
 
 fun Event.toKnownEventOutputModel(sid: Int) = when(details) {
     is FightEvent -> FightEventOutputModel(
@@ -20,6 +22,6 @@ fun Event.toKnownEventOutputModel(sid: Int) = when(details) {
     is IslandEvent -> IslandEventOutputModel(
         eid = eid,
         instant = instant.toString(),
-        islandId = details.islandId
+        island = details.island.toIslandOutputModel()
     )
 }

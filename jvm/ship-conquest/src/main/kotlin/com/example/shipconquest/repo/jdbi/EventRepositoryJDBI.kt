@@ -4,10 +4,9 @@ import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.EventDetails
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.event_details.IslandEvent
+import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.repo.EventRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.FightEventDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.IslandEventDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toEvent
+import com.example.shipconquest.repo.jdbi.dbmodel.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
@@ -49,7 +48,7 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
             .bind("tag", tag)
             .bind("instant", instant.epochSecond)
             .bind("sid", details.sid)
-            .bind("islandId", details.islandId)
+            .bind("islandId", details.island.islandId)
             .executeAndReturnGeneratedKeys("eid")
             .mapTo<Int>()
             .single()
@@ -73,14 +72,14 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
 
         val islandEvents = handle.createQuery(
             """
-                SELECT * FROM dbo.IslandEvent WHERE tag = :tag AND sid = :sid
+                SELECT * FROM dbo.IslandEvent WHERE tag = :tag AND sid = :sid 
             """
         )
             .bind("tag", tag)
             .bind("sid", sid)
             .mapTo<IslandEventDBModel>()
             .toList()
-            .map { it.toEvent() }
+            .map { it.toEvent(getIsland(tag = tag, islandId = it.islandId)) }
 
         return fightEvents + islandEvents
     }
@@ -91,7 +90,7 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
         val fightEvents = handle.createQuery(
             """
                 SELECT * FROM dbo.FightEvent 
-                WHERE tag = :tag AND instant > :instant AND AND (sidA = :sid OR sidB = :sid)
+                WHERE tag = :tag AND instant > :instant AND (sidA = :sid OR sidB = :sid)
             """
         )
             .bind("tag", tag)
@@ -112,7 +111,7 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
             .bind("instant", instant.epochSecond)
             .mapTo<IslandEventDBModel>()
             .toList()
-            .map { it.toEvent() }
+            .map { it.toEvent(getIsland(tag = tag, islandId = it.islandId)) }
 
         return fightEvents + islandEvents
     }
@@ -140,5 +139,33 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
             .bind("sid", sid)
             .bind("instant", instant.epochSecond)
             .execute()
+    }
+
+    private fun getIsland(tag: String, islandId: Int): Island {
+        logger.info("Getting island from db with tag = {} and islandId = {}", tag, islandId)
+
+        val wildIsland = handle.createQuery(
+            """
+               select * from dbo.WildIsland where tag = :tag AND islandId = :id
+            """
+        )
+            .bind("tag", tag)
+            .bind("id", islandId)
+            .mapTo<WildIslandDBModel>()
+            .singleOrNull()
+            ?.toWildIsland()
+
+        if (wildIsland != null) return wildIsland
+
+        return handle.createQuery(
+            """
+               select * from dbo.OwnedIsland where tag = :tag AND islandId = :id
+            """
+        )
+            .bind("tag", tag)
+            .bind("id", islandId)
+            .mapTo<OwnedIslandDBModel>()
+            .single()
+            .toOwnedIsland()
     }
 }

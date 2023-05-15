@@ -1,6 +1,6 @@
 class UnknownEvent {
   final int eid;
-  final DateTime instant;
+  final Duration duration;
   // constructor
-  UnknownEvent({required this.eid, required this.instant});
+  UnknownEvent({required this.eid, required this.duration});
 }

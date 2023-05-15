@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
 import '../../../domain/immutable_collections/sequence.dart';
 import '../../../domain/island/island.dart';
+import '../../../domain/ship/ship.dart';
 import '../../../domain/space/coordinate.dart';
 import '../../../domain/space/position.dart';
 import '../../../domain/horizon.dart';
@@ -28,6 +30,7 @@ class SceneController with ChangeNotifier {
   Sequence<Island> get islands => _islands.toSequence();
 
   // variables
+  Position _lastPos = const Position(x: double.infinity, y: double.infinity);
   Grid<int, Island> _islands = Grid.empty();
   Sequence<Coordinate> _newTiles = Sequence.empty();
   Sequence<Coordinate> _oldTiles = Sequence.empty();
@@ -40,14 +43,20 @@ class SceneController with ChangeNotifier {
 
   void updateIsland(Island island) {
     _islands = _islands.put(island.id, island);
-    _visitedIslands = _visitedIslands.put(island.id, island);
     // update widgets
     notifyListeners();
   }
 
+  void discoverIsland(Island island) {
+    _visitedIslands = _visitedIslands.put(island.id, island);
+  }
+
   Future<Sequence<Coordinate>> getScene(Position position, ShipServices services, int sId) async {
-    //final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
-    final shouldFetch = true;
+    if (distance(position, _lastPos) <= 1.0) return Sequence.empty();
+    final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
+
+    // update position
+    _lastPos = position;
 
     return shouldFetch ? fetchScene(position, services, sId) : buildEmptyScene(position);
   }

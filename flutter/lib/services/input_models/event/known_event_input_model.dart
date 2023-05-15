@@ -1,34 +1,36 @@
 
 import 'package:ship_conquest/domain/event/known_event.dart';
 
+import '../island_input_model.dart';
+
 class KnownEventInputModel {
   final int eid;
   final String instant;
   final bool? won;
-  final int? islandId;
+  final IslandInputModel? island;
 
   KnownEventInputModel.fromJson(Map<String, dynamic> json):
       eid = json["eid"],
       instant = json["instant"],
       won = json["won"],
-      islandId = json["islandId"];
+      island = IslandInputModel.fromJson(json['island']);
 }
 
 extension ToDomain on KnownEventInputModel {
   KnownEvent toKnownEvent() {
     final wonCast = won;
-    final islandIdCast = islandId;
+    final islandCast = island;
     if (wonCast != null) {
       return FightEvent(
           eid: eid,
           instant: DateTime.parse(instant),
           won: wonCast
       );
-    } else if (islandIdCast != null) {
+    } else if (islandCast != null) {
       return IslandEvent(
           eid: eid,
           instant: DateTime.parse(instant),
-          islandId: islandIdCast
+          island: islandCast.toIsland()
       );
     }
 

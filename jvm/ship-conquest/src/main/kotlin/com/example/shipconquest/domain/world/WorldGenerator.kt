@@ -14,7 +14,7 @@ const val seaLevel = 2
 class WorldGenerator(
     private val worldSize: Int
 ) {
-    val islandSize = 30
+    val islandSize = 25
     private val falloffGrid = Falloff.generateFalloffMap(islandSize)
 
     fun generateIslandCoordinates(
@@ -27,7 +27,6 @@ class WorldGenerator(
         val offset = gridSize / 2
 
         return buildList {
-            this.add(Vector2(x = 10, y = 10))
             for (y in 0 until numIslands) {
                 for (x in 0 until numIslands) {
                     val position = Vector2(x = offset + x * gridSize, y = offset + y * gridSize)

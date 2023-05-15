@@ -1,10 +1,11 @@
-class Sequence<T> {
+class Sequence<T> extends Iterable<T> {
   final List<T> data;
   // constructor
   Sequence({required this.data});
 
   Sequence.empty() : data = [];
 
+  @override
   int get length => data.length;
 
   T get(int index) => data[index];
@@ -17,5 +18,20 @@ class Sequence<T> {
     return Sequence(data: _data);
   }
 
-  Sequence<K> map<K>(K Function(T value) block) => Sequence(data: data.map(block).toList());
+  Sequence<T> filter(bool Function(T) condition) => Sequence(data: [...data.where(condition)]);
+
+  Sequence<N> filterInstance<N>() => Sequence(data: [...data.whereType<N>()]);
+
+  void forEachIndexed(void Function(int index, T element) f) {
+    final len = data.length;
+    for (var i = 0; i < len; i++) {
+      f(i, data[i]);
+    }
+  }
+
+  @override
+  Sequence<K> map<K>(K Function(T value) toElement) => Sequence(data: data.map(toElement).toList());
+
+  @override
+  Iterator<T> get iterator => data.iterator;
 }

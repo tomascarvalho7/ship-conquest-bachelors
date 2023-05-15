@@ -1,7 +1,5 @@
-import 'package:ship_conquest/domain/ship/mobile_ship.dart';
+import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
-import 'package:ship_conquest/domain/ship/static_ship.dart';
-import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/services/input_models/coord_2d_input_model.dart';
 
 import '../../../domain/ship/ship.dart';
@@ -34,6 +32,9 @@ extension ToDomain on ShipInputModel {
     final duration = movement.duration;
     final landmarks = movement.landmarks;
     final coord = movement.coord;
+    final completed =  Grid(data: { for(var event in completedEvents) event.eid : event.toKnownEvent() });
+    final future = Grid(data: { for(var event in futureEvents) event.eid : event.toUnknownEvent() });
+
     if (startTime != null && duration != null && landmarks != null) {
       return MobileShip(
           sid: sid,
@@ -42,13 +43,15 @@ extension ToDomain on ShipInputModel {
               startTime: DateTime.parse(startTime),
               duration: parseDuration(duration)
           ),
-          completedEvents: Sequence(data: completedEvents.map((e) => e.toKnownEvent()).toList()),
-          futureEvents: Sequence(data: futureEvents.map((e) => e.toUnknownEvent()).toList())
+          completedEvents: completed,
+          futureEvents: future
       );
     } else if (coord != null) {
       return StaticShip(
           sid: sid,
-          coordinate: coord.toCoord2D()
+          coordinate: coord.toCoord2D(),
+          completedEvents: completed,
+          futureEvents: future
       );
     }
     throw Exception("Invalid input model");

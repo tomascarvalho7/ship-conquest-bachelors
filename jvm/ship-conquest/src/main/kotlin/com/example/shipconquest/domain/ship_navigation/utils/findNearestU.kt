@@ -6,7 +6,7 @@ import kotlin.math.sqrt
 
 fun findNearestU(intersection: LineIntersection, pathMovement: Mobile): Double {
     val iterations = 10
-    val u = intersection.lineIndex / 3.0
+    val u = intersection.lineIndex.floorDiv(3)
     var minT = 0.0
     var maxT = 1.0
     var bestT = 0.5 // initial guess for t
@@ -14,10 +14,10 @@ fun findNearestU(intersection: LineIntersection, pathMovement: Mobile): Double {
 
     for(i in 0 until iterations) {
         val t = (minT + maxT) / 2
-        val diff = intersection.position - pathMovement.getPosition(u = u + t)
+        val diff = pathMovement.getPosition(u = u + t) - intersection.position
         val len = diff.length()
 
-        if (len > bestDiff) {
+        if (len < bestDiff) {
             bestT = t
             bestDiff = len
         }

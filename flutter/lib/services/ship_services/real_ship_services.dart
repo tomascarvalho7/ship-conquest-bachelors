@@ -36,7 +36,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "c976-2001-8a0-6e2e-ba00-ec73-b1b6-24ee-a2c1.ngrok-free.app";
+const baseUri = "f1ab-46-189-211-105.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -171,7 +171,7 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     final response = await http.get(
-        Uri.https(baseUri, "$lobbyId/ship", {'shipId': sid}),
+        Uri.https(baseUri, "$lobbyId/ship", {'shipId': sid.toString()}),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         }

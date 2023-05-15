@@ -58,7 +58,6 @@ class LobbyService(
             }
             // add player to the lobby
             addPlayerToLobby(transaction, tag, uid)
-            transaction.shipRepo.createShipPosition(tag, uid, listOf(Vector2(150, 80)), null, null)
             // return
             right(value = tag)
         }
@@ -82,7 +81,7 @@ class LobbyService(
                 return@run right(tag)
 
             addPlayerToLobby(transaction, tag, uid)
-            transaction.shipRepo.createShipPosition(tag, uid, listOf(Vector2(80, 80)), null, null)
+            transaction.shipRepo.createShipInfo(tag, uid, listOf(Vector2(80, 80)), null, null)
             right(tag)
         }
     }
@@ -112,7 +111,7 @@ class LobbyService(
 
     fun addPlayerToLobby(transaction: Transaction, tag: String, uid: String) {
         transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
-        transaction.shipRepo.createShipPosition(tag, uid, generateRandomSpawnPoint(), null, null)
+        transaction.shipRepo.createShipInfo(tag, uid, generateRandomSpawnPoint(), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
 

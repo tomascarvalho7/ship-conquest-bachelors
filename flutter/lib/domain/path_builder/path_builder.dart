@@ -62,7 +62,9 @@ class PathBuilder {
     return List.generate(length, (index) {
       if (index == 0) return path[0];
 
-      return path[min(index * 4 * step, path.length - 1)];
+      final offset = (index / 4).floor();
+
+      return path[min((index - offset) * step, path.length - 1)];
     });
   }
 }

@@ -9,12 +9,12 @@ import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-data class LineIntersection(val position: Position, val lineIndex: Int, val islandId: Int)
+data class LineIntersection(val position: Position, val lineIndex: Int, val island: Island)
 fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIntersection? {
     var closestLine: LineIntersection? = null
     var closestDistance: Double? = null
 
-    fun newClosestPoint(position: Position, index: Int, islandId: Int) {
+    fun newClosestPoint(position: Position, index: Int, island: Island) {
         val start = points[0]
         val distance = position.distanceTo(start.toPosition())
         val closestDist = closestDistance
@@ -22,7 +22,7 @@ fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIn
             closestLine = LineIntersection(
                 position = position,
                 lineIndex = index,
-                islandId = islandId
+                island = island
             )
             closestDistance = distance
         }
@@ -33,8 +33,8 @@ fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIn
             val p1 = points[i]
             val p2 = points[i + 1]
 
-            val distance = distanceBetweenPointAndLine(island.coordinate, p1, p2)
-            if (distance <= island.radius) {
+            val distance = distanceToLineSegment(island.coordinate, p1, p2)
+            if (distance <= island.radius / 1.5) {
                 // Calculate the intersection points
                 val dx = p2.x - p1.x
                 val dy = p2.y - p1.y
@@ -53,10 +53,10 @@ fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIn
 
                     // Check if the intersection points are within the line segment
                     if (t1 in 0.0..1.0) {
-                        newClosestPoint(Position(x1, y1), i, island.islandId)
+                        newClosestPoint(Position(x1, y1), i, island)
                     }
                     if (t2 in 0.0..1.0) {
-                        newClosestPoint(Position(x2, y2), i, island.islandId)
+                        newClosestPoint(Position(x2, y2), i, island)
                     }
                 }
             }
@@ -68,8 +68,23 @@ fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIn
 fun Int.cube() = this * this
 fun Int.cubeSquared() = sqrt(this * this.toDouble()).toInt()
 
-fun distanceBetweenPointAndLine(point: Vector2, lineStart: Vector2, lineEnd: Vector2) =
-    abs((lineEnd.y - lineStart.y) * point.x - (lineEnd.x - lineStart.x) * point.y
-    + lineEnd.x * lineStart.y - lineEnd.y * lineStart.x) /
-    sqrt((lineEnd.y - lineStart.y).toDouble().pow(2.0)
-    + (lineEnd.x - lineStart.x).toDouble().pow(2.0))
+fun distanceToLineSegment(p: Vector2, lineStart: Vector2, lineEnd: Vector2): Double {
+    val dx = lineEnd.x - lineStart.x
+    val dy = lineEnd.y - lineStart.y
+
+    // the line segment is actually a point
+    if (dx == 0 && dy == 0) return p.distanceTo(lineStart)
+
+    val t = ((p.x - lineStart.x) * dx + (p.y - lineStart.y) * dy) / (dx.cube() + dy.cube())
+
+    if (t < 0) { // closest point is beyond lineStart
+        return p.distanceTo(lineStart)
+    } else if (t > 1) { // closest point is beyond lineEnd
+        return p.distanceTo(lineEnd)
+    }
+
+    // closest point on the line segment
+    val closest = Vector2(x = lineStart.x + t * dx, y = lineStart.y + t * dy)
+
+    return p.distanceTo(closest)
+}

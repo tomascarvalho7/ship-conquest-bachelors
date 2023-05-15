@@ -1,12 +1,14 @@
 package com.example.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.domain.event.Event
+import com.example.shipconquest.domain.event.UnknownEvent
+import com.example.shipconquest.service.formatDuration
+import java.time.Instant
 
-data class UnknownEventOutputModel(val info: String, val eid: Int, val instant: String)
+data class UnknownEventOutputModel(val info: String, val eid: Int, val duration: String)
 
-fun Event.toUnknownEventOutputModel() =
+fun UnknownEvent.toUnknownEventOutputModel() =
     UnknownEventOutputModel(
         info = "Upcoming unknown event.",
         eid = eid,
-        instant = instant.toString()
+        duration = formatDuration(duration)
     )

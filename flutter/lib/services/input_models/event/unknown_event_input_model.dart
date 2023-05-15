@@ -1,20 +1,21 @@
 import '../../../domain/event/unknown_event.dart';
+import '../utils/decode.dart';
 
 class UnknownEventInputModel {
   final String info;
   final int eid;
-  final String instant;
+  final String duration;
 
   UnknownEventInputModel.fromJson(Map<String, dynamic> json):
       info = json["info"],
       eid = json["eid"],
-      instant = json["instant"];
+      duration = json["duration"];
 }
 
 extension ToDomain on UnknownEventInputModel {
   UnknownEvent toUnknownEvent() =>
       UnknownEvent(
           eid: eid,
-          instant: DateTime.parse(instant)
+          duration: parseDuration(duration)
       );
 }

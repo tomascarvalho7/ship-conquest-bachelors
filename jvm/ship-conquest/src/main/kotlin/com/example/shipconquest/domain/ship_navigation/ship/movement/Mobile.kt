@@ -23,6 +23,15 @@ class Mobile(
         )
     }
 
+    fun getUniquePoints() = landmarks.flatMap { cubic ->
+        listOf(
+            cubic.p0,
+            cubic.p1,
+            cubic.p2,
+            cubic.p3
+        )
+    }.distinct()
+
     fun getPositionFromInstant(instant: Instant): Position {
         val percentage = getTimePercentage(now = instant, startTime, endTime)
         return getPosition(percentage * landmarks.size)

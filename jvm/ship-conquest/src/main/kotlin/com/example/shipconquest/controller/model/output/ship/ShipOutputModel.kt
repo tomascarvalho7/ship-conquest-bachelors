@@ -1,6 +1,7 @@
 package com.example.shipconquest.controller.model.output.ship
 
 import com.example.shipconquest.domain.ship_navigation.ship.Ship
+import java.time.Instant
 
 data class ShipOutputModel(
     val sid: Int,

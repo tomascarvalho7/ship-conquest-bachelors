@@ -40,7 +40,7 @@ class GameEvent {
     final shipPosition = ship.getPosition(-globalScale);
     cameraController.setFocusAndUpdate(toIsometric(shipPosition));
     // update scene
-    sceneController.getScene(shipPosition, services, ship.getSid());
+    sceneController.getScene(shipPosition, services, ship.sid);
   }
 
   static void conquestIsland(BuildContext context, Island island) async {

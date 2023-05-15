@@ -2,6 +2,7 @@ package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
+import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
 import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
 import com.example.shipconquest.repo.ShipRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
@@ -20,10 +21,10 @@ import java.time.Instant
 
 class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
-    override fun getShipBuilder(tag: String, shipId: Int, uid: String, instant: Instant): ShipBuilder? {
-        logger.info("Getting ship {} builder of user {} in lobby {}", shipId, uid, tag)
+    override fun getShipInfo(tag: String, shipId: Int, uid: String): ShipInfo? {
+        logger.info("Getting ship {} info of user {} in lobby {}", shipId, uid, tag)
 
-        val shipInfo = handle.createQuery(
+        return handle.createQuery(
             """
             select shipId, pos_info from dbo.ship where gameTag = :tag and uid = :uid and shipId = :shipId;
             """
@@ -32,41 +33,13 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .bind("uid", uid)
             .bind("shipId", shipId)
             .mapTo<ShipInfoDBModel>()
-            .singleOrNull() ?: return null
-
-        val fightEvents = handle.createQuery(
-            """
-                SELECT * FROM dbo.FightEvent 
-                WHERE tag = :tag AND instant > :instant AND (sidA = :sid OR sidB = :sid)
-            """
-        )
-            .bind("tag", tag)
-            .bind("sid", shipId)
-            .bind("instant", instant.epochSecond)
-            .mapTo<FightEventDBModel>()
-            .toList()
-            .map { it.toEvent() }
-
-        val islandEvents = handle.createQuery(
-            """
-                SELECT * FROM dbo.IslandEvent 
-                WHERE tag = :tag AND sid = :sid AND instant > :instant
-            """
-        )
-            .bind("tag", tag)
-            .bind("sid", shipId)
-            .bind("instant", instant.epochSecond)
-            .mapTo<IslandEventDBModel>()
-            .toList()
-            .map { it.toEvent() }
-
-        return shipInfo.toShipBuilder(fightEvents + islandEvents)
+            .singleOrNull()?.toShipInfo()
     }
 
-    override fun getShipsBuilder(tag: String, uid: String, instant: Instant): List<ShipBuilder> {
-        logger.info("Getting ships movement of user {} in lobby {}", uid, tag)
+    override fun getShipsInfo(tag: String, uid: String): List<ShipInfo> {
+        logger.info("Getting ships info of user {} in lobby {}", uid, tag)
 
-        val shipsInfo = handle.createQuery(
+        return handle.createQuery(
             """
                 SELECT shipId, pos_info FROM dbo.Ship WHERE gameTag = :tag AND uid = :uid
             """
@@ -74,42 +47,11 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .bind("tag", tag)
             .bind("uid", uid)
             .mapTo<ShipInfoDBModel>()
+            .map { it.toShipInfo() }
             .toList()
-
-        return List(shipsInfo.size) { index ->
-            val shipInfo = shipsInfo[index]
-
-            val fightEvents = handle.createQuery(
-                """
-                SELECT * FROM dbo.FightEvent 
-                WHERE tag = :tag AND instant > :instant AND (sidA = :sid OR sidB = :sid)
-            """
-            )
-                .bind("tag", tag)
-                .bind("sid", shipInfo.shipId)
-                .bind("instant", instant.epochSecond)
-                .mapTo<FightEventDBModel>()
-                .toList()
-                .map { it.toEvent() }
-
-            val islandEvents = handle.createQuery(
-                """
-                SELECT * FROM dbo.IslandEvent 
-                WHERE tag = :tag AND sid = :sid AND instant > :instant
-            """
-            )
-                .bind("tag", tag)
-                .bind("sid", shipInfo.shipId)
-                .bind("instant", instant.epochSecond)
-                .mapTo<IslandEventDBModel>()
-                .toList()
-                .map { it.toEvent() }
-
-            shipInfo.toShipBuilder(fightEvents + islandEvents)
-        }
     }
 
-    override fun createShipPosition(
+    override fun createShipInfo(
         tag: String,
         uid: String,
         points: List<Vector2>,
@@ -135,7 +77,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .execute()
     }
 
-    override fun updateShipPosition(
+    override fun updateShipInfo(
         tag: String,
         uid: String,
         shipId: Int,
@@ -181,22 +123,6 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .bind("uid", uid)
             .bind("shipId", shipId)
             .execute()
-    }
-
-    override fun checkShipPathExists(tag: String, shipId: String, uid: String): Boolean {
-        logger.info("Checking if ship {} path exists of user = {} lobby = {}", shipId, uid, tag)
-
-        val result = handle.createQuery(
-            """
-               select static_position from dbo.ShipPath where gameTag = :tag AND uid = :uid AND shipId = :shipId
-            """
-        )
-            .bind("tag", tag)
-            .bind("uid", uid)
-            .bind("shipId", shipId)
-            .map(PositionMapper())
-            .singleOrNull()
-        return result == null
     }
 
     companion object {

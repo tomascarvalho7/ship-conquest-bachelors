@@ -55,7 +55,7 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
 
   void manageNearbyIslands(Sequence<Island> islands) {
     // if new islands are found, animate slider
-    if (!isNearbyIslands && islands.length > 0) {
+    if (!isNearbyIslands && islands.isNotEmpty && panelController.isAttached) {
       panelController.animatePanelToPosition(
           .25,
           duration: const Duration(milliseconds: 500),
@@ -63,7 +63,7 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
       );
     }
 
-    if (isNearbyIslands && islands.length == 0) {
+    if (isNearbyIslands && islands.isNotEmpty && panelController.isAttached) {
       panelController.animatePanelToPosition(
           .0,
           duration: const Duration(milliseconds: 500),
@@ -71,6 +71,6 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
       );
     }
     // update nearby islands
-    isNearbyIslands = islands.length > 0;
+    isNearbyIslands = islands.isNotEmpty;
   }
 }

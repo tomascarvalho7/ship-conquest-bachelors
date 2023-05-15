@@ -22,7 +22,7 @@ class PathManagementInterface extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           FlexButton(
-                            onPressed: () => MinimapEvent.confirm(context),
+                            onPressed: () => MinimapEvent.confirmAndNavigateTo(context),
                             child: IconSwitch(
                                 condition: pathManager.routePoints.length > 0,
                                 icon: Icons.check,

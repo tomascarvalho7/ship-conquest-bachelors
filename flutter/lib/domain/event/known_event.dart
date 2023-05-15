@@ -1,7 +1,14 @@
-abstract class KnownEvent {}
+import '../island/island.dart';
+
+sealed class KnownEvent {
+  int get eid;
+  DateTime get instant;
+}
 
 class FightEvent implements KnownEvent {
+  @override
   final int eid;
+  @override
   final DateTime instant;
   final bool won;
   // constructor
@@ -9,9 +16,11 @@ class FightEvent implements KnownEvent {
 }
 
 class IslandEvent implements KnownEvent {
+  @override
   final int eid;
+  @override
   final DateTime instant;
-  final int islandId;
+  final Island island;
   // constructor
-  IslandEvent({required this.eid, required this.instant, required this.islandId});
+  IslandEvent({required this.eid, required this.instant, required this.island});
 }

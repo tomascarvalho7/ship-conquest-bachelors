@@ -15,6 +15,11 @@ class Grid<K, V> {
 
   Grid<K, V> put(K key, V value) => Grid(data: {...data, key: value});
 
+  Grid<K, V> delete(K key) {
+    data.remove(key); // remove
+    return Grid(data: {...data}); // return immutable instance
+  }
+
   Grid<K, N> map<N>(N Function(V value) block) =>
       Grid(data: {...data.map((key, value) => MapEntry(key, block(value)))});
 

@@ -71,11 +71,6 @@ class GameController(val service: GameService) {
         }
     }
 
-    @GetMapping("{tag}/print")
-    fun print(@PathVariable tag: String) {
-        service.printMap(tag)
-    }
-
     @GetMapping("/{tag}/minimap")
     fun getMinimap(user: User, @PathVariable tag: String): ResponseEntity<*> {
         val result = service.getMinimap(tag = tag, uid = user.id)
