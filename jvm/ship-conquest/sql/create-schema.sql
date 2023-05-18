@@ -45,25 +45,27 @@ CREATE TABLE dbo.Lobby_User (
   FOREIGN KEY (lobby_tag) REFERENCES dbo.Lobby(tag)
 );
 
-CREATE TABLE dbo.VisitedPoints
-(
-    gameTag varchar(6) NOT NULL,
-    uid varchar(30) NOT NULL,
-    points jsonb,
-    PRIMARY KEY (gameTag, uid),
-    FOREIGN KEY (uid) REFERENCES dbo.User(id),
-    FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
-);
-
 CREATE TABLE dbo.Ship
 (
     shipId serial NOT null,
     gameTag varchar(6) NOT NULL,
     uid varchar(30) NOT NULL,
-    pos_info jsonb,
     PRIMARY KEY (gameTag, uid, shipId),
     FOREIGN KEY (uid) REFERENCES dbo.User(id),
     FOREIGN KEY (gameTag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.ShipPath
+(
+	pid serial not null,
+	gameTag varchar(6) NOT NULL,
+    uid varchar(30) NOT NULL,
+	sid int not null,
+	points jsonb NOT NULL,
+	startTime int,
+	duration interval,
+	PRIMARY KEY (pid),
+	FOREIGN KEY (sid, gameTag, uid) REFERENCES dbo.Ship(shipId, gameTag, uid)
 );
 
 CREATE TABLE dbo.FightEvent
@@ -123,3 +125,4 @@ CREATE TABLE dbo.PlayerStatistics(
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );
+
