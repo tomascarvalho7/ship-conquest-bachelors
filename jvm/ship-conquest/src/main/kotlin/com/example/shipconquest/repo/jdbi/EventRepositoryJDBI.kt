@@ -84,6 +84,20 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
         return fightEvents + islandEvents
     }
 
+    override fun getIslandEventsBeforeInstant(tag: String, sid: Int, instant: Instant): List<Event> {
+        return handle.createQuery(
+            """
+                SELECT * FROM dbo.IslandEvent WHERE tag = :tag AND sid = :sid AND instant < :instant
+            """
+        )
+            .bind("tag", tag)
+            .bind("sid", sid)
+            .bind("instant", instant.epochSecond)
+            .mapTo<IslandEventDBModel>()
+            .toList()
+            .map { it.toEvent(getIsland(tag, it.islandId)) }
+    }
+
     override fun getShipEventsAfterInstant(tag: String, sid: Int, instant: Instant): List<Event> {
         logger.info("Getting events after instant from ship with id = {} on game with tag = {}", sid, tag)
 

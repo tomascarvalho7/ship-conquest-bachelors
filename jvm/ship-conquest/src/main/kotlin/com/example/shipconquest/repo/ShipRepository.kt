@@ -3,6 +3,7 @@ package com.example.shipconquest.repo
 import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
 import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
+import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
 import org.slf4j.Logger
 import java.time.Duration
 import java.time.Instant
@@ -13,6 +14,11 @@ interface ShipRepository {
     fun getShipInfo(tag: String, shipId: Int, uid: String): ShipInfo?
 
     fun getShipsInfo(tag: String, uid: String): List<ShipInfo>
+
+    fun getUserShips(uid: String, tag: String): List<Int>
+
+    fun getShipPaths(tag: String, sid: Int): List<Movement>
+
     fun createShipInfo(
         tag: String,
         uid: String,

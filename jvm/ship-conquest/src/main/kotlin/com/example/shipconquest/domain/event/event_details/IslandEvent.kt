@@ -11,9 +11,15 @@ data class IslandEvent(val sid: Int, val island: Island): EventDetails
 
 fun IslandEvent.updateMovement(movement: Movement, instant: Instant) =
     // stop on island event
-    Stationary(
-        position = when(movement) {
-            is Mobile -> movement.getPositionFromInstant(instant).toVector2()
-            is Stationary -> movement.position
-        }
-    )
+    when(movement) {
+        is Mobile ->
+            Mobile(
+                landmarks = movement.splitPathBeforeTime(instant),
+                startTime = movement.startTime,
+                duration = movement.duration
+            )
+        is Stationary ->
+            Stationary(
+                position = movement.position
+            )
+    }

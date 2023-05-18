@@ -26,14 +26,17 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
 
         return handle.createQuery(
             """
-            select shipId, pos_info from dbo.ship where gameTag = :tag and uid = :uid and shipId = :shipId;
-            """
+                SELECT shipId, points, startTime, duration FROM dbo.Ship ship inner join dbo.ShipPath path ON 
+                path.sid = ship.shipId AND path.gameTag = ship.gameTag AND path.uid = ship.uid 
+                WHERE ship.gameTag = :tag AND ship.uid = :uid
+                """
         )
             .bind("tag", tag)
             .bind("uid", uid)
             .bind("shipId", shipId)
-            .mapTo<ShipInfoDBModel>()
-            .singleOrNull()?.toShipInfo()
+            .mapTo<ShipInfoDBModelExtended>()
+            .singleOrNull()
+            ?.toShipInfoDBModel()?.toShipInfo() ?: return null
     }
 
     override fun getShipsInfo(tag: String, uid: String): List<ShipInfo> {
@@ -41,16 +44,48 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
 
         return handle.createQuery(
             """
-                SELECT shipId, pos_info FROM dbo.Ship WHERE gameTag = :tag AND uid = :uid
+                SELECT shipId, points, startTime, duration FROM dbo.Ship ship 
+                inner join dbo.ShipPath path ON path.sid = ship.shipId AND 
+                path.gameTag = ship.gameTag AND path.uid = ship.uid
+                WHERE ship.gameTag = :tag AND ship.uid = :uid
             """
         )
             .bind("tag", tag)
             .bind("uid", uid)
-            .mapTo<ShipInfoDBModel>()
-            .map { it.toShipInfo() }
+            .mapTo<ShipInfoDBModelExtended>()
+            .toList()
+            .toShipInfoDBModelList()
+            .toShipInfoList()
+    }
+
+    override fun getUserShips(uid: String, tag: String): List<Int> {
+        return handle.createQuery(
+            """
+                SELECT shipId FROM dbo.Ship WHERE gameTag = :tag AND uid = :uid
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .mapTo<Int>()
             .toList()
     }
 
+    override fun getShipPaths(tag: String, sid: Int): List<Movement> {
+        logger.info("Getting all ship paths from the db for ship {} in lobby {}", sid, tag)
+
+        return handle.createQuery(
+            """
+                SELECT points, startTime, duration FROM dbo.ShipPath path inner join dbo.Ship ship ON 
+                path.sid = ship.shipId AND path.gameTag = ship.gameTag AND path.uid = ship.uid
+                WHERE ship.gameTag = :tag AND ship.shipId = :sid
+            """
+        )
+            .bind("tag", tag)
+            .bind("sid", sid)
+            .mapTo<ShipMovementDBModel>()
+            .toList()
+            .map { it.toMovement() }
+    }
     override fun createShipInfo(
         tag: String,
         uid: String,
@@ -60,21 +95,35 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
     ) {
         logger.info("Creating a ship of user {} in lobby {}", uid, tag)
 
-        handle.createUpdate(
+        val sid = handle.createUpdate(
             """
-            insert into dbo.Ship (gameTag, uid, pos_info) values(:tag, :uid, :positionInfo);
+            insert into dbo.Ship (gameTag, uid) values(:tag, :uid);
         """
         )
             .bind("tag", tag)
             .bind("uid", uid)
+            .execute()
+
+        handle.createUpdate("""
+            insert into dbo.ShipPath (gameTag, uid, sid, points, startTime, duration) VALUES (:tag, :uid, :sid, :points, :startTime, :duration)
+        """)
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("sid", sid)
             .bind(
-                "positionInfo",
+                "points",
                 PGobject().apply {
                     type = "jsonb"
-                    value = serializeShipPosition(points, startTime, duration)
+                    value = serializeShipPosition(points)
                 }
             )
-            .execute()
+            .bind("startTime", startTime?.epochSecond)
+            .bind("duration", duration)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .single()
+
+
     }
 
     override fun updateShipInfo(
@@ -87,22 +136,24 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
     ) {
         logger.info("Updating a ship's position of user {} in lobby {}", uid, tag)
 
-        handle.createUpdate(
-            """
-            update dbo.Ship SET gameTag = :tag, uid = :uid, pos_info = :positionInfo WHERE shipId = :shipId;
-        """
-        )
+        handle.createUpdate("""
+            insert into dbo.ShipPath (gameTag, uid, sid, points, startTime, duration) VALUES (:tag, :uid, :sid, :points, :startTime, :duration)
+        """)
             .bind("tag", tag)
             .bind("uid", uid)
+            .bind("sid", shipId)
             .bind(
-                "positionInfo",
+                "points",
                 PGobject().apply {
                     type = "jsonb"
-                    value = serializeShipPosition(points, startTime, duration)
+                    value = serializeShipPosition(points)
                 }
             )
-            .bind("shipId", shipId)
-            .execute()
+            .bind("startTime", startTime?.epochSecond)
+            .bind("duration", duration)
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .single()
     }
 
     override fun deleteShipEntry(tag: String, shipId: String, uid: String) {
@@ -128,11 +179,11 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
     companion object {
         private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
-        fun serializeShipPosition(position: List<Vector2>, startTime: Instant?, duration: Duration?): String =
-            objectMapper.writeValueAsString(ShipMovementDBModel(position.map { PositionDBModel(it.x, it.y) }
-                .toTypedArray(), startTime, duration))
+        fun serializeShipPosition(position: List<Vector2>): String =
+            objectMapper.writeValueAsString(ShipPointsDBModel(position.map { PositionDBModel(it.x, it.y) }
+                .toTypedArray()))
 
         fun deserializeShipPosition(json: String) =
-            objectMapper.readValue<ShipMovementDBModel>(json)
+            objectMapper.readValue<ShipPointsDBModel>(json)
     }
 }

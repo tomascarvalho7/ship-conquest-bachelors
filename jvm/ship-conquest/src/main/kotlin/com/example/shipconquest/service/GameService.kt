@@ -9,13 +9,16 @@ import com.example.shipconquest.domain.ship_navigation.CubicBezier
 import com.example.shipconquest.domain.ship_navigation.ship.Fleet
 import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
 import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
+import com.example.shipconquest.domain.ship_navigation.ship.movement.Mobile
+import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
+import com.example.shipconquest.domain.ship_navigation.utils.toVector2List
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
+import com.example.shipconquest.domain.world.islands.IslandList
 import com.example.shipconquest.domain.world.islands.getNearIslands
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
-import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
 import com.example.shipconquest.right
 import com.example.shipconquest.service.result.*
@@ -24,12 +27,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 import kotlin.math.roundToInt
 
 //take these out of here
 const val chunkSize = 20.0
-const val viewDistance = 10
+const val viewDistance = 15
 
 @Service
 class GameService(
@@ -94,16 +98,85 @@ class GameService(
 
     fun getMinimap(tag: String, uid: String): GetMinimapResult {
         return transactionManager.run { transaction ->
-            val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, uid)
             val game = transaction.gameRepo.get(tag) ?: return@run left(GetMinimapError.GameNotFound)
+            // get user ships
+            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+            val currInstant = gameLogic.getInstant()
 
-            val pointList = visitedPoints?.flatMap { point ->
-                val pulseResult = game.map.pulse(origin = point, radius = viewDistance, water = false)
-                pulseResult + Vector3(point.x, point.y, 0)
-            }?.distinct()
-                ?: emptyList()
+            val islandsCenter = mutableListOf<Vector2>()
+            val movements = mutableListOf<Movement>()
+            val pathPoints = mutableListOf<Vector2>()
+            // iterate in users ships
+            for (sid in userShips) {
+                // get ship path
+                val paths = transaction.shipRepo.getShipPaths(tag, sid)
+                val events = transaction.eventRepo.getShipEvents(tag, sid)
+                val mobilePaths = paths.map { it.getCurrentMovement(currInstant, events) }
+                movements.addAll(mobilePaths)
 
-            right(value = Minimap(visitedPoints = pointList, size = game.map.size))
+                // get known islands TODO: eventRepo.getIslands(tag, uid)
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, currInstant).map {
+                    val details = it.details
+                    if (details is IslandEvent) {
+                        // get islands center coordinates
+                        val islandCenter = transaction.islandRepo.get(tag, details.island.islandId)
+                        if (islandCenter != null) {
+                            islandsCenter += islandCenter.coordinate
+                        }
+                    }
+                }
+            }
+
+            // pulse island coordinates and add them to final response
+            val islands = islandsCenter.flatMap { point ->
+                game.map.pulse(origin = point, radius = viewDistance, water = true)
+            }.distinct()
+
+            // add paths to final response
+            pathPoints.addAll(trimPaths(movements.filterIsInstance<Mobile>(), currInstant).toVector2List())
+
+            right(value = Minimap(paths = pathPoints, islands = islands, size = game.map.size))
+        }
+    }
+
+    fun getKnownIslands(tag: String, uid: String): GetKnownIslandsResult {
+        return transactionManager.run { transaction ->
+            transaction.gameRepo.get(tag) ?: return@run left(GetKnownIslandsError.GameNotFound)
+
+            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+
+            val knownIslands = mutableListOf<Island>()
+            for (sid in userShips) {
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, gameLogic.getInstant()).map {
+                    val details = it.details
+                    if (details is IslandEvent) {
+                        val island = transaction.islandRepo.get(tag, details.island.islandId)
+                        if (island != null) {
+                            knownIslands += island
+                        }
+                    }
+                }
+            }
+            right(IslandList(knownIslands))
+        }
+    }
+
+    fun getUnknownIslands(tag: String, uid: String): GetUnknownIslandsResult {
+        return transactionManager.run { transaction ->
+            transaction.gameRepo.get(tag) ?: return@run left(GetUnknownIslandsError.GameNotFound)
+
+            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+
+            val knownIslands = mutableListOf<Int>()
+            for (sid in userShips) {
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, gameLogic.getInstant()).map {
+                    val details = it.details
+                    if (details is IslandEvent) {
+                        knownIslands += details.island.islandId
+                    }
+                }
+            }
+            right(listOf())
         }
     }
 
@@ -235,4 +308,17 @@ fun formatDuration(durationString: Duration): String {
     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 
     return dateFormat.format(Date(durationMillis))
+}
+
+fun trimPaths(paths: List<Mobile>, instant: Instant): List<CubicBezier> {
+    var oldPath: Mobile? = null
+    val bezierList = hashMapOf<Mobile, List<CubicBezier>>()
+    for (path in paths) {
+        if (oldPath != null && (oldPath.startTime + oldPath.duration).isAfter(path.startTime)) {
+            bezierList[oldPath] = oldPath.splitPathBeforeTime(path.startTime)
+        }
+        bezierList[path] = path.splitPathBeforeTime(instant)
+        oldPath = path
+    }
+    return bezierList.values.flatten()
 }

@@ -16,41 +16,39 @@ import java.time.Duration
 import java.time.Instant
 
 data class ShipMovementDBModel(
+    val points: ShipPointsDBModel,
+    val startTime: Instant?,
+    val duration: Duration?
+)
+
+data class ShipPointsDBModel(
     val points: Array<PositionDBModel>,
-    @JsonSerialize(using = InstantSerializer::class)
-    @JsonDeserialize(using = InstantDeserializer::class) val startTime: Instant?,
-    @JsonSerialize(using = DurationSerializer::class)
-    @JsonDeserialize(using = DurationDeserializer::class) val duration: Duration?
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as ShipMovementDBModel
+        other as ShipPointsDBModel
 
         if (!points.contentEquals(other.points)) return false
-        if (startTime != other.startTime) return false
-        if (duration != other.duration) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = points.contentHashCode()
-        result = 31 * result + startTime.hashCode()
-        result = 31 * result + duration.hashCode()
-        return result
+        return points.contentHashCode()
     }
 }
 
+
 fun ShipMovementDBModel.toMovement(): Movement {
     if (startTime == null || duration == null) return Stationary(
-        position = points[0].toVector2()
+        position = points.points[0].toVector2()
     )
 
 
     return Mobile(
-        landmarks = buildBeziers(points.map { Vector2(it.x, it.y) }),
+        landmarks = buildBeziers(points.points.map { Vector2(it.x, it.y) }),
         startTime = startTime,
         duration = duration
     )

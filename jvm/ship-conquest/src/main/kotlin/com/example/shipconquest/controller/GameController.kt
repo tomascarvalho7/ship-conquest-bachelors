@@ -86,6 +86,22 @@ class GameController(val service: GameService) {
         }
     }
 
+    @GetMapping("/{tag}/islands/known")
+    fun getKnownIslands(
+        user: User,
+        @PathVariable tag: String
+    ): ResponseEntity<*>  {
+        val result = service.getKnownIslands(tag, user.id)
+
+        return when(result) {
+            is Either.Right -> response(result.value)
+            is Either.Left -> when(result.value) {
+                GetKnownIslandsError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+            }
+        }
+    }
+
     @PostMapping("/{tag}/navigate")
     fun navigate(
         user: User,

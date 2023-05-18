@@ -36,7 +36,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "f1ab-46-189-211-105.ngrok-free.app";
+const baseUri = "5c83-2001-8a0-6e2e-ba00-d03-f924-5043-3c65.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -115,17 +115,22 @@ class RealShipServices extends ShipServices {
       final res = MinimapInputModel.fromJson(jsonDecode(response.body));
       // TODO use .toMinimap
       final minimap = Minimap(length: res.length, data: HashMap<Coord2D, int>());
-      for (var point in res.points) {
+      for (var point in res.islands) {
         if (minimap.data[Coord2D(x: point.x, y: point.y)] == null) {
           minimap.add(
               x: point.x, y: point.y, height: point.z);
         }
       }
-      List<Coord2D> visitedPoints = res.points
-          .where((point) => point.z == 0)
+      final points = res.paths
           .map((coord) => Coord2D(x: coord.x, y: coord.y))
           .toList();
-      // addWaterPath(minimap, colorGradient, visitedPoints, 15);
+
+      for (var bezier in buildBeziers(points)) {
+        for (double t = 0; t<=1; t += 0.1) {
+          pulseAndFill(minimap, bezier.get(t).toCoord2D(), 10);
+        }
+    }
+
       return minimap;
     } else {
       throw Exception("error fetching minimap");
@@ -389,8 +394,7 @@ double calcDistance(Coord2D p1, Coord2D p2) {
   return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
 }
 
-Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
-    List<Coord2D> visitedPoints, int radius) {
+Minimap addWaterPath(Minimap minimap, List<Coord2D> visitedPoints, int radius) {
   List<Coord2D> points = [];
   if (visitedPoints.length == 1) {
     return pulseAndFill(minimap, visitedPoints.first, radius);
@@ -413,7 +417,7 @@ Minimap addWaterPath(Minimap minimap, ColorGradient colorGradient,
         double x = h + a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
         double y = k + a * cos(t) * sin(phi) + b * sin(t) * cos(phi);
 
-        points.add(Coord2D(x: x.floor(), y: y.floor()));
+        points.add(Coord2D(x: x. floor(), y: y.floor()));
       }
       minimap = fillEllipse(points, minimap, [currPoint, nextPoint], a);
     }

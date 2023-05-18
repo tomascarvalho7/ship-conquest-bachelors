@@ -81,7 +81,6 @@ class LobbyService(
                 return@run right(tag)
 
             addPlayerToLobby(transaction, tag, uid)
-            transaction.shipRepo.createShipInfo(tag, uid, listOf(Vector2(80, 80)), null, null)
             right(tag)
         }
     }

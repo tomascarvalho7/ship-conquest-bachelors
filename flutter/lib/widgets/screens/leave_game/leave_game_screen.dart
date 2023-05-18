@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../initial_loading/loading_screen.dart';
+
 class LeaveGameScreen extends StatefulWidget {
   const LeaveGameScreen({Key? key}) : super(key: key);
 
@@ -24,17 +26,14 @@ class _LeaveGameScreenState extends State<LeaveGameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO meter bonito e que ta so para usar
-    return Scaffold(
-        body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            CircularProgressIndicator(),
-            Text("Saving game info...")
-          ],
-        ),
-    ));
+    return Stack(children: [
+      LoadingScreen(),
+      Align(
+        alignment: const Alignment(0.0, 0.3),
+        child: Text("Saving game info...",
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.secondary),),
+      )
+    ]);
   }
 
   @override

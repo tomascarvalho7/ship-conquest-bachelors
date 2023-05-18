@@ -17,5 +17,6 @@ fun Jdbi.configure(): Jdbi {
     registerColumnMapper(CubicBezierMapper())
     registerColumnMapper(CubicBezierListMapper())
     registerColumnMapper(ShipPositionMapper())
+    registerColumnMapper(ShipInfoMapper())
     return this
 }

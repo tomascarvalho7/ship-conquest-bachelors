@@ -12,7 +12,7 @@ import 'package:ship_conquest/widgets/screens/profile/user_profile.dart';
 import 'package:ship_conquest/widgets/screens/signIn/authentication_screen.dart';
 
 import '../../widgets/screens/game_loading/game_loading_screen.dart';
-import '../../widgets/screens/initial_loading/loading_screen.dart';
+import '../../widgets/screens/initial_loading/initial_loading_screen.dart';
 import '../../widgets/screens/start_menu/start_menu.dart';
 
 GoRouter createRouter() => GoRouter(initialLocation: "/", routes: [

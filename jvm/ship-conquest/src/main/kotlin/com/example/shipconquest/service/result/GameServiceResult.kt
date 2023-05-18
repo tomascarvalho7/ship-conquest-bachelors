@@ -7,6 +7,8 @@ import com.example.shipconquest.domain.ship_navigation.ship.Fleet
 import com.example.shipconquest.domain.ship_navigation.ship.Ship
 import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.world.Horizon
+import com.example.shipconquest.domain.world.islands.Island
+import com.example.shipconquest.domain.world.islands.IslandList
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 
 sealed class GetChunksError {
@@ -35,6 +37,19 @@ sealed class NavigationError {
 }
 
 typealias NavigationResult = Either<NavigationError, Ship>
+
+sealed class GetKnownIslandsError {
+    object GameNotFound: GetKnownIslandsError()
+}
+
+typealias GetKnownIslandsResult = Either<GetKnownIslandsError, IslandList>
+
+sealed class GetUnknownIslandsError {
+    object GameNotFound: GetUnknownIslandsError()
+}
+
+typealias GetUnknownIslandsResult = Either<GetUnknownIslandsError, List<Int>> // TODO change this return type
+
 
 sealed class ConquestIslandError {
     object GameNotFound: ConquestIslandError()

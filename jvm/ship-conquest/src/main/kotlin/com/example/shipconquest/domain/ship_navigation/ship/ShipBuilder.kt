@@ -12,7 +12,7 @@ data class ShipBuilder(val info: ShipInfo, val events: List<Event>)
 
 fun ShipBuilder.build(instant: Instant) = Ship(
         sid = info.id,
-        movement = info.getCurrentMovement(instant = instant, events),
+        movement = info.movement.getCurrentMovement(instant = instant, events),
         completedEvents = events
             .filter { it.instant.isBefore(instant) },
         futureEvents = events

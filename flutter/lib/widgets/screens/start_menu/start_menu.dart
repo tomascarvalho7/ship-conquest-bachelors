@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
+import 'package:ship_conquest/widgets/screens/initial_loading/loading_screen.dart';
 
 class StartMenuScreen extends StatefulWidget {
   const StartMenuScreen({Key? key}) : super(key: key);
@@ -148,7 +149,7 @@ class WaitForAsyncScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
           children: [
-            const Center(child: CircularProgressIndicator(),),
+            const Center(child: CircularProgressIndicator()),
             Align(
                 alignment: Alignment.bottomCenter,
                 child: FractionallySizedBox(
