@@ -42,24 +42,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
     override fun getShipsInfo(tag: String, uid: String): List<ShipInfo> {
         logger.info("Getting ships info of user {} in lobby {}", uid, tag)
 
-        return handle.createQuery(
-            """
-                SELECT shipId, points, startTime, duration FROM dbo.Ship ship 
-                inner join dbo.ShipPath path ON path.sid = ship.shipId AND 
-                path.gameTag = ship.gameTag AND path.uid = ship.uid
-                WHERE ship.gameTag = :tag AND ship.uid = :uid
-            """
-        )
-            .bind("tag", tag)
-            .bind("uid", uid)
-            .mapTo<ShipInfoDBModelExtended>()
-            .toList()
-            .toShipInfoDBModelList()
-            .toShipInfoList()
-    }
-
-    override fun getUserShips(uid: String, tag: String): List<Int> {
-        return handle.createQuery(
+        val ships = handle.createQuery(
             """
                 SELECT shipId FROM dbo.Ship WHERE gameTag = :tag AND uid = :uid
             """
@@ -68,24 +51,24 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .bind("uid", uid)
             .mapTo<Int>()
             .toList()
+
+
+        return ships.map {id ->
+            val movements = handle.createQuery(
+                """
+                SELECT points, startTime, duration FROM dbo.ShipPath path 
+                WHERE path.gameTag = :tag AND path.sid = :sid
+            """
+            )
+                .bind("tag", tag)
+                .bind("sid", id)
+                .mapTo<ShipMovementDBModel>()
+                .toList()
+                .map { it.toMovement() }
+            ShipInfo(id, movements)
+        }
     }
 
-    override fun getShipPaths(tag: String, sid: Int): List<Movement> {
-        logger.info("Getting all ship paths from the db for ship {} in lobby {}", sid, tag)
-
-        return handle.createQuery(
-            """
-                SELECT points, startTime, duration FROM dbo.ShipPath path inner join dbo.Ship ship ON 
-                path.sid = ship.shipId AND path.gameTag = ship.gameTag AND path.uid = ship.uid
-                WHERE ship.gameTag = :tag AND ship.shipId = :sid
-            """
-        )
-            .bind("tag", tag)
-            .bind("sid", sid)
-            .mapTo<ShipMovementDBModel>()
-            .toList()
-            .map { it.toMovement() }
-    }
     override fun createShipInfo(
         tag: String,
         uid: String,

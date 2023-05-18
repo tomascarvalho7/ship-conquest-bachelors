@@ -46,7 +46,7 @@ class GameService(
         return transactionManager.run { transaction ->
             val shipInfo = transaction.shipRepo.getShipInfo(tag, shipId.toInt(), googleId)
                 ?: return@run left(GetChunksError.ShipPositionNotFound)
-            val coord = gameLogic.getCoordFromMovement(shipInfo.movement)
+            val coord = gameLogic.getCoordFromMovement(gameLogic.getMostRecentMovement(shipInfo))
 
             val visitedPoints = transaction.gameRepo.getVisitedPoints(tag, googleId)
             if (visitedPoints == null) {
@@ -100,22 +100,22 @@ class GameService(
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag) ?: return@run left(GetMinimapError.GameNotFound)
             // get user ships
-            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+            val userShips = transaction.shipRepo.getShipsInfo(tag, uid)
             val currInstant = gameLogic.getInstant()
 
             val islandsCenter = mutableListOf<Vector2>()
             val movements = mutableListOf<Movement>()
             val pathPoints = mutableListOf<Vector2>()
             // iterate in users ships
-            for (sid in userShips) {
+            for (ship in userShips) {
                 // get ship path
-                val paths = transaction.shipRepo.getShipPaths(tag, sid)
-                val events = transaction.eventRepo.getShipEvents(tag, sid)
+                val paths = ship.movements
+                val events = transaction.eventRepo.getShipEvents(tag, ship.id)
                 val mobilePaths = paths.map { it.getCurrentMovement(currInstant, events) }
                 movements.addAll(mobilePaths)
 
                 // get known islands TODO: eventRepo.getIslands(tag, uid)
-                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, currInstant).map {
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, ship.id, currInstant).map {
                     val details = it.details
                     if (details is IslandEvent) {
                         // get islands center coordinates
@@ -143,11 +143,11 @@ class GameService(
         return transactionManager.run { transaction ->
             transaction.gameRepo.get(tag) ?: return@run left(GetKnownIslandsError.GameNotFound)
 
-            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+            val userShips = transaction.shipRepo.getShipsInfo(uid, tag)
 
             val knownIslands = mutableListOf<Island>()
-            for (sid in userShips) {
-                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, gameLogic.getInstant()).map {
+            for (ship in userShips) {
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, ship.id, gameLogic.getInstant()).map {
                     val details = it.details
                     if (details is IslandEvent) {
                         val island = transaction.islandRepo.get(tag, details.island.islandId)
@@ -165,11 +165,11 @@ class GameService(
         return transactionManager.run { transaction ->
             transaction.gameRepo.get(tag) ?: return@run left(GetUnknownIslandsError.GameNotFound)
 
-            val userShips = transaction.shipRepo.getUserShips(uid, tag)
+            val userShips = transaction.shipRepo.getShipsInfo(uid, tag)
 
             val knownIslands = mutableListOf<Int>()
-            for (sid in userShips) {
-                transaction.eventRepo.getIslandEventsBeforeInstant(tag, sid, gameLogic.getInstant()).map {
+            for (ship in userShips) {
+                transaction.eventRepo.getIslandEventsBeforeInstant(tag, ship.id, gameLogic.getInstant()).map {
                     val details = it.details
                     if (details is IslandEvent) {
                         knownIslands += details.island.islandId
@@ -204,7 +204,7 @@ class GameService(
                 logger.info("minutes: {}, seconds: {}", duration.toMinutes(), duration.seconds)
                 transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, island))
             }
-            val shipBuilder = ShipBuilder(info = ShipInfo(id = shipId, movement = movement), events = islandEvents)
+            val shipBuilder = ShipBuilder(info = ShipInfo(id = shipId, movements = listOf(movement)), events = islandEvents)
             right(gameLogic.buildShip(shipBuilder))
         }
     }

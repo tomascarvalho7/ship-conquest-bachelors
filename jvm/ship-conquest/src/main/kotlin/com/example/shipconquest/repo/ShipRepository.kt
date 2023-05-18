@@ -15,10 +15,6 @@ interface ShipRepository {
 
     fun getShipsInfo(tag: String, uid: String): List<ShipInfo>
 
-    fun getUserShips(uid: String, tag: String): List<Int>
-
-    fun getShipPaths(tag: String, sid: Int): List<Movement>
-
     fun createShipInfo(
         tag: String,
         uid: String,

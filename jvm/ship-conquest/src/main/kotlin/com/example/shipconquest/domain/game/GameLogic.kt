@@ -7,6 +7,7 @@ import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship_navigation.utils.comparePoints
 import com.example.shipconquest.domain.ship_navigation.utils.findIntersectionPoints
 import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
+import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
 import com.example.shipconquest.domain.ship_navigation.ship.build
 import com.example.shipconquest.domain.ship_navigation.ship.movement.Mobile
 import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
@@ -58,11 +59,16 @@ class GameLogic(private val clock: Clock) {
 
     fun buildPlayerStatistics(builder: PlayerStatsBuilder) = builder.build(clock.now())
 
+    fun getMostRecentMovement(info: ShipInfo): Movement {
+        return info.movements.last()
+    }
+
     fun getShipBuilder(tag: String, uid: String, sid: Int, transaction: Transaction): ShipBuilder? {
         val info = transaction.shipRepo.getShipInfo(tag = tag, uid = uid, shipId = sid) ?: return null
 
-        val events = if (info.movement is Mobile) {
-            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, instant = info.movement.startTime)
+        val lastMovement = getMostRecentMovement(info)
+        val events = if (lastMovement is Mobile) {
+            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, instant = lastMovement.startTime)
         } else emptyList()
 
         return ShipBuilder(info = info, events = events)
@@ -74,8 +80,9 @@ class GameLogic(private val clock: Clock) {
         return List(fleetInfo.size) { index ->
             val info = fleetInfo[index]
 
-            val events = if (info.movement is Mobile) {
-                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, instant = info.movement.startTime)
+            val lastMovement = getMostRecentMovement(info)
+            val events = if (lastMovement is Mobile) {
+                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, instant = lastMovement.startTime)
             } else emptyList()
 
             return@List ShipBuilder(info = info, events = events)
@@ -96,11 +103,11 @@ class GameLogic(private val clock: Clock) {
 
     fun findFightEvents(pathMovement: Mobile, shipBuilders: List<ShipBuilder>) = buildList {
         val pathOutline = buildOutlinePlanes(pathMovement.getUniquePoints(), thickness = 5.0)
-        val shipsInMovement = shipBuilders.filter { it.info.movement is Mobile }
+        val shipsInMovement = shipBuilders.filter { getMostRecentMovement(it.info) is Mobile }
 
         // for every ship in movement
         for (ship in shipsInMovement) {
-            val movement = ship.info.movement as Mobile
+            val movement = ship.info.movements as Mobile
             val index = (movement.getU(clock.now()) * 3).toInt() // plane index
             val otherOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
 

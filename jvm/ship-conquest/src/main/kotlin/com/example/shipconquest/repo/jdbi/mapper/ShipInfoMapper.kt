@@ -19,6 +19,6 @@ class ShipInfoMapper : ColumnMapper<ShipInfoDBModel> {
 
         val points = ShipRepositoryJDBI.deserializeShipPosition(pointsJson)
         val shipMovement = ShipMovementDBModel(points, startTime, duration)
-        return ShipInfoDBModel(shipId, shipMovement)
+        return ShipInfoDBModel(shipId, listOf(shipMovement))
     }
 }
