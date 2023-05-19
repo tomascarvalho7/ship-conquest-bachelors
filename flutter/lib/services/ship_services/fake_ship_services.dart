@@ -14,6 +14,7 @@ import 'package:ship_conquest/domain/user/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 
+import '../../domain/event/unknown_event.dart';
 import '../../domain/lobby.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
@@ -165,6 +166,16 @@ class FakeShipServices extends ShipServices {
       ),
     ]
     );
+  }
+
+  @override
+  Future subscribe(void Function(int sid, UnknownEvent event) onEvent) async {
+    return;
+  }
+
+  @override
+  Future unsubscribe() async {
+    return;
   }
 }
 

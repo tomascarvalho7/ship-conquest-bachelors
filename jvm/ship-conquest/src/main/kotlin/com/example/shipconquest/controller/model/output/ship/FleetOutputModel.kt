@@ -1,6 +1,6 @@
 package com.example.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.domain.ship_navigation.ship.Fleet
+import com.example.shipconquest.domain.ship.Fleet
 
 data class FleetOutputModel(val ships: List<ShipOutputModel>)
 

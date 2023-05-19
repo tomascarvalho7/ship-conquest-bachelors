@@ -1,7 +1,7 @@
 package com.example.shipconquest.domain.world
 
-import com.example.shipconquest.domain.Vector2
-import com.example.shipconquest.domain.Vector3
+import com.example.shipconquest.domain.space.Vector2
+import com.example.shipconquest.domain.space.Vector3
 import kotlin.math.*
 
 data class HeightMap(val data: Map<Vector2, Int>, val size: Int)

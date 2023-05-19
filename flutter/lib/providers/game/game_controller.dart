@@ -55,25 +55,22 @@ class GameController {
   );
 
   Future<void> load() async { // load initial data
+    // remove previous events
     scheduleController.stop();
-
     // initialize notifications
     NotificationService.initialize();
-    // fetch player fleet of ships & schedule they're events
-    final ships = await services.getUserShips();
-    shipController.setFleet(ships);
+    final ships = await gameLogic.loadData();
+    // schedule ship events
     scheduleShipEvents(ships);
-    // fetch player statistics
-    statisticsController.updateStatistics(await services.getPlayerStatistics());
-    // load visited islands & get scene for current ship
-    sceneController.load(Sequence.empty());
-    final position = shipController.getMainShip().getPosition(globalScale);
-    sceneController.getScene(position, services, shipController.getMainShip().sid);
-    // fetch player minimap
-    minimapController.load(await services.getMinimap());
+    // subscribe to game events
+    services.subscribe(gameLogic.onEvent);
+  }
 
-    // schedule game update every 2 seconds
-    scheduleController.scheduleJob(const Duration(seconds: 2), gameLogic.update);
+  void exit() async {
+    // remove previous events
+    scheduleController.stop();
+    // unsubscribe to game events
+    services.unsubscribe();
   }
 
   void scheduleShipEvents(Sequence<Ship> ships) {

@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 data class Node(
     val position: Vector2,

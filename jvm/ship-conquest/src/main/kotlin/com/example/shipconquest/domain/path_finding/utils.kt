@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 fun calculateHeuristic(currPoint: Vector2, end: Vector2, influencePoint: Vector2): Double {
     val distance = calculateManhattanDistance(currPoint, end)

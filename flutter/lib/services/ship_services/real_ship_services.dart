@@ -2,7 +2,9 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/event/unknown_event.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
@@ -31,6 +33,7 @@ import '../input_models/create_lobby_input_model.dart';
 import '../input_models/join_lobby_input_model.dart';
 import '../input_models/lobby_input_model.dart';
 import '../input_models/lobby_list_input_model.dart';
+import '../input_models/notification/event_notification_input_model.dart';
 import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
@@ -387,6 +390,48 @@ class RealShipServices extends ShipServices {
     } else {
       throw Exception("error getting player statistics");
     }
+  }
+
+  @override
+  Future subscribe(void Function(int sid, UnknownEvent event) onEvent) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+
+    SSEClient.subscribeToSSE(
+        url: Uri.https(baseUri, "$lobbyId/subscribe").toString(),
+        header: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+          HttpHeaders.acceptHeader: "text/event-stream",
+          HttpHeaders.cacheControlHeader: "no-cache",
+        }
+    ).listen((event) {
+      final data = event.data;
+      if (data == null) return;
+      final (sid, unknownEvent) = EventNotificationInputModel
+          .fromJson(jsonDecode(data))
+          .toDomain();
+
+      onEvent(sid, unknownEvent);
+    });
+  }
+
+  @override
+  Future unsubscribe() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+
+    // fetch unsubscribe
+    await http.get(Uri.https(baseUri, "$lobbyId/unsubscribe"), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
+    // unsubscribe from SSE
+    SSEClient.unsubscribeFromSSE();
   }
 }
 

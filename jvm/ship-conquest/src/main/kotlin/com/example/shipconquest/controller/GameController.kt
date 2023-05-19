@@ -10,14 +10,14 @@ import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.GameService
 import com.example.shipconquest.service.result.*
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @RestController
 class GameController(val service: GameService) {
-    /**
-     * name to be either view, glance, or inspectHorizon
-     */
+
     @GetMapping("/{tag}/view")
     fun view(user: User, @PathVariable tag: String, @RequestParam shipId: String): ResponseEntity<*> {
         val result = service.getChunks(tag = tag, shipId = shipId, googleId = user.id)
@@ -63,6 +63,8 @@ class GameController(val service: GameService) {
                     Problem.response(status = 404, problem = Problem.islandNotFound())
                 ConquestIslandError.PlayerStatisticsNotFound ->
                     Problem.response(status = 404, problem = Problem.statisticsNotFound())
+                ConquestIslandError.AlreadyOwnedIsland ->
+                    Problem.response(status = 400, problem = Problem.alreadyOwnedIsland())
                 ConquestIslandError.NotEnoughCurrency ->
                     Problem.response(status = 400, problem = Problem.notEnoughCurrency())
                 ConquestIslandError.ShipTooFarAway ->
@@ -86,22 +88,6 @@ class GameController(val service: GameService) {
         }
     }
 
-    @GetMapping("/{tag}/islands/known")
-    fun getKnownIslands(
-        user: User,
-        @PathVariable tag: String
-    ): ResponseEntity<*>  {
-        val result = service.getKnownIslands(tag, user.id)
-
-        return when(result) {
-            is Either.Right -> response(result.value)
-            is Either.Left -> when(result.value) {
-                GetKnownIslandsError.GameNotFound ->
-                    Problem.response(status = 404, problem = Problem.gameNotFound())
-            }
-        }
-    }
-
     @PostMapping("/{tag}/navigate")
     fun navigate(
         user: User,
@@ -112,10 +98,17 @@ class GameController(val service: GameService) {
         val result = service.navigate(tag, user.id, shipId, bodyObj.points)
 
         return when (result) {
-            is Either.Right -> response(content = result.value.toShipOutputModel())
+            is Either.Right -> {
+                // publish and notify of new events
+                ShipEventsAPI.publishEvents(result.value.futureEvents)
+                // return sailing ship
+                response(content = result.value.toShipOutputModel())
+            }
             is Either.Left -> when (result.value) {
                 NavigationError.InvalidNavigationPath ->
-                    Problem.response(status = 404, problem = Problem.invalidNavigation())
+                    Problem.response(status = 400, problem = Problem.invalidNavigation())
+                NavigationError.ShipNotFound ->
+                    Problem.response(status = 404, problem = Problem.shipNotFound())
             }
         }
     }
@@ -145,6 +138,42 @@ class GameController(val service: GameService) {
             is Either.Right -> response(content = result.value.toFleetOutputModel())
             is Either.Left -> TODO("bruh")
         }
+    }
+
+    @GetMapping("/{tag}/islands/known")
+    fun getKnownIslands(
+        user: User,
+        @PathVariable tag: String
+    ): ResponseEntity<*>  {
+        val result = service.getKnownIslands(tag, user.id)
+
+        return when(result) {
+            is Either.Right -> response(result.value)
+            is Either.Left -> when(result.value) {
+                GetKnownIslandsError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+            }
+        }
+    }
+
+    @GetMapping("/{tag}/subscribe", MediaType.TEXT_EVENT_STREAM_VALUE)
+    fun subscribe(user: User, @PathVariable tag: String): SseEmitter {
+        val result = service.getShips(tag = tag, uid = user.id)
+
+        return when (result) {
+            is Either.Right -> {
+                val emitter = ShipEventsAPI.subscribeToFleetEvents(uid = user.id, fleet = result.value)
+                emitter.send(result.value.toFleetOutputModel())
+                return emitter
+            }
+            is Either.Left -> TODO("bruh")
+        }
+    }
+
+    @GetMapping("/{tag}/unsubscribe")
+    fun unsubscribe(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        ShipEventsAPI.unsubscribeToFleetEvents(uid = user.id)
+        return response("placeholder content") // TODO:
     }
 
     private fun <T> response(content: T) = ResponseEntity

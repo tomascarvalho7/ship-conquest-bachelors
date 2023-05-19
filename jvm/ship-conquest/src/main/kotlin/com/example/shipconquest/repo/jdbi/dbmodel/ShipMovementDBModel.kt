@@ -1,17 +1,11 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.Vector2
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Mobile
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Stationary
-import com.example.shipconquest.domain.toPosition
-import com.example.shipconquest.repo.jdbi.serialization.DurationDeserializer
-import com.example.shipconquest.repo.jdbi.serialization.DurationSerializer
-import com.example.shipconquest.repo.jdbi.serialization.InstantDeserializer
-import com.example.shipconquest.repo.jdbi.serialization.InstantSerializer
+
+import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.ship.movement.Stationary
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.service.buildBeziers
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.time.Duration
 import java.time.Instant
 

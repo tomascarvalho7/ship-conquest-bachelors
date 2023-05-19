@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 /**
  *  Using the A* algorithm, find the shortest path avoiding the existing isles and using the influence point to modify the result

@@ -2,6 +2,7 @@ import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 
+import '../../domain/event/unknown_event.dart';
 import '../../domain/lobby.dart';
 import '../../domain/minimap.dart';
 import '../../domain/ship/ship.dart';
@@ -36,4 +37,8 @@ abstract class ShipServices {
   Future<UserInfo> getPersonalInfo();
 
   Future<Island> conquestIsland(int sId, int islandId);
+
+  Future subscribe(void Function(int sid, UnknownEvent event) onEvent);
+
+  Future unsubscribe();
 }

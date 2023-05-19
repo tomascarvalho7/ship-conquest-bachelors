@@ -1,6 +1,6 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
+import com.example.shipconquest.domain.ship.ShipInfo
 import java.time.Duration
 import java.time.Instant
 

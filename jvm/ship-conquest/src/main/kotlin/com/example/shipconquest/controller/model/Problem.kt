@@ -92,6 +92,11 @@ data class Problem(val title: String, val detail: String) {
             title = "User already exists",
             detail = "The given user already exists in the system."
         )
+
+        fun alreadyOwnedIsland() = Problem(
+            title = "Can't conquest already owned island",
+            detail = "You cannot conquest a island that already belongs to you."
+        )
     }
 }
 

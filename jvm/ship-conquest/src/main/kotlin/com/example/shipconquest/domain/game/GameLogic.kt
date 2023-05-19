@@ -1,18 +1,19 @@
 package com.example.shipconquest.domain.game
 
 import com.example.shipconquest.Clock
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.event.Event
+import com.example.shipconquest.domain.event.event_details.FightEvent
+import com.example.shipconquest.domain.event.logic.EventLogic
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
-import com.example.shipconquest.domain.ship_navigation.utils.comparePoints
-import com.example.shipconquest.domain.ship_navigation.utils.findIntersectionPoints
-import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
-import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
-import com.example.shipconquest.domain.ship_navigation.ship.build
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Mobile
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Stationary
-import com.example.shipconquest.domain.ship_navigation.utils.*
+import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.ship.movement.Stationary
+import com.example.shipconquest.domain.bezier.utils.*
+import com.example.shipconquest.domain.event.logic.utils.findIntersectionPoints
+import com.example.shipconquest.domain.ship.ShipBuilder
+import com.example.shipconquest.domain.ship.ShipInfo
+import com.example.shipconquest.domain.ship.build
 import com.example.shipconquest.domain.toVector2
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
@@ -29,13 +30,20 @@ import kotlin.math.roundToLong
 const val incomePerHour = 25
 @Component
 class GameLogic(private val clock: Clock) {
+    val eventLogic = EventLogic(clock)
     fun getInstant() = clock.now()
+
+    fun getMostRecentMovement(info: ShipInfo): Movement {
+        return info.movements.last()
+    }
+
     fun conquestIsland(
         uid: String,
         island: Island,
         onWild: (old: WildIsland, new: OwnedIsland) -> Unit,
         onOwned: (old: OwnedIsland, new: OwnedIsland) -> Unit
-    ): OwnedIsland {
+    ): OwnedIsland? {
+        if (island is OwnedIsland && island.uid == uid) return null;
         val newIsland = OwnedIsland(
             islandId = island.islandId,
             coordinate = island.coordinate,
@@ -58,10 +66,6 @@ class GameLogic(private val clock: Clock) {
     }
 
     fun buildPlayerStatistics(builder: PlayerStatsBuilder) = builder.build(clock.now())
-
-    fun getMostRecentMovement(info: ShipInfo): Movement {
-        return info.movements.last()
-    }
 
     fun getShipBuilder(tag: String, uid: String, sid: Int, transaction: Transaction): ShipBuilder? {
         val info = transaction.shipRepo.getShipInfo(tag = tag, uid = uid, shipId = sid) ?: return null
@@ -89,9 +93,28 @@ class GameLogic(private val clock: Clock) {
         }
     }
 
+    fun getEnemyShipsBuilder(tag: String, uid: String, transaction: Transaction): List<ShipBuilder> {
+        val enemyFleetInfo = transaction.shipRepo.getOtherShipsInfo(tag = tag, uid = uid)
+
+        return List(enemyFleetInfo.size) { index ->
+            val info = enemyFleetInfo[index]
+
+            val lastMovement = getMostRecentMovement(info)
+            val events = if (lastMovement is Mobile) {
+                transaction.eventRepo.getShipEventsAfterInstant(
+                    tag = tag,
+                    sid = info.id,
+                    instant = lastMovement.startTime
+                )
+            } else emptyList()
+
+            return@List ShipBuilder(info = info, events = events)
+        }
+    }
+
     fun buildShip(builder: ShipBuilder) = builder.build(clock.now())
 
-    fun findIslandEvents(
+    fun buildIslandEvents(
         pathMovement: Mobile,
         islands: List<Island>,
         onIslandEvent: (instant: Instant, island: Island) -> Event
@@ -101,33 +124,15 @@ class GameLogic(private val clock: Clock) {
         return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.island))
     }
 
-    fun findFightEvents(pathMovement: Mobile, shipBuilders: List<ShipBuilder>) = buildList {
-        val pathOutline = buildOutlinePlanes(pathMovement.getUniquePoints(), thickness = 5.0)
-        val shipsInMovement = shipBuilders.filter { getMostRecentMovement(it.info) is Mobile }
-
+    fun buildFightEvents(
+        shipBuilder: ShipBuilder,
+        shipBuilders: List<ShipBuilder>,
+        onEvent: (instant: Instant, fightDetails: FightEvent) -> Event
+    ) = buildList {
         // for every ship in movement
-        for (ship in shipsInMovement) {
-            val movement = ship.info.movements as Mobile
-            val index = (movement.getU(clock.now()) * 3).toInt() // plane index
-            val otherOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
-
-            // check every plane for an intersection with other planes
-            for (i in pathOutline.indices) {
-                val plane = pathOutline[i]
-                val otherPlaneIndex = i + index
-                // check if planes are overlapping
-                if (plane.isOverlapping(otherOutline[otherPlaneIndex])) {
-                    val pathSegment = pathMovement.landmarks[i / 3]
-                        .split(start = i / 3.0, end = (i + 1) / 3.0)
-                        .sample(5)
-                    val otherPathSegment = pathMovement.landmarks[(otherPlaneIndex) / 3]
-                        .split(start = otherPlaneIndex / 3.0, end = (otherPlaneIndex + 1) / 3.0)
-                        .sample(5)
-
-                    val u = comparePoints(pathSegment, otherPathSegment) / (5.0 * 3.0)
-                    add(pathMovement.getInstant(u))
-                }
-            }
+        for (ship in shipBuilders) {
+            val event = eventLogic.buildFightEventsBetween(current = shipBuilder, enemy = ship, onEvent = onEvent)
+            if (event != null) add(event)
         }
     }
 

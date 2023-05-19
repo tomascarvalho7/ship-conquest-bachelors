@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.path_finding
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 fun main() {
     val testMap = generateSquare(10, 11, 10) + generateSquare(10, 21, 10) + generateSquare(19, 1, 10) + generateSquare(2, 31, 10) + generateSquare(2, 31, 5)

@@ -4,8 +4,6 @@ class Coord2DInputModel {
   final int x;
   final int y;
 
-  Coord2DInputModel({required this.x, required this.y});
-
   Coord2DInputModel.fromJson(Map<String, dynamic> json)
       : x = json['x'],
         y = json['y'];

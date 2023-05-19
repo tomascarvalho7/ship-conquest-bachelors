@@ -1,6 +1,6 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 data class PositionDBModel(val x: Int, val y: Int)
 

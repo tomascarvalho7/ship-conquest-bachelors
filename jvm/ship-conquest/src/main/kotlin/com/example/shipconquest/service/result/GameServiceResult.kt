@@ -2,12 +2,10 @@ package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
 import com.example.shipconquest.domain.Minimap
-import com.example.shipconquest.domain.ShipPathTime
-import com.example.shipconquest.domain.ship_navigation.ship.Fleet
-import com.example.shipconquest.domain.ship_navigation.ship.Ship
+import com.example.shipconquest.domain.ship.Fleet
+import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.world.Horizon
-import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.IslandList
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 
@@ -34,6 +32,7 @@ typealias GetMinimapResult = Either<GetMinimapError, Minimap>
 
 sealed class NavigationError {
     object InvalidNavigationPath: NavigationError()
+    object ShipNotFound: NavigationError()
 }
 
 typealias NavigationResult = Either<NavigationError, Ship>
@@ -56,6 +55,7 @@ sealed class ConquestIslandError {
     object NotEnoughCurrency: ConquestIslandError()
     object ShipNotFound: ConquestIslandError()
     object IslandNotFound: ConquestIslandError()
+    object AlreadyOwnedIsland: ConquestIslandError()
     object ShipTooFarAway: ConquestIslandError()
     object PlayerStatisticsNotFound: ConquestIslandError()
 }

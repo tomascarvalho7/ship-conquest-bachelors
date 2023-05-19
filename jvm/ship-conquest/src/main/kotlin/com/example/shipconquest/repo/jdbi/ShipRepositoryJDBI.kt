@@ -1,13 +1,10 @@
 package com.example.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.Vector2
-import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
-import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
+import com.example.shipconquest.domain.ship.ShipInfo
+import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.repo.ShipRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
-import com.example.shipconquest.repo.jdbi.mapper.PositionMapper
-import com.example.shipconquest.repo.jdbi.mapper.ShipPositionMapper
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -69,6 +66,21 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         }
     }
 
+    override fun getOtherShipsInfo(tag: String, uid: String): List<ShipInfo> {
+        logger.info("Getting other ships info of user {} in lobby {}", uid, tag)
+
+        return handle.createQuery(
+            """
+                SELECT shipId, pos_info FROM dbo.Ship WHERE gameTag = :tag AND uid != :uid
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .mapTo<ShipInfoDBModel>()
+            .map { it.toShipInfo() }
+            .toList()
+    }
+
     override fun createShipInfo(
         tag: String,
         uid: String,
@@ -113,9 +125,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         tag: String,
         uid: String,
         shipId: Int,
-        points: List<Vector2>,
-        startTime: Instant?,
-        duration: Duration?
+        movement: Mobile
     ) {
         logger.info("Updating a ship's position of user {} in lobby {}", uid, tag)
 
@@ -129,14 +139,12 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
                 "points",
                 PGobject().apply {
                     type = "jsonb"
-                    value = serializeShipPosition(points)
+                    value = serializeShipPosition(movement.getPoints())
                 }
             )
-            .bind("startTime", startTime?.epochSecond)
-            .bind("duration", duration)
-            .executeAndReturnGeneratedKeys()
-            .mapTo<Int>()
-            .single()
+            .bind("startTime", movement.startTime.epochSecond)
+            .bind("duration", movement.duration)
+            .execute()
     }
 
     override fun deleteShipEntry(tag: String, shipId: String, uid: String) {

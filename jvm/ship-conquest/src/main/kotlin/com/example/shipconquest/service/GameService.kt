@@ -1,17 +1,18 @@
 package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.*
+import com.example.shipconquest.domain.bezier.CubicBezier
+import com.example.shipconquest.domain.bezier.utils.toVector2List
 import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
-import com.example.shipconquest.domain.ship_navigation.CubicBezier
-import com.example.shipconquest.domain.ship_navigation.ship.Fleet
-import com.example.shipconquest.domain.ship_navigation.ship.ShipBuilder
-import com.example.shipconquest.domain.ship_navigation.ship.ShipInfo
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Mobile
-import com.example.shipconquest.domain.ship_navigation.ship.movement.Movement
-import com.example.shipconquest.domain.ship_navigation.utils.toVector2List
+import com.example.shipconquest.domain.ship.Fleet
+import com.example.shipconquest.domain.ship.ShipBuilder
+import com.example.shipconquest.domain.ship.addEvents
+import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
@@ -111,7 +112,7 @@ class GameService(
                 // get ship path
                 val paths = ship.movements
                 val events = transaction.eventRepo.getShipEvents(tag, ship.id)
-                val mobilePaths = paths.map { it.getCurrentMovement(currInstant, events) }
+                val mobilePaths = paths.map { it.build(currInstant, events) }
                 movements.addAll(mobilePaths)
 
                 // get known islands TODO: eventRepo.getIslands(tag, uid)
@@ -187,25 +188,28 @@ class GameService(
         }
 
         return transactionManager.run { transaction ->
+            val shipInfo = transaction.shipRepo.getShipInfo(tag = tag, shipId =  shipId, uid = uid)
+                ?: return@run left(NavigationError.ShipNotFound)
             // delete future events since ship path has changed
             transaction.eventRepo.deleteShipEventsAfterInstant(tag = tag, sid = shipId, instant = movement.startTime)
             transaction.shipRepo.updateShipInfo(
                 tag,
                 uid,
                 shipId,
-                points,
-                movement.startTime,
-                movement.duration
+                movement
             )
+
             // get all islands
-            val islands = transaction.islandRepo.getAll(tag)
-            val islandEvents = gameLogic.findIslandEvents(movement, islands) { instant, island ->
-                val duration = Duration.between(gameLogic.getInstant(), instant)
-                logger.info("minutes: {}, seconds: {}", duration.toMinutes(), duration.seconds)
+            val islands = transaction.islandRepo.getAll(tag = tag)
+            val islandEvents = gameLogic.buildIslandEvents(movement, islands) { instant, island ->
                 transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, island))
             }
-            val shipBuilder = ShipBuilder(info = ShipInfo(id = shipId, movements = listOf(movement)), events = islandEvents)
-            right(gameLogic.buildShip(shipBuilder))
+            val shipBuilder = ShipBuilder(info = shipInfo, events = islandEvents)
+            val ships = gameLogic.getEnemyShipsBuilder(tag = tag, uid = uid, transaction)
+            val fightEvents = gameLogic.buildFightEvents(shipBuilder, ships) { instant, details ->
+                transaction.eventRepo.createFightingEvent(tag, instant, details)
+            }
+            right(gameLogic.buildShip(shipBuilder.addEvents(newEvents = fightEvents)))
         }
     }
 
@@ -243,41 +247,43 @@ class GameService(
             // TODO: update with canSightIsland
             if (false) return@run left(ConquestIslandError.ShipTooFarAway)
 
-            return@run right(
-                value = gameLogic.conquestIsland(
-                    uid = uid,
-                    island = island,
-                    onWild = { _, newIsland ->
-                        // add ownership of island and take cost from currency
-                        transaction.islandRepo.wildToOwnedIsland(tag = tag, island = newIsland)
+            val newIsland = gameLogic.conquestIsland(
+                uid = uid,
+                island = island,
+                onWild = { _, newIsland ->
+                    // add ownership of island and take cost from currency
+                    transaction.islandRepo.wildToOwnedIsland(tag = tag, island = newIsland)
+                    transaction.statsRepo.updatePlayerCurrency(
+                        tag = tag,
+                        uid = uid,
+                        instant = newIsland.conquestDate,
+                        newStaticCurrency = playerStatistics.income.staticCurrency - 100
+                    )
+                },
+                onOwned = { oldIsland, newIsland ->
+                    // update previous owner of island currency
+                    val oldOwner = transaction.statsRepo.getPlayerStats(tag = tag, uid = oldIsland.uid)
+                    if (oldOwner != null)
                         transaction.statsRepo.updatePlayerCurrency(
                             tag = tag,
-                            uid = uid,
+                            uid = oldOwner.uid,
                             instant = newIsland.conquestDate,
-                            newStaticCurrency = playerStatistics.income.staticCurrency - 100
+                            newStaticCurrency = oldOwner.income.getCurrency(newIsland.conquestDate)
                         )
-                    },
-                    onOwned = { oldIsland, newIsland ->
-                        // update previous owner of island currency
-                        val oldOwner = transaction.statsRepo.getPlayerStats(tag = tag, uid = oldIsland.uid)
-                        if (oldOwner != null)
-                            transaction.statsRepo.updatePlayerCurrency(
-                                tag = tag,
-                                uid = oldOwner.uid,
-                                instant = newIsland.conquestDate,
-                                newStaticCurrency = oldOwner.income.getCurrency(newIsland.conquestDate)
-                            )
 
-                        // add ownership of island and take cost from currency
-                        transaction.islandRepo.updateOwnedIsland(tag = tag, island = newIsland)
-                        transaction.statsRepo.updatePlayerCurrency(
-                            tag = tag,
-                            uid = uid,
-                            instant = newIsland.conquestDate,
-                            newStaticCurrency = playerStatistics.income.getCurrency(newIsland.conquestDate) - 200
-                        )
-                    }
-                )
+                    // add ownership of island and take cost from currency
+                    transaction.islandRepo.updateOwnedIsland(tag = tag, island = newIsland)
+                    transaction.statsRepo.updatePlayerCurrency(
+                        tag = tag,
+                        uid = uid,
+                        instant = newIsland.conquestDate,
+                        newStaticCurrency = playerStatistics.income.getCurrency(newIsland.conquestDate) - 200
+                    )
+                }
+            ) ?: return@run left(ConquestIslandError.AlreadyOwnedIsland)
+
+            return@run right(
+                value = newIsland
             )
         }
     }

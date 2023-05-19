@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.world
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 import java.util.HashMap
 
 class HeightMapBuilder(val size: Int) {

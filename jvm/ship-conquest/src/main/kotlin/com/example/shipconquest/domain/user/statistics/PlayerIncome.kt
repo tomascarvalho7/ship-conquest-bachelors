@@ -13,4 +13,4 @@ fun PlayerIncome.getCurrency(now: Instant): Int {
 }
 
 fun PlayerIncome.getMaxCurrency(): Int =
-    max(passiveIncome.sumOf { island -> island.incomePerHour * 48 }, 200)
+    max(passiveIncome.sumOf { island -> island.incomePerHour * 24 }, 200)

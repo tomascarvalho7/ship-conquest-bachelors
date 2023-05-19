@@ -1,10 +1,10 @@
 package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.Vector2
 import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.world.WorldGenerator
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.left

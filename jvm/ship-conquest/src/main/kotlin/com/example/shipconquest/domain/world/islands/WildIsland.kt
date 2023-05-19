@@ -1,6 +1,6 @@
 package com.example.shipconquest.domain.world.islands
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 
 data class WildIsland(
     override val islandId: Int,

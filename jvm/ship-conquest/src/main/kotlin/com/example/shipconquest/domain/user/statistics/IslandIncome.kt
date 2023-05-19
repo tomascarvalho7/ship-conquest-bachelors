@@ -12,8 +12,8 @@ data class IslandIncome(val incomePerHour: Int, val conquestDate: Instant)
  */
 fun IslandIncome.getCurrency(now: Instant): Int {
     val elapsedDuration = Duration.between(conquestDate, now)
-    val seconds = elapsedDuration.toSecondsPart() / 3600
-    val minutes = elapsedDuration.toMinutesPart() / 60
+    val seconds = elapsedDuration.toSecondsPart() / 3600.0
+    val minutes = elapsedDuration.toMinutesPart() / 60.0
     val total = elapsedDuration.toHours().toDouble() + minutes + seconds
 
     return floor(total * incomePerHour).toInt()

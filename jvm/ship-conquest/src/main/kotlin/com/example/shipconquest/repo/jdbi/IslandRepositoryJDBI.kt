@@ -1,9 +1,8 @@
 package com.example.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
-import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.repo.IslandRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.OwnedIslandDBModel
 import com.example.shipconquest.repo.jdbi.dbmodel.WildIslandDBModel
@@ -13,8 +12,6 @@ import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.time.Instant
-import java.util.*
 
 class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -71,6 +68,14 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
             .list()
 
         return wildIslands + ownedIslands
+    }
+
+    override fun getVisitedIslands(tag: String, uid: String): List<Island> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUnvisitedIslands(tag: String, uid: String): List<Island> {
+        TODO("Not yet implemented")
     }
 
     override fun create(tag: String, origin: Vector2, radius: Int) {

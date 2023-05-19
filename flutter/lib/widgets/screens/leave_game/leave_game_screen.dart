@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../../providers/game/game_controller.dart';
 import '../initial_loading/loading_screen.dart';
 
 class LeaveGameScreen extends StatefulWidget {
@@ -16,6 +18,8 @@ class _LeaveGameScreenState extends State<LeaveGameScreen> {
   @override
   void initState() {
     super.initState();
+    final gameController = context.read<GameController>();
+    gameController.exit();
     Future.delayed(const Duration(seconds: 1)).then((_) {
       if (!_isNavigated) {
         context.go("/home");

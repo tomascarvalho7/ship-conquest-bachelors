@@ -1,7 +1,7 @@
 package com.example.shipconquest.domain.world
 
 import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.Vector2
+import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.generators.Falloff
 import com.example.shipconquest.domain.generators.SimplexNoise
 import com.example.shipconquest.domain.generators.get
