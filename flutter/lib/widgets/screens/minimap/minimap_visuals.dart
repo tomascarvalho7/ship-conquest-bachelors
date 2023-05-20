@@ -38,32 +38,35 @@ class MinimapVisuals extends StatelessWidget {
    );
   }
 
-  Widget minimapInterface(BuildContext context) =>
-      Consumer<MinimapController>(
-          builder: (_, minimapController, __) {
-            final scale = minimapSize / minimapController.minimap.length;
-            return Consumer2<ShipController, RouteController>(
-                builder: (_, shipController, routeController, __) {
-                  routeController.setupHooks(shipController.getShipPositions(scale));
-                  return CameraPathController(
-                      context: context,
-                      routeController: routeController,
-                      background: const Color.fromRGBO(51, 56, 61, 1),
-                      nodes: shipController.getShipPositions(scale),
-                      child: MinimapView(
-                          gradient: colorGradient,
-                          minimap: minimapController.minimap,
-                          child: RouteView(
-                              controller: routeController,
-                              hooks: shipController.getShipPositions(scale),
-                              child: const PathView()
-                          )
-                      )
-                  );
-                }
-            );
-          }
-      );
+  Widget minimapInterface(BuildContext context) {
+    final routeController = context.read<RouteController>();
+
+    return Consumer<MinimapController>(
+        builder: (_, minimapController, __) {
+          final scale = minimapSize / minimapController.minimap.length;
+          return Consumer<ShipController>(
+              builder: (_, shipController, __) {
+                final ships = shipController.getShipPositions(scale);
+                routeController.setupHooks(ships);
+                return CameraPathController(
+                    context: context,
+                    routeController: routeController,
+                    background: const Color.fromRGBO(51, 56, 61, 1),
+                    nodes: ships,
+                    child: MinimapView(
+                        gradient: colorGradient,
+                        minimap: minimapController.minimap,
+                        child: RouteView(
+                            hooks: ships,
+                            child: const PathView()
+                        )
+                    )
+                );
+              }
+          );
+        }
+    );
+  }
 
   Widget pathManagementInterfaceHolder() =>
       const Positioned(

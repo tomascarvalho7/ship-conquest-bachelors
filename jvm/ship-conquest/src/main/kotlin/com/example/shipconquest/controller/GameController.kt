@@ -100,7 +100,7 @@ class GameController(val service: GameService) {
         return when (result) {
             is Either.Right -> {
                 // publish and notify of new events
-                ShipEventsAPI.publishEvents(result.value.futureEvents)
+                ShipEventsAPI.publishEvents(tag = tag, futureEvents = result.value.futureEvents)
                 // return sailing ship
                 response(content = result.value.toShipOutputModel())
             }
@@ -162,8 +162,8 @@ class GameController(val service: GameService) {
 
         return when (result) {
             is Either.Right -> {
-                val emitter = ShipEventsAPI.subscribeToFleetEvents(uid = user.id, fleet = result.value)
-                emitter.send(result.value.toFleetOutputModel())
+                val emitter = ShipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
+                //emitter.send(result.value.toFleetOutputModel())
                 return emitter
             }
             is Either.Left -> TODO("bruh")
@@ -172,7 +172,7 @@ class GameController(val service: GameService) {
 
     @GetMapping("/{tag}/unsubscribe")
     fun unsubscribe(user: User, @PathVariable tag: String): ResponseEntity<*> {
-        ShipEventsAPI.unsubscribeToFleetEvents(uid = user.id)
+        ShipEventsAPI.unsubscribeToFleetEvents(tag = tag, uid = user.id)
         return response("placeholder content") // TODO:
     }
 

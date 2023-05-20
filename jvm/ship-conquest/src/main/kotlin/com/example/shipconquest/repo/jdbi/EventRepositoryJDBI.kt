@@ -1,12 +1,12 @@
 package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.EventDetails
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.repo.EventRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
+import com.example.shipconquest.repo.jdbi.dbmodel.island.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
@@ -158,28 +158,15 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
     private fun getIsland(tag: String, islandId: Int): Island {
         logger.info("Getting island from db with tag = {} and islandId = {}", tag, islandId)
 
-        val wildIsland = handle.createQuery(
-            """
-               select * from dbo.WildIsland where tag = :tag AND islandId = :id
-            """
-        )
-            .bind("tag", tag)
-            .bind("id", islandId)
-            .mapTo<WildIslandDBModel>()
-            .singleOrNull()
-            ?.toWildIsland()
-
-        if (wildIsland != null) return wildIsland
-
         return handle.createQuery(
             """
-               select * from dbo.OwnedIsland where tag = :tag AND islandId = :id
+               select * from dbo.Island where tag = :tag AND islandId = :id
             """
         )
             .bind("tag", tag)
             .bind("id", islandId)
-            .mapTo<OwnedIslandDBModel>()
+            .mapTo<GenericIslandDBModel>()
             .single()
-            .toOwnedIsland()
+            .toIsland()
     }
 }

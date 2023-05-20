@@ -18,7 +18,6 @@ class ShipInfoMapper : ColumnMapper<ShipInfoDBModel> {
         val duration = if (durationSeconds != 0) Duration.ofSeconds(durationSeconds.toLong()) else null
 
         val points = ShipRepositoryJDBI.deserializeShipPosition(pointsJson)
-        val shipMovement = ShipMovementDBModel(points, startTime, duration)
-        return ShipInfoDBModel(shipId, listOf(shipMovement))
+        return ShipInfoDBModel(shipId, points, startTime, duration)
     }
 }

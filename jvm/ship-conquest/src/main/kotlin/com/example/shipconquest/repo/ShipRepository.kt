@@ -3,6 +3,7 @@ package com.example.shipconquest.repo
 
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.space.Vector2
 import org.slf4j.Logger
 import java.time.Duration

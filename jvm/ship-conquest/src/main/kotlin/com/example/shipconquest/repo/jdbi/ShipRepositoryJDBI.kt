@@ -2,6 +2,7 @@ package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.repo.ShipRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
@@ -23,47 +24,34 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
 
         return handle.createQuery(
             """
-                SELECT shipId, points, startTime, duration FROM dbo.Ship ship inner join dbo.ShipPath path ON 
-                path.sid = ship.shipId AND path.gameTag = ship.gameTag AND path.uid = ship.uid 
-                WHERE ship.gameTag = :tag AND ship.uid = :uid
+                SELECT sid, points, startTime, duration 
+                FROM dbo.Ship ship inner join dbo.ShipPath path ON path.sid = ship.shipId 
+                WHERE ship.gameTag = :tag AND ship.uid = :uid AND ship.shipId = :sid
                 """
         )
             .bind("tag", tag)
             .bind("uid", uid)
-            .bind("shipId", shipId)
-            .mapTo<ShipInfoDBModelExtended>()
-            .singleOrNull()
-            ?.toShipInfoDBModel()?.toShipInfo() ?: return null
+            .bind("sid", shipId)
+            .mapTo<ShipInfoDBModel>()
+            .toList()
+            .toShipInfo()
     }
 
     override fun getShipsInfo(tag: String, uid: String): List<ShipInfo> {
         logger.info("Getting ships info of user {} in lobby {}", uid, tag)
 
-        val ships = handle.createQuery(
+        return handle.createQuery(
             """
-                SELECT shipId FROM dbo.Ship WHERE gameTag = :tag AND uid = :uid
+                SELECT sid, points, startTime, duration 
+                FROM dbo.ShipPath 
+                WHERE gameTag = :tag AND uid = :uid
             """
         )
             .bind("tag", tag)
             .bind("uid", uid)
-            .mapTo<Int>()
+            .mapTo<ShipInfoDBModel>()
             .toList()
-
-
-        return ships.map {id ->
-            val movements = handle.createQuery(
-                """
-                SELECT points, startTime, duration FROM dbo.ShipPath path 
-                WHERE path.gameTag = :tag AND path.sid = :sid
-            """
-            )
-                .bind("tag", tag)
-                .bind("sid", id)
-                .mapTo<ShipMovementDBModel>()
-                .toList()
-                .map { it.toMovement() }
-            ShipInfo(id, movements)
-        }
+            .toShipInfoCollection()
     }
 
     override fun getOtherShipsInfo(tag: String, uid: String): List<ShipInfo> {
@@ -71,14 +59,16 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
 
         return handle.createQuery(
             """
-                SELECT shipId, pos_info FROM dbo.Ship WHERE gameTag = :tag AND uid != :uid
+                SELECT sid, points, startTime, duration 
+                FROM dbo.ShipPath 
+                WHERE gameTag = :tag AND uid != :uid
             """
         )
             .bind("tag", tag)
             .bind("uid", uid)
             .mapTo<ShipInfoDBModel>()
-            .map { it.toShipInfo() }
             .toList()
+            .toShipInfoCollection()
     }
 
     override fun createShipInfo(
@@ -97,10 +87,13 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         )
             .bind("tag", tag)
             .bind("uid", uid)
-            .execute()
+            .executeAndReturnGeneratedKeys()
+            .mapTo<Int>()
+            .single()
 
         handle.createUpdate("""
-            insert into dbo.ShipPath (gameTag, uid, sid, points, startTime, duration) VALUES (:tag, :uid, :sid, :points, :startTime, :duration)
+            insert into dbo.ShipPath (gameTag, uid, sid, points, startTime, duration) 
+            VALUES (:tag, :uid, :sid, :points, :startTime, :duration)
         """)
             .bind("tag", tag)
             .bind("uid", uid)

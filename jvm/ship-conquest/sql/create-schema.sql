@@ -91,7 +91,7 @@ CREATE TABLE dbo.IslandEvent
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
 
-CREATE TABLE dbo.WildIsland
+CREATE TABLE dbo.Island
 (
     tag varchar(6) NOT NULL,
     islandId INT GENERATED ALWAYS AS IDENTITY,
@@ -104,18 +104,11 @@ CREATE TABLE dbo.WildIsland
 
 CREATE TABLE dbo.OwnedIsland
 (
-    tag varchar(6) NOT NULL,
-    islandId INT NOT NULL,
-    x INT NOT NULL,
-    y INT NOT NULL,
-    radius INT NOT NULL,
     incomePerHour INT NOT NULL,
     uid varchar(30) NOT NULL,
     instant INT NOT NULL,
-    PRIMARY KEY (tag, islandId),
-    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
-);
+) INHERITS (dbo.Island);
 
 CREATE TABLE dbo.PlayerStatistics(
     tag varchar(6) NOT NULL,

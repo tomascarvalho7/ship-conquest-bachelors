@@ -5,8 +5,11 @@ import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.domain.space.Vector2
+import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.domain.world.WorldGenerator
+import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.WildIsland
+import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
@@ -16,6 +19,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
+import kotlin.random.Random
 
 @Service
 class LobbyService(
@@ -26,7 +30,7 @@ class LobbyService(
     fun createLobby(name: String, uid: String): CreateLobbyResult {
         val lobbyName = name.toLobbyName() ?: return left(CreateLobbyError.InvalidServerName)
         // generate world
-        val generator = WorldGenerator(600)
+        val generator = WorldGenerator(300)
         val origins = generator.generateIslandCoordinates(Factor(70))
         val world = generator.generate(origins)
 
@@ -45,11 +49,10 @@ class LobbyService(
                     creationTime = Instant.now().toEpochMilli()
                 )
             )
-            transaction.gameRepo.createGame(game = Game(tag = tag, map = world))
+            val game = Game(tag = tag, map = world)
+            transaction.gameRepo.createGame(game = game)
             // create island from world map
             for (origin in origins) {
-                val island =
-                    WildIsland(coordinate = origin, radius = generator.islandSize, islandId = 0) // TODO mudar isto
                 transaction.islandRepo.create(
                     tag = tag,
                     origin = origin,
@@ -57,7 +60,7 @@ class LobbyService(
                 )
             }
             // add player to the lobby
-            addPlayerToLobby(transaction, tag, uid)
+            addPlayerToLobby(transaction, game, tag, uid)
             // return
             right(value = tag)
         }
@@ -74,13 +77,13 @@ class LobbyService(
 
     fun joinLobby(uid: String, tag: String): JoinLobbyResult {
         return transactionManager.run { transaction ->
-            if (transaction.lobbyRepo.get(tag) == null)
-                return@run left(JoinLobbyError.LobbyNotFound)
+            val game = transaction.gameRepo.get(tag = tag)
+                ?: return@run left(JoinLobbyError.LobbyNotFound)
 
             if (transaction.lobbyRepo.checkUserInLobby(uid, tag))
                 return@run right(tag)
 
-            addPlayerToLobby(transaction, tag, uid)
+            addPlayerToLobby(transaction, game, tag, uid)
             right(tag)
         }
     }
@@ -108,11 +111,21 @@ class LobbyService(
         }
     }
 
-    fun addPlayerToLobby(transaction: Transaction, tag: String, uid: String) {
+    fun addPlayerToLobby(transaction: Transaction, game: Game, tag: String, uid: String) {
         transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
-        transaction.shipRepo.createShipInfo(tag, uid, generateRandomSpawnPoint(), null, null)
+        transaction.shipRepo.createShipInfo(tag, uid, generateRandomSpawnPoint(game.map), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
 
-    private fun generateRandomSpawnPoint() = listOf(Vector2(50, 50)) //TODO generate it randomly
+    private fun generateRandomSpawnPoint(world: HeightMap): List<Vector2> {
+        while(true) {
+            val randomCoord = Vector2(
+                x = Random.nextInt(from = 0, until = world.size),
+                y = Random.nextInt(from = 0, until = world.size)
+            )
+
+            if (world.pulse(origin = randomCoord, radius = 30, water = false).isEmpty())
+                return listOf(randomCoord)
+        }
+    }
 }

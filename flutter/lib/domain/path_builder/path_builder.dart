@@ -28,7 +28,7 @@ class PathBuilder {
       oldNodes[current.position] = current; // add current node to old nodes
       iterations++; // increment iterations
       // if distance is smaller than step, then path has been found
-      if (euclideanDistance(current.position, end) <= step) {
+      if (euclideanDistance(current.position, end) <= radius) {
         return reconstructPath(Node(position: end, parent: current));
       }
 

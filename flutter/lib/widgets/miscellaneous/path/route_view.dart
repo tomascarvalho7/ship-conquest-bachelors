@@ -9,10 +9,9 @@ import '../../../providers/game/minimap_controllers/route_controller.dart';
 
 class RouteView extends StatelessWidget {
   final Sequence<Position> hooks;
-  final RouteController controller;
   final Widget child;
   // constructor
-  const RouteView({super.key, required this.hooks, required this.controller, required this.child});
+  const RouteView({super.key, required this.hooks, required this.child});
 
   // constants
   static const Color startColor = Colors.yellowAccent;
@@ -23,16 +22,19 @@ class RouteView extends StatelessWidget {
   Widget build(BuildContext context) =>
       Consumer<CameraController>(
           builder: (_, camera, __) =>
-              CustomPaint(
-                  painter: RoutePainter(
-                      hooks: hooks,
-                      scale: camera.scaleFactor,
-                      start: startColor,
-                      mid: midColor,
-                      end: endColor,
-                      points: controller.pathPoints
-                  ),
-                  child: Container(child: child)
+              Consumer<RouteController>(
+                builder: (_, routeController, __) =>
+                    CustomPaint(
+                        painter: RoutePainter(
+                            hooks: hooks,
+                            scale: camera.scaleFactor,
+                            start: startColor,
+                            mid: midColor,
+                            end: endColor,
+                            points: routeController.pathPoints
+                        ),
+                        child: Container(child: child)
+                    )
               )
       );
 }

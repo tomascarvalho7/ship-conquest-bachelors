@@ -12,8 +12,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
  * on top of the PublisherAPI
  */
 object ShipEventsAPI {
-    // n sid (Ship Identifiers) -> uid (User Identifiers)
-    private var ships = mapOf<Int, String>()
+    // (N) gameKey (Tag, Ship Identifier) -> gameSubscriptionKey(Tag, User identifier)
+    private var ships = mapOf<GameKey, GameSubscriptionKey>()
 
     private fun buildEvent(id: String, data: Any) =
         SseEmitter
@@ -22,16 +22,16 @@ object ShipEventsAPI {
             //.name(name)
             .data(data)
 
-    fun publishEvents(futureEvents: List<FutureEvent>) {
+    fun publishEvents(tag: String, futureEvents: List<FutureEvent>) {
         for(futureEvent in futureEvents) {
             val details = futureEvent.event.details
 
             if (details is FightEvent) {
                 // get enemy uid
-                val key = ships[details.sidB]
+                val key = ships[GameKey(tag = tag, sid = details.sidB)]
                 // notify enemy ship of new future event
                 if (key != null) PublisherAPI.publish(
-                    key = key,
+                    key = key.toCode(),
                     message = buildEvent(
                         id = "${futureEvent.event.eid}",
                         data = buildEventNotification(sid = details.sidB, event = futureEvent)
@@ -41,21 +41,32 @@ object ShipEventsAPI {
         }
     }
 
-    fun subscribeNewShipToFleetEvents(uid: String, ship: Ship) {
+    fun subscribeNewShipToFleetEvents(tag: String, uid: String, ship: Ship) {
         // add a new entry of ship identifier pointing to user id
-        ships = ships.plus(ship.sid to uid)
-    }
-
-    fun subscribeToFleetEvents(uid: String, fleet: Fleet): SseEmitter {
-        // create new entry for each ship pointing to user id
         ships = ships.plus(
-            fleet.ships.map { ship -> ship.sid to uid }
+            GameKey(tag = tag, sid = ship.sid) to GameSubscriptionKey(tag = tag, uid = uid)
         )
-        return PublisherAPI.subscribe(key = uid)
     }
 
-    fun unsubscribeToFleetEvents(uid: String) {
+    fun subscribeToFleetEvents(tag: String, uid: String, fleet: Fleet): SseEmitter {
+        // create new entry for each ship pointing to user id
+        val key = GameSubscriptionKey(tag = tag, uid = uid)
+        ships = ships.plus(
+            fleet.ships.map { ship ->
+                GameKey(tag = tag, sid = ship.sid) to key
+            }
+        )
+        return PublisherAPI.subscribe(key = key.toCode())
+    }
+
+    fun unsubscribeToFleetEvents(tag: String, uid: String) {
         // remove fleet entries
-        PublisherAPI.unsubscribe(key = uid);
+        PublisherAPI.unsubscribe(key = GameSubscriptionKey(tag = tag, uid = uid).toCode())
     }
 }
+
+data class GameKey(val tag: String, val sid: Int)
+
+data class GameSubscriptionKey(val tag: String, val uid: String)
+
+fun GameSubscriptionKey.toCode() = hashCode().toString()

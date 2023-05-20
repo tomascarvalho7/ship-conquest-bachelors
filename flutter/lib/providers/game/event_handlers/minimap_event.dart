@@ -48,17 +48,16 @@ class MinimapEvent {
     if (points != null) {
       // invert scale on coord2D function
       invertScale(Position pos) => Coord2D(x: (pos.x * invScale).round(), y: (pos.y * invScale).round());
-
       final path = PathBuilder.build(
           minimapController.minimap,
           invertScale(points.start),
           invertScale(points.mid),
           invertScale(points.end),
-          5,
-          15,
-          500
+          10,
+          20,
+          250
       );
-      final nrOfBeziers = (path.length > 20) ? (path.length / 20).round() : 1;
+      final nrOfBeziers = (path.length > 10) ? (path.length / 10).round() : 1;
       routeController.setRoutePoints(Sequence(data: PathBuilder.normalize(path, nrOfBeziers)));
       routeController.deselect();
     }

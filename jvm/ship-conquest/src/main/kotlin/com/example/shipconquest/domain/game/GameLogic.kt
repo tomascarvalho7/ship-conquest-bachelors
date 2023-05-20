@@ -15,8 +15,10 @@ import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.build
 import com.example.shipconquest.domain.toVector2
+import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
+import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.WildIsland
@@ -35,6 +37,19 @@ class GameLogic(private val clock: Clock) {
 
     fun getMostRecentMovement(info: ShipInfo): Movement {
         return info.movements.last()
+    }
+
+    fun makeTransaction(
+        statistics: PlayerStatsBuilder,
+        transaction: Int,
+        onSuccess: (newCurrency: Int, instant: Instant) -> Unit
+    ): Int? {
+        val instant = clock.now()
+        val currency = statistics.income.getCurrency(now = instant)
+        val newCurrency = if (currency > transaction) currency - transaction else null
+
+        if (newCurrency != null) onSuccess(newCurrency, instant)
+        return newCurrency
     }
 
     fun conquestIsland(

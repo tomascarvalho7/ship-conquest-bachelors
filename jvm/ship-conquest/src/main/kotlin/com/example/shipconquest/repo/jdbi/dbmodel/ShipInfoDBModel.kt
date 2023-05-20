@@ -4,17 +4,24 @@ import com.example.shipconquest.domain.ship.ShipInfo
 import java.time.Duration
 import java.time.Instant
 
-data class ShipInfoDBModel(val shipId: Int, val movements: List<ShipMovementDBModel>)
-
-data class ShipInfoDBModelExtended(
-    val shipId: Int,
+data class ShipInfoDBModel(
+    val sid: Int,
     val points: ShipPointsDBModel,
     val startTime: Instant?,
     val duration: Duration?
 )
 
-fun ShipInfoDBModelExtended.toShipInfoDBModel() =
-    ShipInfoDBModel(shipId, listOf(ShipMovementDBModel(points, startTime, duration)))
+fun List<ShipInfoDBModel>.toShipInfoCollection() =
+    groupBy { info -> info.sid }
+        .map { (key, value) -> shipInfo(id = key, dataset = value) }
 
-fun ShipInfoDBModel.toShipInfo() =
-    ShipInfo(id = shipId, movements = movements.map { it.toMovement() })
+fun List<ShipInfoDBModel>.toShipInfo() =
+    toShipInfoCollection()
+        .firstOrNull()
+
+fun shipInfo(id: Int, dataset: List<ShipInfoDBModel>) = ShipInfo(
+        id = id,
+        movements = dataset.map { info ->
+            ShipMovementDBModel(info.points, info.startTime, info.duration).toMovement()
+        }
+    )

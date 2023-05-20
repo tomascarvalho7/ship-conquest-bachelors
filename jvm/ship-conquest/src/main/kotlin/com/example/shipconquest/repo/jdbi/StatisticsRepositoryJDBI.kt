@@ -3,9 +3,9 @@ package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.repo.StatisticsRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.OwnedIslandDBModel
+import com.example.shipconquest.repo.jdbi.dbmodel.island.OwnedIslandDBModel
 import com.example.shipconquest.repo.jdbi.dbmodel.PlayerStatsDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toIslandIncome
+import com.example.shipconquest.repo.jdbi.dbmodel.island.toIslandIncome
 import com.example.shipconquest.repo.jdbi.dbmodel.toPlayerStats
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo

@@ -4,10 +4,7 @@ import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.repo.IslandRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.OwnedIslandDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.WildIslandDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toOwnedIsland
-import com.example.shipconquest.repo.jdbi.dbmodel.toWildIsland
+import com.example.shipconquest.repo.jdbi.dbmodel.island.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
@@ -19,63 +16,70 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
     override fun get(tag: String, islandId: Int): Island? {
         logger.info("Getting island from db with tag = {} and islandId = {}", tag, islandId)
 
-        val wildIsland = handle.createQuery(
-            """
-               select * from dbo.WildIsland where tag = :tag AND islandId = :id
-            """
-        )
-            .bind("tag", tag)
-            .bind("id", islandId)
-            .mapTo<WildIslandDBModel>()
-            .singleOrNull()
-            ?.toWildIsland()
-
-        if (wildIsland != null) return wildIsland
-
         return handle.createQuery(
             """
-               select * from dbo.OwnedIsland where tag = :tag AND islandId = :id
+               select * from dbo.Island where tag = :tag AND islandId = :id
             """
         )
             .bind("tag", tag)
             .bind("id", islandId)
-            .mapTo<OwnedIslandDBModel>()
+            .mapTo<GenericIslandDBModel>()
             .singleOrNull()
-            ?.toOwnedIsland()
+            ?.toIsland()
     }
 
     override fun getAll(tag: String): List<Island> {
         logger.info("Getting all island's from db with tag = {}", tag)
 
-        val wildIslands = handle.createQuery(
+        return handle.createQuery(
             """
-               select * from dbo.WildIsland where tag = :tag
-            """
-        )
-            .bind("tag", tag)
-            .mapTo<WildIslandDBModel>()
-            .map { it.toWildIsland() }
-            .list()
-
-        val ownedIslands = handle.createQuery(
-            """
-               select * from dbo.OwnedIsland where tag = :tag
+               select * from dbo.Island where tag = :tag
             """
         )
             .bind("tag", tag)
-            .mapTo<OwnedIslandDBModel>()
-            .map { it.toOwnedIsland() }
+            .mapTo<GenericIslandDBModel>()
+            .map { it.toIsland() }
             .list()
-
-        return wildIslands + ownedIslands
     }
 
     override fun getVisitedIslands(tag: String, uid: String): List<Island> {
-        TODO("Not yet implemented")
+        logger.info("Getting visited islands by user with uid = {} on game with tag = {}", uid, tag)
+
+        return handle.createQuery(
+            """
+                SELECT * FROM dbo.Island
+                WHERE tag = :tag AND islandId IN (
+                    SELECT islandId FROM dbo.IslandEvent I 
+                    INNER JOIN dbo.Ship S ON I.sid = S.sid 
+                    WHERE tag = :tag AND uid = :uid
+                )
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .mapTo<GenericIslandDBModel>()
+            .map { it.toIsland() }
+            .list()
     }
 
     override fun getUnvisitedIslands(tag: String, uid: String): List<Island> {
-        TODO("Not yet implemented")
+        logger.info("Getting unvisited islands by user with uid = {} on game with tag = {}", uid, tag)
+
+        return handle.createQuery(
+            """
+                SELECT * FROM dbo.Island
+                WHERE tag = :tag AND islandId NOT IN (
+                    SELECT islandId FROM dbo.IslandEvent I 
+                    INNER JOIN dbo.Ship S ON I.sid = S.shipId
+                    WHERE tag = :tag AND uid = :uid
+                )
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .mapTo<GenericIslandDBModel>()
+            .map { it.toIsland() }
+            .list()
     }
 
     override fun create(tag: String, origin: Vector2, radius: Int) {
@@ -83,7 +87,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         handle.createUpdate(
             """
-                insert into dbo.WildIsland(tag, x, y, radius) values(:tag, :x, :y, :radius)
+                insert into dbo.Island(tag, x, y, radius) values(:tag, :x, :y, :radius)
             """
         )
             .bind("tag", tag)
@@ -119,7 +123,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         handle.createUpdate(
             """
-               DELETE FROM dbo.WildIsland WHERE tag = :tag AND islandId = :id
+               DELETE FROM dbo.Island WHERE tag = :tag AND islandId = :id
             """
         )
             .bind("tag", tag)
