@@ -6,6 +6,7 @@ import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/owned_island.dart';
+import 'package:ship_conquest/domain/island/wild_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
@@ -177,5 +178,11 @@ class FakeShipServices extends ShipServices {
   Future unsubscribe() async {
     return;
   }
+
+  @override
+  Future<Sequence<Island>> getVisitedIslands() async =>
+      Sequence(data: [
+        WildIsland(id: 1, coordinate: Coord2D(x: 10, y: 10), radius: 25)
+    ]);
 }
 

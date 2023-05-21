@@ -36,7 +36,8 @@ class GameLogic {
     // fetch player statistics
     statisticsController.updateStatistics(await services.getPlayerStatistics());
     // load visited islands & get scene for current ship
-    sceneController.load(Sequence.empty());
+    final islands = await services.getVisitedIslands();
+    sceneController.load(islands);
     final position = shipController.getMainShip().getPosition(globalScale);
     sceneController.getScene(position, services, shipController.getMainShip().sid);
     // fetch player minimap

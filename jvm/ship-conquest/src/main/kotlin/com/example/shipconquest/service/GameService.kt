@@ -6,11 +6,7 @@ import com.example.shipconquest.domain.bezier.utils.toVector2List
 import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.GameLogic
-import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
-import com.example.shipconquest.domain.ship.Fleet
-import com.example.shipconquest.domain.ship.ShipBuilder
-import com.example.shipconquest.domain.ship.addEvents
-import com.example.shipconquest.domain.ship.addMovement
+import com.example.shipconquest.domain.ship.*
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.space.Vector2
@@ -45,11 +41,11 @@ class GameService(
 ) : ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun getChunks(tag: String, shipId: String, googleId: String): GetChunksResult {
+    fun getChunks(tag: String, shipId: Int, uid: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val shipInfo = transaction.shipRepo.getShipInfo(tag, shipId.toInt(), googleId)
+            val shipBuilder = gameLogic.getShipBuilder(tag = tag, uid = uid, sid = shipId, transaction = transaction)
                 ?: return@run left(GetChunksError.ShipPositionNotFound)
-            val coord = gameLogic.getCoordFromMovement(gameLogic.getMostRecentMovement(shipInfo))
+            val coord = gameLogic.getCoordFromMovement(gameLogic.buildShip(shipBuilder).movement)
 
             val game = transaction.gameRepo.get(tag = tag) // TODO: can be optimized
             if (game != null) {

@@ -19,8 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 class GameController(val service: GameService) {
 
     @GetMapping("/{tag}/view")
-    fun view(user: User, @PathVariable tag: String, @RequestParam shipId: String): ResponseEntity<*> {
-        val result = service.getChunks(tag = tag, shipId = shipId, googleId = user.id)
+    fun view(user: User, @PathVariable tag: String, @RequestParam shipId: Int): ResponseEntity<*> {
+        val result = service.getChunks(tag = tag, shipId = shipId, uid = user.id)
 
         return when (result) {
             is Either.Right -> response(content = result.value.toHorizonOutputModel())
@@ -148,7 +148,7 @@ class GameController(val service: GameService) {
         val result = service.getKnownIslands(tag, user.id)
 
         return when(result) {
-            is Either.Right -> response(result.value)
+            is Either.Right -> response(result.value.toIslandListOutputModel())
             is Either.Left -> when(result.value) {
                 GetKnownIslandsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())

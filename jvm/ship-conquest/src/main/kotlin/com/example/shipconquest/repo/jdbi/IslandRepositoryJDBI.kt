@@ -50,7 +50,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 SELECT * FROM dbo.Island
                 WHERE tag = :tag AND islandId IN (
                     SELECT islandId FROM dbo.IslandEvent I 
-                    INNER JOIN dbo.Ship S ON I.sid = S.sid 
+                    INNER JOIN dbo.Ship S ON I.sid = S.shipId
                     WHERE tag = :tag AND uid = :uid
                 )
             """

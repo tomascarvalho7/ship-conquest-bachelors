@@ -36,7 +36,9 @@ abstract class ShipServices {
 
   Future<UserInfo> getPersonalInfo();
 
+  // Island related routes
   Future<Island> conquestIsland(int sId, int islandId);
+  Future<Sequence<Island>> getVisitedIslands();
 
   Future subscribe(void Function(int sid, UnknownEvent event) onEvent);
 

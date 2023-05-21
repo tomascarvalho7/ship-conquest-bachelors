@@ -30,6 +30,7 @@ import '../../domain/horizon.dart';
 import '../../domain/lobby.dart';
 import '../../domain/user/user_info.dart';
 import '../input_models/create_lobby_input_model.dart';
+import '../input_models/islands_input_model.dart';
 import '../input_models/join_lobby_input_model.dart';
 import '../input_models/lobby_input_model.dart';
 import '../input_models/lobby_list_input_model.dart';
@@ -39,7 +40,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "6b83-46-189-174-32.ngrok-free.app";
+const baseUri = "229a-2001-8a0-6e2e-ba00-f0e1-5d6d-c3c8-a3cc.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -238,7 +239,8 @@ class RealShipServices extends ShipServices {
     });
 
     if (response.statusCode == 200) {
-      final res = LobbyListInputModel.fromJson(jsonDecode(response.body));
+      final res = LobbyListInputModel
+          .fromJson(jsonDecode(response.body));
 
       return List.generate(
           res.list.length,
@@ -365,7 +367,9 @@ class RealShipServices extends ShipServices {
         body: jsonEncode({'shipId': sId, 'islandId': islandId}));
 
     if (response.statusCode == 200) {
-      return IslandInputModel.fromJson(jsonDecode(response.body)).toIsland();
+      return IslandInputModel
+          .fromJson(jsonDecode(response.body))
+          .toIsland();
     } else {
       throw Exception("error conquesting island");
     }
@@ -385,7 +389,8 @@ class RealShipServices extends ShipServices {
     });
 
     if (response.statusCode == 200) {
-      return PlayerStatsInputModel.fromJson(jsonDecode(response.body))
+      return PlayerStatsInputModel
+          .fromJson(jsonDecode(response.body))
           .toPlayerStats();
     } else {
       throw Exception("error getting player statistics");
@@ -432,6 +437,27 @@ class RealShipServices extends ShipServices {
     });
     // unsubscribe from SSE
     SSEClient.unsubscribeFromSSE();
+  }
+
+  @override
+  Future<Sequence<Island>> getVisitedIslands() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) throw Exception("couldn't find token");
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) throw Exception("couldn't find lobby");
+    
+    final response = await http.get(Uri.https(baseUri, '$lobbyId/islands/known'), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
+
+    if (response.statusCode == 200) {
+      return IslandsInputModel
+          .fromJson(jsonDecode(response.body))
+          .toIslandSequence();
+    } else {
+      throw Exception("error getting player islands");
+    }
   }
 }
 
