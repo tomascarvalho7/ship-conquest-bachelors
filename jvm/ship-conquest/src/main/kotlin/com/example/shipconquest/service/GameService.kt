@@ -192,6 +192,32 @@ class GameService(
         }
     }
 
+    fun addShip(tag: String, uid: String): CreateShipResult {
+        return transactionManager.run { transaction ->
+            val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
+                ?: return@run left(CreateShipError.PlayerStatisticsNotFound)
+            val game = transaction.gameRepo.get(tag) ?: return@run left(CreateShipError.GameNotFound)
+
+            // TODO create a good way to get ship costs
+            val canBuy = gameLogic.makeTransaction(playerStatistics, 50) { newCurrency, instant ->
+                transaction.statsRepo.updatePlayerCurrency(
+                    tag = tag,
+                    uid = uid,
+                    instant = instant,
+                    newStaticCurrency = newCurrency
+                )
+            }
+
+            return@run if(canBuy != null) {
+                val newShip = transaction.shipRepo.createShipInfo(tag, uid, gameLogic.generateRandomSpawnPoint(game.map), null, null)
+
+                right(gameLogic.buildShip(ShipBuilder(newShip, emptyList())))
+            } else {
+                left(CreateShipError.NotEnoughCurrency)
+            }
+        }
+    }
+
     fun conquestIsland(tag: String, uid: String, shipId: String, islandId: Int): ConquestIslandResult {
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag)

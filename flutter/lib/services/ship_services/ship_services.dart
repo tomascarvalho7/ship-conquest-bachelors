@@ -27,6 +27,7 @@ abstract class ShipServices {
   Future<Ship> navigateTo(int sId, Sequence<Coord2D> landmarks);
   Future<Ship?> getShip(int sId);
   Future<Sequence<Ship>> getUserShips();
+  Future<Ship> createNewShip();
 
   // Lobby related routes
   Future<List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby);
@@ -36,11 +37,16 @@ abstract class ShipServices {
 
   Future<UserInfo> getPersonalInfo();
 
+  Future<void> logoutUser();
+
   // Island related routes
   Future<Island> conquestIsland(int sId, int islandId);
   Future<Sequence<Island>> getVisitedIslands();
 
-  Future subscribe(void Function(int sid, UnknownEvent event) onEvent);
+  Future subscribe(
+      void Function(int sid, UnknownEvent event) onEvent,
+      void Function(Sequence<Ship> fleet) onFleet
+      );
 
   Future unsubscribe();
 }

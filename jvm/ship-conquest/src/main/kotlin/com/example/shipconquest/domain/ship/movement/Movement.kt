@@ -17,6 +17,7 @@ sealed interface Movement {
                     is IslandEvent -> details.updateMovement(movement = this, instant = event.instant)
                 }
         }
+
         return currentMovement
     }
 }

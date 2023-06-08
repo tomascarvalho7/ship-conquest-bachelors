@@ -1,8 +1,10 @@
 package com.example.shipconquest.repo.jdbi
 
+import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.repo.ShipRepository
 import com.example.shipconquest.repo.jdbi.dbmodel.*
@@ -77,7 +79,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         points: List<Vector2>,
         startTime: Instant?,
         duration: Duration?
-    ) {
+    ): ShipInfo {
         logger.info("Creating a ship of user {} in lobby {}", uid, tag)
 
         val sid = handle.createUpdate(
@@ -111,7 +113,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
             .mapTo<Int>()
             .single()
 
-
+        return ShipInfo(sid, listOf(Stationary(points.first())))
     }
 
     override fun updateShipInfo(

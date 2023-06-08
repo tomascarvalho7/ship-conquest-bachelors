@@ -7,9 +7,11 @@ class MinimapIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.secondary,
         onPressed: onClick,
         child: Icon(
             Icons.map,
+            size: 30,
             color: Theme.of(context).colorScheme.background
         )
     );

@@ -63,7 +63,7 @@ class GameController {
     // schedule ship events
     scheduleShipEvents(ships);
     // subscribe to game events
-    services.subscribe(gameLogic.onEvent);
+    services.subscribe(gameLogic.onEvent, gameLogic.onFleet);
   }
 
   void exit() async {

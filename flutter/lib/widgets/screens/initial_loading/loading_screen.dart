@@ -38,8 +38,8 @@ class _LoadingScreenState extends State<LoadingScreen>
               child: Container(
                 width: 200.0,
                 height: 200.0,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.secondary,
                   shape: BoxShape.circle,
                 ),
                 child: CustomPaint(

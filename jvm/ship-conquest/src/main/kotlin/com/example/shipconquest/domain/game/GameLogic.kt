@@ -19,15 +19,18 @@ import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
 import com.example.shipconquest.domain.user.statistics.getCurrency
+import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.WildIsland
+import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.service.buildBeziers
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToLong
+import kotlin.random.Random
 
 const val incomePerHour = 25
 @Component
@@ -134,9 +137,7 @@ class GameLogic(private val clock: Clock) {
         islands: List<Island>,
         onIslandEvent: (instant: Instant, island: Island) -> Event
     ): List<Event> {
-        val intersection = findIntersectionPoints(pathMovement.getUniquePoints(), islands) ?: return emptyList()
-        val u = findNearestU(intersection, pathMovement)
-        return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.island))
+        return eventLogic.buildIslandEvents(pathMovement, islands, onIslandEvent)
     }
 
     fun buildFightEvents(
@@ -161,5 +162,17 @@ class GameLogic(private val clock: Clock) {
         val duration = Duration.ofSeconds((distance * 2.5).roundToLong()) // was 10 before
 
         return Mobile(landmarks = buildBeziers(points), startTime = clock.now(), duration = duration)
+    }
+
+    fun generateRandomSpawnPoint(world: HeightMap): List<Vector2> {
+        while(true) {
+            val randomCoord = Vector2(
+                x = Random.nextInt(from = 0, until = world.size),
+                y = Random.nextInt(from = 0, until = world.size)
+            )
+
+            if (world.pulse(origin = randomCoord, radius = 30, water = false).isEmpty())
+                return listOf(randomCoord)
+        }
     }
 }

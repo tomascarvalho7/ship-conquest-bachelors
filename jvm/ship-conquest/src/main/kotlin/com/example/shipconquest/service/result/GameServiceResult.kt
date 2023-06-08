@@ -70,3 +70,13 @@ typealias GetShipResult = Either<GetShipError, Ship>
 
 // TODO: give more errors
 typealias GetShipsResult = Either<Nothing, Fleet>
+
+sealed class CreateShipError {
+    object NotEnoughCurrency: CreateShipError()
+
+    object PlayerStatisticsNotFound: CreateShipError()
+
+    object GameNotFound: CreateShipError()
+}
+
+typealias CreateShipResult = Either<CreateShipError, Ship>

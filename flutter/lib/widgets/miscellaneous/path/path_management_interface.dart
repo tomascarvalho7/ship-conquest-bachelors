@@ -12,38 +12,33 @@ class PathManagementInterface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Container(
-          color: const Color.fromRGBO(255, 255, 255, 0.25),
-          child: Material(
-            child: Consumer<RouteController>(
-                builder: (_, pathManager, __) =>
-                    Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          FlexButton(
-                            onPressed: () => MinimapEvent.confirmAndNavigateTo(context),
-                            child: IconSwitch(
-                                condition: pathManager.routePoints.length > 0,
-                                icon: Icons.check,
-                                size: 75,
-                                enabled: Colors.green,
-                                disabled: Colors.grey
-                            ),
-                          ),
-                          FlexButton(
-                            onPressed: () => MinimapEvent.cancel(context),
-                            child: IconSwitch(
-                                condition: pathManager.pathPoints != null,
-                                icon: Icons.close,
-                                size: 75,
-                                enabled: Colors.red,
-                                disabled: Colors.grey
-                            ),
-                          )
-                        ]
+      Consumer<RouteController>(
+          builder: (_, pathManager, __) =>
+              Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FlexButton(
+                        onPressed: () => MinimapEvent.confirmAndNavigateTo(context),
+                        child: IconSwitch(
+                            condition: pathManager.routePoints.length > 0,
+                            icon: Icons.check,
+                            size: 60,
+                            enabled: Colors.green,
+                            disabled: Colors.grey
+                        ),
+                      ),
+                    FlexButton(
+                      onPressed: () => MinimapEvent.cancel(context),
+                      child: IconSwitch(
+                          condition: pathManager.pathPoints != null,
+                          icon: Icons.close,
+                          size: 60,
+                          enabled: Colors.red,
+                          disabled: Colors.grey
+                      ),
                     )
-            ),
-          )
+                  ]
+              )
       );
 }

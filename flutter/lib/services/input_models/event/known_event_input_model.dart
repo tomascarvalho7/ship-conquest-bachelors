@@ -13,7 +13,7 @@ class KnownEventInputModel {
       eid = json["eid"],
       instant = json["instant"],
       won = json["won"],
-      island = IslandInputModel.fromJson(json['island']);
+      island = json['island'] != null ? IslandInputModel.fromJson(json['island']) : null;
 }
 
 extension ToDomain on KnownEventInputModel {

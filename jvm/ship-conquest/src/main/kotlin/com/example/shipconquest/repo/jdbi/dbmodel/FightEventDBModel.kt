@@ -28,7 +28,7 @@ fun FightEventDBModel.toEvent() =
 
 fun decodeToWinner(value: Int) =
         when(value) {
-            1 -> FightInteraction.PLAYER_A
-            2 -> FightInteraction.PLAYER_B
+            0 -> FightInteraction.PLAYER_A
+            1 -> FightInteraction.PLAYER_B
             else -> throw IllegalStateException()
         }

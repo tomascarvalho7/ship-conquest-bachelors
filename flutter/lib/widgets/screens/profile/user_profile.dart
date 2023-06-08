@@ -1,8 +1,11 @@
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/services/google/google_signin_api.dart';
 import 'package:ship_conquest/widgets/screens/start_menu/start_menu.dart';
 
 import '../../../domain/user/user_info.dart';
+import '../../../providers/user_storage.dart';
 import '../../../services/ship_services/ship_services.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -32,6 +35,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final services = Provider.of<ShipServices>(context, listen: false);
+
+    final firstName = user?.name.split(' ').first;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -43,19 +49,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  if (user != null) ...[
+                  if (user != null && firstName != null) ...[
                     Container(
-                      padding: const EdgeInsets.fromLTRB(39, 60, 75, 9),
-                      width: double.infinity,
-                      child:
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "${user?.name.split(' ').first ?? ''}'s profile",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      )
-                    ),
+                        padding: const EdgeInsets.fromLTRB(39, 60, 75, 9),
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  "${firstName ?? ''}${firstName.endsWith('s') ? "'" : "'s"} profile",
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                )),
+                            ElevatedButton(
+                              onPressed: () async {
+                                logout(services).then((value) => context.go("/signIn"));
+                              },
+                              style: Theme.of(context)
+                                  .elevatedButtonTheme
+                                  .style
+                                  ?.copyWith(
+                                      backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primary),
+                                      textStyle: MaterialStatePropertyAll(Theme.of(context).textTheme.bodySmall)
+                              ),
+                              child: const Text("Logout!"),
+                            )
+                          ],
+                        )),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: FractionallySizedBox(
@@ -68,7 +90,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Align(
                             alignment: const Alignment(0.0, 0.0),
                             child: Text(
-                              user?.description != null ? "${user?.description}" : "Add a description to your profile!",
+                              user?.description != null
+                                  ? "${user?.description}"
+                                  : "Add a description to your profile!",
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ),
@@ -106,7 +130,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               height: 170,
                               placeholder: const AssetImage(
                                   'assets/images/default_user_image.png'),
-                              image: NetworkImage(user?.imageUrl != null ? "${user?.imageUrl}" : "force error"), // force the error if the image is null
+                              image: NetworkImage(user?.imageUrl != null
+                                  ? "${user?.imageUrl}"
+                                  : "force error"),
+                              // force the error if the image is null
                               fit: BoxFit.cover,
                               imageErrorBuilder: (context, error, stackTrace) {
                                 // If the image fails to load, return a default image
@@ -130,7 +157,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ] else ...[
-                    const WaitForAsyncScreen(mountainsPath: 'assets/images/profile_mountains.png')
+                    const WaitForAsyncScreen(
+                        mountainsPath: 'assets/images/profile_mountains.png')
                   ],
                 ],
               ),
@@ -140,4 +168,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  Future logout(ShipServices services) async {
+    await GoogleSignInApi.logout();
+    await services.logoutUser();
+  }
+
 }

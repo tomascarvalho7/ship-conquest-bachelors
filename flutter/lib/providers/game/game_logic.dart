@@ -56,6 +56,11 @@ class GameLogic {
     );
   }
 
+  void onFleet(Sequence<Ship> fleet) {
+    print("SSE sent an event");
+    shipController.setFleet(fleet);
+  }
+
   Future<void> update() async {
     final ship = shipController.getMainShip();
     // get scene for current ship

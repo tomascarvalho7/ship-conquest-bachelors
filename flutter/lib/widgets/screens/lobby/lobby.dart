@@ -33,9 +33,9 @@ extension DateFilterToOrder on DateFilter {
   String get toRequestOrder {
     switch (this) {
       case DateFilter.newer:
-        return "ascending";
-      case DateFilter.older:
         return "descending";
+      case DateFilter.older:
+        return "ascending";
     }
   }
 }

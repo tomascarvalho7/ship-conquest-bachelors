@@ -140,6 +140,24 @@ class GameController(val service: GameService) {
         }
     }
 
+    // TODO POST needs a body but this request doesn't really need one. check
+    @PostMapping("/{tag}/ship/add")
+    fun addShip(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        val result = service.addShip(tag = tag, uid = user.id)
+
+        return when(result) {
+            is Either.Right -> response(content = result.value.toShipOutputModel())
+            is Either.Left -> when (result.value) {
+                CreateShipError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+                CreateShipError.NotEnoughCurrency ->
+                    Problem.response(status = 400, problem = Problem.notEnoughCurrency())
+                CreateShipError.PlayerStatisticsNotFound ->
+                    Problem.response(status = 404, problem = Problem.statisticsNotFound())
+            }
+        }
+    }
+
     @GetMapping("/{tag}/islands/known")
     fun getKnownIslands(
         user: User,
@@ -163,7 +181,7 @@ class GameController(val service: GameService) {
         return when (result) {
             is Either.Right -> {
                 val emitter = ShipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
-                //emitter.send(result.value.toFleetOutputModel())
+                ShipEventsAPI.publishFleet(tag = tag, uid = user.id, fleet = result.value)
                 return emitter
             }
             is Either.Left -> TODO("bruh")

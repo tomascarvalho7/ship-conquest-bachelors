@@ -1,6 +1,7 @@
 package com.example.shipconquest.repo
 
 
+import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.ship.movement.Movement
@@ -24,7 +25,7 @@ interface ShipRepository {
         points: List<Vector2>,
         startTime: Instant?,
         duration: Duration?
-    )
+    ): ShipInfo
 
     fun updateShipInfo(
         tag: String,

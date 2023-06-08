@@ -33,7 +33,7 @@ class MinimapVisuals extends StatelessWidget {
        pathManagementInterfaceHolder(),
        closeButton(() {
          context.go('/game-home'); // return to game screen
-       })
+       }, context)
      ],
    );
   }
@@ -51,7 +51,7 @@ class MinimapVisuals extends StatelessWidget {
                 return CameraPathController(
                     context: context,
                     routeController: routeController,
-                    background: const Color.fromRGBO(51, 56, 61, 1),
+                    background: Theme.of(context).colorScheme.background,
                     nodes: ships,
                     child: MinimapView(
                         gradient: colorGradient,
@@ -74,14 +74,18 @@ class MinimapVisuals extends StatelessWidget {
           child: PathManagementInterface()
       );
 
-  Widget closeButton(void Function() onPressed) =>
+  Widget closeButton(void Function() onPressed, BuildContext context) =>
       Positioned(
           right: 0,
           top: 40,
           child: FloatingActionButton(
               onPressed: onPressed,
               backgroundColor: Colors.redAccent,
-              child: const SizedBox(width: 50, height: 50,)
+              child:  Icon(
+                Icons.close,
+                size: 30,
+                color: Theme.of(context).colorScheme.background,
+              )
           )
       );
 }

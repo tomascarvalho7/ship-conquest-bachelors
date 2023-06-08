@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ship_conquest/providers/camera_controller.dart';
+import 'package:ship_conquest/widgets/screens/game/utils/elements/add_ship_element.dart';
 
 import '../../../../domain/island/island.dart';
 import '../../../../domain/ship/ship.dart';
@@ -12,13 +13,15 @@ class GameDetailsPanel extends StatelessWidget {
   final CameraController camera;
   final Sequence<Island> islands;
   final Sequence<Ship> ships;
+  final void Function() onShipBuy;
 
   const GameDetailsPanel({
     super.key,
     required this.controller,
     required this.camera,
     required this.ships,
-    required this.islands
+    required this.islands,
+    required this.onShipBuy
   });
 
   @override
@@ -31,7 +34,8 @@ class GameDetailsPanel extends StatelessWidget {
           buildDragHandle(),
           const SizedBox(height: 20),
           ...nearbyIslands(),
-          ...ownedShips()
+          ...ownedShips(),
+          AddShipElement(onClick: onShipBuy, shipCost: 50,)
         ],
       );
 
@@ -47,7 +51,7 @@ class GameDetailsPanel extends StatelessWidget {
   );
 
   List<Widget> nearbyIslands() {
-    if (islands.length == 0) return List.empty();
+    if (islands.isEmpty) return List.empty();
 
     return [
       listTitle("Nearby Islands"),
@@ -61,7 +65,7 @@ class GameDetailsPanel extends StatelessWidget {
   }
 
   List<Widget> ownedShips() {
-    if (ships.length == 0) return List.empty();
+    if (ships.isEmpty) return List.empty();
 
     return [
       listTitle("Your Fleet"),

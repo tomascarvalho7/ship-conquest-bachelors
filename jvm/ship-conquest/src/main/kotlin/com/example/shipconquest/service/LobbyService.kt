@@ -2,6 +2,7 @@ package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.Factor
 import com.example.shipconquest.domain.game.Game
+import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.domain.space.Vector2
@@ -23,7 +24,8 @@ import kotlin.random.Random
 
 @Service
 class LobbyService(
-    override val transactionManager: TransactionManager
+    override val transactionManager: TransactionManager,
+    val gameLogic: GameLogic // TODO check if this dependency is fine to have
 ) : ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -113,19 +115,9 @@ class LobbyService(
 
     fun addPlayerToLobby(transaction: Transaction, game: Game, tag: String, uid: String) {
         transaction.lobbyRepo.joinLobby(uid = uid, tag = tag)
-        transaction.shipRepo.createShipInfo(tag, uid, generateRandomSpawnPoint(game.map), null, null)
+        transaction.shipRepo.createShipInfo(tag, uid, gameLogic.generateRandomSpawnPoint(game.map), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
 
-    private fun generateRandomSpawnPoint(world: HeightMap): List<Vector2> {
-        while(true) {
-            val randomCoord = Vector2(
-                x = Random.nextInt(from = 0, until = world.size),
-                y = Random.nextInt(from = 0, until = world.size)
-            )
 
-            if (world.pulse(origin = randomCoord, radius = 30, water = false).isEmpty())
-                return listOf(randomCoord)
-        }
-    }
 }

@@ -28,7 +28,7 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
             .bind("instant", instant.epochSecond)
             .bind("sidA", details.sidA)
             .bind("sidB", details.sidB)
-            .bind("winner", details.winner)
+            .bind("winner", details.winner.ordinal)
             .executeAndReturnGeneratedKeys("eid")
             .mapTo<Int>()
             .single()

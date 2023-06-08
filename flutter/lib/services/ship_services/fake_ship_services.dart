@@ -131,6 +131,14 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
+  Future<void> logoutUser() async {
+    // delete all user footprint in the app
+    userStorage.deleteToken();
+    userStorage.deleteUser();
+    lobbyStorage.deleteLobbyId();
+  }
+
+  @override
   Future<PlayerStats> getPlayerStatistics() async {
     return PlayerStats(currency: 125, maxCurrency: 600);
   }
@@ -170,7 +178,10 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  Future subscribe(void Function(int sid, UnknownEvent event) onEvent) async {
+  Future subscribe(
+      void Function(int sid, UnknownEvent event) onEvent,
+      void Function(Sequence<Ship> fleet) onFleet
+      ) async {
     return;
   }
 
@@ -184,5 +195,15 @@ class FakeShipServices extends ShipServices {
       Sequence(data: [
         WildIsland(id: 1, coordinate: Coord2D(x: 10, y: 10), radius: 25)
     ]);
+
+  @override
+  Future<Ship> createNewShip() async {
+    return StaticShip(
+        sid: 5,
+        coordinate: Coord2D(x: 25, y: 25),
+        completedEvents: Grid.empty(),
+        futureEvents: Grid.empty()
+    );
+  }
 }
 

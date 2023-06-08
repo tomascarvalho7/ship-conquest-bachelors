@@ -11,7 +11,7 @@ import '../../canvas/image_painter.dart';
 class MinimapView extends StatelessWidget {
   final Minimap minimap;
   final ColorGradient gradient;
-  final Color background = const Color.fromRGBO(0, 0, 0, 0.1);
+  final Color background = const Color.fromRGBO(0, 0, 0, 0.2);
   final Widget? child;
   const MinimapView({super.key, required this.minimap, required this.gradient, this.child});
 

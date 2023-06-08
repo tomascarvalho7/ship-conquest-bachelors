@@ -170,11 +170,11 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                               .textTheme
                                               .bodyMedium
                                               ?.copyWith(
-                                              fontSize: 15,
-                                              color: Colors.black),
+                                                  fontSize: 15,
+                                                  color: Colors.black),
                                           focusedBorder: OutlineInputBorder(
                                             borderRadius:
-                                            BorderRadius.circular(35),
+                                                BorderRadius.circular(35),
                                             borderSide: BorderSide(
                                               color: Theme.of(context)
                                                   .colorScheme
@@ -184,7 +184,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                           ),
                                           enabledBorder: OutlineInputBorder(
                                             borderRadius:
-                                            BorderRadius.circular(35),
+                                                BorderRadius.circular(35),
                                             borderSide: BorderSide(
                                               color: Theme.of(context)
                                                   .colorScheme
@@ -200,7 +200,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                                 .background),
                                         maxLines: 1,
                                         textAlignVertical:
-                                        TextAlignVertical.center,
+                                            TextAlignVertical.center,
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.done,
                                         textAlign: TextAlign.start,
@@ -216,10 +216,15 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                             _usernameController.text;
                                         final description =
                                             _descriptionController.text;
-                                        if (username.length >= 6 ) {
+                                        if (username.length >= 6) {
                                           // TODO limite por definir
-                                          signIn(services, userStorage,
-                                                  username, description.isEmpty ? null: description)
+                                          signIn(
+                                                  services,
+                                                  userStorage,
+                                                  username,
+                                                  description.isEmpty
+                                                      ? null
+                                                      : description)
                                               .then((_) => context.go("/home"));
                                         } else {
                                           // TODO dizer que o nome tem que ser maior
@@ -268,8 +273,8 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     );
   }
 
-  Future signIn(
-      ShipServices services, UserStorage userStorage, String username, String? description) async {
+  Future signIn(ShipServices services, UserStorage userStorage, String username,
+      String? description) async {
     final account = await GoogleSignInApi.login();
     final userInfo = await GoogleSignInApi.getUserInfo(account!);
     final userToken = await services.signIn(userInfo, username, description);

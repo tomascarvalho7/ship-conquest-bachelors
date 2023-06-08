@@ -28,6 +28,11 @@ class ShipController with ChangeNotifier {
     shipIds = Sequence(data: fleet.map((ship) => ship.sid).data);
   }
 
+  void updateFleet(Ship ship) {
+    ships = ships.put(ship.sid, ship);
+    shipIds = shipIds.put(ship.sid);
+  }
+
   void updateShip(Ship ship) {
     ships = ships.put(ship.sid, ship);
     notifyListeners();

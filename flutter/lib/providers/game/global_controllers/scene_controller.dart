@@ -51,8 +51,12 @@ class SceneController with ChangeNotifier {
     _visitedIslands = _visitedIslands.put(island.id, island);
   }
 
-  Future<Sequence<Coordinate>> getScene(Position position, ShipServices services, int sId) async {
+  Future<Sequence<Coordinate>> tryToGetScene(Position position, ShipServices services, int sId) async {
     if (distance(position, _lastPos) <= 1.0) return Sequence.empty();
+    return getScene(position, services, sId);
+  }
+
+  Future<Sequence<Coordinate>> getScene(Position position, ShipServices services, int sId) async {
     final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
 
     // update position
@@ -95,18 +99,18 @@ class SceneController with ChangeNotifier {
   }
 
   void _generateWaterScene(Coord2D origin) {
-      pulse(
-          radius: chunkSize,
-          block: (coord) {
-            final x = origin.x + coord.x;
-            final y = origin.y + coord.y;
-            final pos = Coord2D(x: x, y: y);
-            if (_newTilesMap[pos] == null) {
-              _newTilesMap[pos] = _newTiles.length;
-              _newTiles = _newTiles.put(Coordinate(x: x, y: y, z: 0));
-            }
+    pulse(
+        radius: chunkSize,
+        block: (coord) {
+          final x = origin.x + coord.x;
+          final y = origin.y + coord.y;
+          final pos = Coord2D(x: x, y: y);
+          if (_newTilesMap[pos] == null) {
+            _newTilesMap[pos] = _newTiles.length;
+            _newTiles = _newTiles.put(Coordinate(x: x, y: y, z: 0));
           }
-      );
+        }
+    );
   }
 
   Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services, int sId) async {

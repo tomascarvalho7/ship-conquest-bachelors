@@ -5,6 +5,7 @@ import com.example.shipconquest.domain.bezier.CubicBezier
 import com.example.shipconquest.domain.bezier.utils.split
 import com.example.shipconquest.domain.bezier.utils.toVector2List
 import com.example.shipconquest.domain.space.toPosition
+import com.example.shipconquest.domain.toVector2
 import java.time.Duration
 import java.time.Instant
 
@@ -72,4 +73,8 @@ class Mobile(
 
         return bezierList
     }
+
+    fun getEndTime() = endTime
+
+    fun getFinalCoord() = getPosition(landmarks.size * 1.0).toVector2()
 }

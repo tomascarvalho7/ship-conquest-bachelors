@@ -35,7 +35,8 @@ class StatisticsRepositoryJDBI(private val handle: Handle): StatisticsRepository
 
         val islandsIncome = handle.createQuery(
             """
-               select * from dbo.OwnedIsland where tag = :tag and uid = :uid
+               select * from dbo.Island where tag = :tag and uid = :uid 
+               AND incomePerHour IS NOT NULL AND uid IS NOT NULL AND instant IS NOT NULL
             """
         )
             .bind("tag", tag)

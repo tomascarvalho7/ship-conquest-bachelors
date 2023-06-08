@@ -21,7 +21,7 @@ class GameInterface extends StatelessWidget {
 
   Widget topBar(BuildContext context) =>
       Align(
-        alignment: const Alignment(0.0, -0.9),
+        alignment: const Alignment(0.0, -0.8),
         child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

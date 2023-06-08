@@ -1,6 +1,9 @@
 package com.example.shipconquest.controller
 
+import com.example.shipconquest.controller.model.output.notification.EventNotificationOutputModel
 import com.example.shipconquest.controller.model.output.notification.buildEventNotification
+import com.example.shipconquest.controller.model.output.ship.FleetOutputModel
+import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
 import com.example.shipconquest.domain.event.FutureEvent
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.ship.Fleet
@@ -15,12 +18,32 @@ object ShipEventsAPI {
     // (N) gameKey (Tag, Ship Identifier) -> gameSubscriptionKey(Tag, User identifier)
     private var ships = mapOf<GameKey, GameSubscriptionKey>()
 
-    private fun buildEvent(id: String, data: Any) =
+    private fun buildEvent(id: String, data: EventNotificationOutputModel) =
         SseEmitter
             .event()
             .id(id)
-            //.name(name)
+            .name("event")
             .data(data)
+            .build()
+
+    private fun buildEvent(id: String, data: FleetOutputModel) =
+        SseEmitter
+            .event()
+            .id(id)
+            .name("fleet")
+            .data(data)
+            .build()
+
+    fun publishFleet(tag: String, uid: String, fleet: Fleet) {
+        val key = GameSubscriptionKey(tag = tag, uid = uid)
+        PublisherAPI.publish(
+            key = key.toCode(),
+            message = buildEvent(
+                id = key.toCode(),
+                data = fleet.toFleetOutputModel()
+            )
+        )
+    }
 
     fun publishEvents(tag: String, futureEvents: List<FutureEvent>) {
         for(futureEvent in futureEvents) {

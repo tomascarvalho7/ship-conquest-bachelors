@@ -12,9 +12,14 @@ import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.getMobileMovementOrNull
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.bezier.utils.*
+import com.example.shipconquest.domain.distanceTo
 import com.example.shipconquest.domain.event.logic.utils.calculateWinner
 import com.example.shipconquest.domain.event.logic.utils.comparePoints
+import com.example.shipconquest.domain.event.logic.utils.findIntersectionPoints
+import com.example.shipconquest.domain.space.toPosition
+import com.example.shipconquest.domain.world.islands.Island
 import java.time.Instant
+import kotlin.math.min
 
 class EventLogic(private val clock: Clock) {
     fun buildFightEventsBetween(
@@ -31,13 +36,44 @@ class EventLogic(private val clock: Clock) {
         return onEvent(instant, fightDetails)
     }
 
+    fun buildIslandEvents(
+        pathMovement: Mobile,
+        islands: List<Island>,
+        onIslandEvent: (instant: Instant, island: Island) -> Event
+    ): List<Event> {
+        val intersection = findIntersectionPoints(pathMovement.getUniquePoints(), islands) ?: return emptyList()
+        val points = pathMovement
+            .landmarks[intersection.lineIndex / 3]
+            .sample(10)
+
+
+        val u = findNearestPointToIsland(points, intersection.island) + (intersection.lineIndex / 3)
+        return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.island))
+    }
+
+    private fun findNearestPointToIsland(points: List<Position> , island: Island): Double {
+        var bestDistance = Double.MAX_VALUE
+        var t = 0.0
+        for ((index, point) in points.withIndex()) {
+            val distance = point.distanceTo(island.coordinate.toPosition())
+            if (distance <= island.radius * 0.85) return t
+            if (distance > island.radius * 0.85 && distance < bestDistance) {
+                bestDistance = distance
+                t = index / 10.0
+            }
+        }
+
+        return t
+    }
+
     private fun getFirstIntersection(movement: Mobile, enemy: Mobile): Instant? {
         val pathOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
         // get enemy route info
         val index = (enemy.getU(clock.now()) * 3).toInt() // plane index
         val otherOutline = buildOutlinePlanes(enemy.getUniquePoints(), thickness = 5.0)
 
-        for (i in pathOutline.indices) {
+        val length = min(pathOutline.size, otherOutline.size - index)
+        for (i in 0 until length) {
             val plane = pathOutline[i]
             val otherPlaneIndex = i + index
             val otherPlane = otherOutline[otherPlaneIndex]
