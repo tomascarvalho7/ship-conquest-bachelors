@@ -1,3 +1,5 @@
+import 'grid.dart';
+
 class Sequence<T> extends Iterable<T> {
   final List<T> data;
   // constructor
@@ -17,6 +19,11 @@ class Sequence<T> extends Iterable<T> {
     _data[index] = tile; // replace element
     return Sequence(data: _data);
   }
+
+  Grid<K, V> toGrid<K, V>(K Function(T element) getKey, V Function(T element) getValue) =>
+    Grid(data: {
+      for (var element in data) getKey(element) : getValue(element)
+    });
 
   Sequence<T> filter(bool Function(T) condition) => Sequence(data: [...data.where(condition)]);
 

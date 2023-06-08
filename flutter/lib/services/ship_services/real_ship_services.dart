@@ -54,8 +54,7 @@ class RealShipServices extends ShipServices {
   RealShipServices({required this.userStorage, required this.lobbyStorage});
 
   @override
-  FutureEither<ErrorFeedback, Horizon> getNewChunk(
-      int chunkSize, Coord2D coordinates, int sId) async {
+  FutureEither<ErrorFeedback, Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId) async {
     final res = await getStorageVariables();
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
@@ -65,20 +64,14 @@ class RealShipServices extends ShipServices {
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         });
-    if (response.statusCode == 200) {
-      return Right(
-        HorizonInputModel.fromJson(jsonDecode(response.body)).toHorizon()
-      );
-    } else {
-      return Left(
-        ProblemInputModel.fromJson(jsonDecode(response.body)).toErrorFeedback()
-      );
-    }
+
+    return handleResponse(response, (json) =>
+      HorizonInputModel.fromJson(json).toHorizon()
+    );
   }
 
   @override
-  Future<Token> signIn(
-      String idToken, String username, String? description) async {
+  FutureEither<ErrorFeedback, Token> signIn(String idToken, String username, String? description) async {
     Map<String, dynamic> jsonBody = {
       'idtoken': idToken,
       'username': username,
@@ -89,73 +82,41 @@ class RealShipServices extends ShipServices {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(jsonBody));
 
-    if (response.statusCode == 200) {
-      final res = TokenInputModel.fromJson(jsonDecode(response.body));
-      return res.toToken();
-    } else {
-      throw Exception("error creating user token");
-    }
+    return handleResponse(response, (json) =>
+        TokenInputModel.fromJson(json).toToken()
+    );
   }
 
   @override
-  Future<Token> logIn(String idToken) async {
+  FutureEither<ErrorFeedback, Token> logIn(String idToken) async {
     final response = await http.post(Uri.https(baseUri, "get-token"),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: "idtoken=$idToken");
 
-    if (response.statusCode == 200) {
-      final res = TokenInputModel.fromJson(jsonDecode(response.body));
-      return res.toToken();
-    } else {
-      throw Exception("error creating user token");
-    }
+    return handleResponse(response, (json) =>
+        TokenInputModel.fromJson(json).toToken()
+    );
   }
 
   @override
-  Future<Minimap> getMinimap() async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
+  FutureEither<ErrorFeedback, Minimap> getMinimap() async {
+    final res = await getStorageVariables();
+    if (res.isLeft) return Left(res.left);
+    final (token, lobbyId) = res.right;
 
-    final String? lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId == null) throw Exception("couldn't find lobby");
+    final response = await http.get(Uri.https(baseUri, "$lobbyId/minimap"),
+    headers: {HttpHeaders.authorizationHeader: 'Bearer $token'} );
 
-    final response =
-        await http.get(Uri.https(baseUri, "$lobbyId/minimap"), headers: {
-      HttpHeaders.authorizationHeader: 'Bearer $token',
-    });
-
-    if (response.statusCode == 200) {
-      final res = MinimapInputModel.fromJson(jsonDecode(response.body));
-      // TODO use .toMinimap
-      final minimap =
-          Minimap(length: res.length, data: HashMap<Coord2D, int>());
-      for (var point in res.islands) {
-        if (minimap.data[Coord2D(x: point.x, y: point.y)] == null) {
-          minimap.add(x: point.x, y: point.y, height: point.z);
-        }
-      }
-      final points =
-          res.paths.map((coord) => Coord2D(x: coord.x, y: coord.y)).toList();
-
-      for (var bezier in buildBeziers(points)) {
-        for (double t = 0; t <= 1; t += 0.1) {
-          pulseAndFill(minimap, bezier.get(t).toCoord2D(), 10);
-        }
-      }
-
-      return minimap;
-    } else {
-      throw Exception("error fetching minimap");
-    }
+    return handleResponse(response, (json) =>
+      MinimapInputModel.fromJson(json).toMinimap()
+    );
   }
 
   @override
-  Future<Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
-
-    final String? lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId == null) throw Exception("couldn't find lobby");
+  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
+    final res = await getStorageVariables();
+    if (res.isLeft) return Left(res.left);
+    final (token, lobbyId) = res.right;
 
     Map<String, dynamic> jsonBody = {
       'points': landmarks
@@ -171,20 +132,16 @@ class RealShipServices extends ShipServices {
         },
         body: jsonEncode(jsonBody));
 
-    if (response.statusCode == 200) {
-      return ShipInputModel.fromJson(jsonDecode(response.body)).toShip();
-    } else {
-      throw Exception("error navigating with ship");
-    }
+    return handleResponse(response, (json) =>
+      ShipInputModel.fromJson(jsonDecode(response.body)).toShip()
+    );
   }
 
   @override
-  Future<Ship?> getShip(int sid) async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
-
-    final String? lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId == null) throw Exception("couldn't find lobby");
+  FutureEither<ErrorFeedback, Ship> getShip(int sId) async {
+    final res = await getStorageVariables();
+    if (res.isLeft) return Left(res.left);
+    final (token, lobbyId) = res.right;
 
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/ship", {'shipId': sid.toString()}),
@@ -192,34 +149,25 @@ class RealShipServices extends ShipServices {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         });
 
-    if (response.statusCode == 200) {
-      return ShipInputModel.fromJson(jsonDecode(response.body)).toShip();
-    } else if (response.statusCode == 404) {
-      return null;
-    } else {
-      throw Exception("error getting ship");
-    }
+    return handleResponse(response, (json) =>
+      ShipInputModel.fromJson(jsonDecode(response.body)).toShip()
+    );
   }
 
   @override
-  Future<Sequence<Ship>> getUserShips() async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
-
-    final String? lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId == null) throw Exception("couldn't find lobby");
+  FutureEither<ErrorFeedback, Sequence<Ship>> getUserShips() async {
+    final res = await getStorageVariables();
+    if (res.isLeft) return Left(res.left);
+    final (token, lobbyId) = res.right;
 
     final response =
         await http.get(Uri.https(baseUri, "$lobbyId/ships"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
-    if (response.statusCode == 200) {
-      return ShipsInputModel.fromJson(jsonDecode(response.body))
-          .toSequenceOfShips();
-    } else {
-      throw Exception("error navigating with ship");
-    }
+    return handleResponse(response, (json) =>
+      ShipsInputModel.fromJson(jsonDecode(response.body)).toSequenceOfShips()
+    );
   }
 
   @override
@@ -498,6 +446,9 @@ class RealShipServices extends ShipServices {
     lobbyStorage.deleteLobbyId();
   }
 
+  /// returns the user Token and the user current LobbyId from
+  /// the application internal storage, or a [ErrorFeedback] in
+  /// case something goes wrong
   FutureEither<ErrorFeedback, (String, String)> getStorageVariables() async {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
@@ -507,86 +458,14 @@ class RealShipServices extends ShipServices {
 
     return Right((token, lobbyId));
   }
-}
 
-double calcDistance(Coord2D p1, Coord2D p2) {
-  return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
-}
-
-Minimap addWaterPath(Minimap minimap, List<Coord2D> visitedPoints, int radius) {
-  List<Coord2D> points = [];
-  if (visitedPoints.length == 1) {
-    return pulseAndFill(minimap, visitedPoints.first, radius);
+  /// handle a http response from the back-end application
+  /// on a successful response build a generic [T] input model
+  /// on a unsuccessful response build a [ErrorFeedback] from a [ProblemInputModel]
+  Either<ErrorFeedback, T> handleResponse<T>(http.Response response, T Function(Map<String, dynamic> json) block) {
+    final json = jsonDecode(response.body);
+    return response.statusCode == 200
+        ? Right(block(json)) // successful on status == 200
+        : Left(ProblemInputModel.fromJson(json).toErrorFeedback()); // unsuccessful on status != 200
   }
-  for (int idx = 0; idx < visitedPoints.length; idx++) {
-    final currPoint = visitedPoints[idx];
-    if (idx + 1 < visitedPoints.length) {
-      final nextPoint = visitedPoints[idx + 1];
-      final phi = atan((nextPoint.y - currPoint.y) /
-          (nextPoint.x - currPoint.x)); // rotation angle of the ellipse
-      double distance =
-          calcDistance(currPoint, nextPoint); //distance between focus points
-      final a = distance + (2 * radius); // major
-      final b = 2 * radius; //minor
-
-      double h = (currPoint.x + nextPoint.x) / 2; // center x
-      double k = (currPoint.y + nextPoint.y) / 2; // center y
-
-      for (double t = 0; t < 2 * pi; t += 0.1) {
-        double x = h + a * cos(t) * cos(phi) - b * sin(t) * sin(phi);
-        double y = k + a * cos(t) * sin(phi) + b * sin(t) * cos(phi);
-
-        points.add(Coord2D(x: x.floor(), y: y.floor()));
-      }
-      minimap = fillEllipse(points, minimap, [currPoint, nextPoint], a);
-    }
-  }
-  return minimap;
-}
-
-Minimap fillEllipse(List<Coord2D> points, Minimap minimap,
-    List<Coord2D> focusPoints, double major) {
-  // find the ellipse's bounding box
-  int minX = points.map((p) => p.x).reduce(min);
-  int maxX = points.map((p) => p.x).reduce(max);
-  int minY = points.map((p) => p.y).reduce(min);
-  int maxY = points.map((p) => p.y).reduce(max);
-
-  // iterate in the ellipse's bounding box and add the tiles that are inside the ellipse
-  for (int x = minX; x <= maxX; x++) {
-    for (int y = minY; y <= maxY; y++) {
-      final currCoord = Coord2D(x: x, y: y);
-      if (isInsideEllipse(currCoord, focusPoints, major) &&
-          minimap.data[currCoord] == null) {
-        minimap.add(x: x, y: y, height: 0);
-      }
-    }
-  }
-  return minimap;
-}
-
-bool isInsideEllipse(Coord2D point, List<Coord2D> focusPoints, double a) {
-  // in an ellipse, the sum of distances of every point to the focus points is less than the semimajor
-  double l1 = calcDistance(point, focusPoints[0]);
-  double l2 = calcDistance(point, focusPoints[1]);
-  return l1 + l2 <= a;
-}
-
-Minimap pulseAndFill(Minimap minimap, Coord2D center, int radius) {
-  for (var y = -radius; y <= radius; y++) {
-    final yF = y.toDouble();
-    for (var x = -radius; x <= radius; x++) {
-      final xF = x.toDouble();
-      final distance = sqrt(pow(xF, 2) + pow(yF, 2));
-
-      if (radius / distance >= 0.95) {
-        final pos = center + Coord2D(x: x, y: y);
-
-        if (minimap.get(x: pos.x, y: pos.y) == null) {
-          minimap.add(x: pos.x, y: pos.y, height: 0);
-        }
-      }
-    }
-  }
-  return minimap;
 }

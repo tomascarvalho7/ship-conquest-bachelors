@@ -15,6 +15,8 @@ class Grid<K, V> {
 
   Grid<K, V> put(K key, V value) => Grid(data: {...data, key: value});
 
+  Grid<K, V> operator + (Grid<K, V> other) => Grid(data: {...data, ...other.data});
+
   Grid<K, V> delete(K key) {
     data.remove(key); // remove
     return Grid(data: {...data}); // return immutable instance
