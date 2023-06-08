@@ -8,7 +8,7 @@ import com.example.shipconquest.domain.generators.get
 import kotlin.math.roundToInt
 
 
-const val frequency = .1f
+const val frequency = .1
 const val seaLevel = 2
 
 class WorldGenerator(
@@ -34,7 +34,7 @@ class WorldGenerator(
                         x = (-offset..offset).random(),
                         y = (-offset..offset).random()
                     )
-                    this.add(position + randomOffset)
+                    add(position + randomOffset)
                 }
             }
         }
@@ -48,14 +48,14 @@ class WorldGenerator(
         }
 
     private fun generateIslandTerrain(origin: Vector2, builder: HeightMapBuilder) {
-        val noiseMap = SimplexNoise.generateSimplexNoise(islandSize, frequency)
+        val noiseMap = SimplexNoise.generateSimplexNoise(size = islandSize, offset = origin, frequency = frequency)
         val offset = origin - Vector2(islandSize / 2, islandSize / 2)
         // apply falloff, scale noise
         for (y in 0 until islandSize) {
             for (x in 0 until islandSize) {
                 val noiseValue = noiseMap.get(x = x, y = y)
                 val falloffValue = 1 - falloffGrid.get(x = x, y = y)
-                val value = remapNoiseValue(value =  noiseValue * falloffValue)
+                val value = remapNoiseValue(value = noiseValue * falloffValue)
 
                 if (value > seaLevel)
                     builder.add(x = offset.x + x, y = offset.y + y, height = value)
@@ -65,5 +65,5 @@ class WorldGenerator(
 
     // in value is between -1 and 1 (float)
     // out value is between -100 and 100 (int)
-    private fun remapNoiseValue(value: Float) = (value * 100).roundToInt()
+    private fun remapNoiseValue(value: Double) = (value * 100).roundToInt()
 }

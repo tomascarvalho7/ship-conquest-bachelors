@@ -1,5 +1,6 @@
 package com.example.shipconquest.domain.generators
 
+import com.example.shipconquest.domain.space.Vector2
 import kotlin.math.sqrt
 
 // 2D Simplex noise
@@ -37,12 +38,12 @@ object SimplexNoise {
         }
     }
 
-    // Skewing and unskewing factors for 2, 3, and 4 dimensions
+    // Skewing and un skewing factors for 2, 3, and 4 dimensions
     private val F2 = 0.5 * (sqrt(3.0) - 1.0)
     private val G2 = (3.0 - sqrt(3.0)) / 6.0
 
     // This method is a *lot* faster than using (int)Math.floor(x)
-    private fun fastfloor(x: Double): Int {
+    private fun fastFloor(x: Double): Int {
         val xi = x.toInt()
         return if (x < xi) xi - 1 else xi
     }
@@ -52,14 +53,14 @@ object SimplexNoise {
     }
 
     // 2D simplex noise point generator
-    fun noise(xin: Double, yin: Double): Double {
+    private fun noise(xin: Double, yin: Double): Double {
         val n0: Double
         val n1: Double
         val n2: Double // Noise contributions from the three corners
         // Skew the input space to determine which simplex cell we're in
         val s = (xin + yin) * F2 // Hairy factor for 2D
-        val i = fastfloor(xin + s)
-        val j = fastfloor(yin + s)
+        val i = fastFloor(xin + s)
+        val j = fastFloor(yin + s)
         val t = (i + j) * G2
         val X0 = i - t // Unskew the cell origin back to (x,y) space
         val Y0 = j - t
@@ -113,9 +114,10 @@ object SimplexNoise {
 
     fun generateSimplexNoise(
         size: Int,
-        frequency: Float
-    ): Grid<Float> {
-        val noiseMap = Grid<Float>(data = mutableListOf(), size = size)
+        offset: Vector2,
+        frequency: Double
+    ): Grid<Double> {
+        val noiseMap = Grid<Double>(data = mutableListOf(), size = size)
 
         // build array
 
@@ -123,7 +125,7 @@ object SimplexNoise {
         while (y < size) {
             var x = 0
             while (x < size) {
-                val value = noise((x * frequency).toDouble(), (y * frequency).toDouble()).toFloat()
+                val value = noise((x + offset.x) * frequency, (y + offset.y) * frequency)
                 noiseMap.add(x = x, y = y, value = (value + 1) / 2) // generate values between 0 and 1
                 x++
             }

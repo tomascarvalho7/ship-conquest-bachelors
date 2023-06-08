@@ -171,6 +171,8 @@ class GameService(
 
     fun getShip(tag: String, uid: String, shipId: Int): GetShipResult {
         return transactionManager.run { transaction ->
+            // check if game exists
+            transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipError.GameNotFound)
             val builder = gameLogic.getShipBuilder(tag = tag, uid = uid, sid = shipId, transaction)
                 ?: return@run left(GetShipError.ShipNotFound)
 
@@ -182,6 +184,8 @@ class GameService(
 
     fun getShips(tag: String, uid: String): GetShipsResult {
         return transactionManager.run { transaction ->
+            // check if game exists
+            transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipsError.GameNotFound)
             val shipsBuilder = gameLogic.getShipsBuilder(tag = tag, uid = uid, transaction)
 
             return@run right(

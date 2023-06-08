@@ -5,8 +5,12 @@ import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.*
-import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
+import com.example.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
 import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
+import com.example.shipconquest.controller.sse.GameKey
+import com.example.shipconquest.controller.sse.GameSubscriptionKey
+import com.example.shipconquest.controller.sse.publisher.Publisher
+import com.example.shipconquest.controller.sse.ShipEventsAPI
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.GameService
 import com.example.shipconquest.service.result.*
@@ -14,9 +18,17 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import java.util.concurrent.ConcurrentHashMap
 
 @RestController
 class GameController(val service: GameService) {
+    // uid (User Identifiers) -> SSE Emitter
+    val subscriptions = ConcurrentHashMap<String, SseEmitter>()
+    // (N) gameKey (Tag, Ship Identifier) -> gameSubscriptionKey(Tag, User identifier)
+    val shipToSubscription = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
+    // Server Sent Events API
+    val publisherAPI = Publisher(subscriptions = subscriptions)
+    val shipEventsAPI = ShipEventsAPI(publisherAPI = publisherAPI, ships = shipToSubscription)
 
     @GetMapping("/{tag}/view")
     fun view(user: User, @PathVariable tag: String, @RequestParam shipId: Int): ResponseEntity<*> {
@@ -100,7 +112,7 @@ class GameController(val service: GameService) {
         return when (result) {
             is Either.Right -> {
                 // publish and notify of new events
-                ShipEventsAPI.publishEvents(tag = tag, futureEvents = result.value.futureEvents)
+                shipEventsAPI.publishEvents(tag = tag, futureEvents = result.value.futureEvents)
                 // return sailing ship
                 response(content = result.value.toShipOutputModel())
             }
@@ -109,6 +121,23 @@ class GameController(val service: GameService) {
                     Problem.response(status = 400, problem = Problem.invalidNavigation())
                 NavigationError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
+            }
+        }
+    }
+
+    @PostMapping("/{tag}/ship/add")
+    fun addShip(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        val result = service.addShip(tag = tag, uid = user.id)
+
+        return when(result) {
+            is Either.Right -> response(content = result.value.toShipOutputModel())
+            is Either.Left -> when (result.value) {
+                CreateShipError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+                CreateShipError.NotEnoughCurrency ->
+                    Problem.response(status = 400, problem = Problem.notEnoughCurrency())
+                CreateShipError.PlayerStatisticsNotFound ->
+                    Problem.response(status = 404, problem = Problem.statisticsNotFound())
             }
         }
     }
@@ -126,34 +155,9 @@ class GameController(val service: GameService) {
             is Either.Left -> when (result.value) {
                 GetShipError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
-            }
-        }
-    }
-
-    @GetMapping("/{tag}/ships")
-    fun getShips(user: User, @PathVariable tag: String): ResponseEntity<*> {
-        val result = service.getShips(tag = tag, uid = user.id)
-
-        return when (result) {
-            is Either.Right -> response(content = result.value.toFleetOutputModel())
-            is Either.Left -> TODO("bruh")
-        }
-    }
-
-    // TODO POST needs a body but this request doesn't really need one. check
-    @PostMapping("/{tag}/ship/add")
-    fun addShip(user: User, @PathVariable tag: String): ResponseEntity<*> {
-        val result = service.addShip(tag = tag, uid = user.id)
-
-        return when(result) {
-            is Either.Right -> response(content = result.value.toShipOutputModel())
-            is Either.Left -> when (result.value) {
-                CreateShipError.GameNotFound ->
+                GetShipError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
-                CreateShipError.NotEnoughCurrency ->
-                    Problem.response(status = 400, problem = Problem.notEnoughCurrency())
-                CreateShipError.PlayerStatisticsNotFound ->
-                    Problem.response(status = 404, problem = Problem.statisticsNotFound())
+                GetShipError.GameNotFound -> TODO()
             }
         }
     }
@@ -180,18 +184,21 @@ class GameController(val service: GameService) {
 
         return when (result) {
             is Either.Right -> {
-                val emitter = ShipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
-                ShipEventsAPI.publishFleet(tag = tag, uid = user.id, fleet = result.value)
-                return emitter
+                return shipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
             }
-            is Either.Left -> TODO("bruh")
+            is Either.Left -> TODO("testar")/*when(result.value) {
+                GetShipsError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+            }*/
         }
     }
 
     @GetMapping("/{tag}/unsubscribe")
     fun unsubscribe(user: User, @PathVariable tag: String): ResponseEntity<*> {
-        ShipEventsAPI.unsubscribeToFleetEvents(tag = tag, uid = user.id)
-        return response("placeholder content") // TODO:
+        val key = shipEventsAPI.unsubscribeToFleetEvents(tag = tag, uid = user.id)
+        return response(
+            content = subscriptionKeyToUnsubscribedOutputModel(key = key)
+        )
     }
 
     private fun <T> response(content: T) = ResponseEntity

@@ -187,7 +187,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                       final String lobbyId = await services.createLobby(name);
                       lobbyStorage.setLobbyId(lobbyId);
                       if (!mounted) return;
-                      context.go("/loading/game");
+                      context.go("/loading-game");
                     }
                   },
                   child: const Icon(Icons.add),
@@ -387,7 +387,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                                           await services.joinLobby(lobby.tag);
                                       lobbyStorage.setLobbyId(lobbyId);
                                       if (!mounted) return;
-                                      context.go("/loading/game");
+                                      context.go("/loading-game");
                                     },
                                   );
                                 },

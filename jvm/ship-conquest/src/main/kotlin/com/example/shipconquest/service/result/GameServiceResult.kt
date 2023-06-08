@@ -63,13 +63,17 @@ sealed class ConquestIslandError {
 typealias ConquestIslandResult = Either<ConquestIslandError, OwnedIsland>
 
 sealed class GetShipError {
+    object GameNotFound: GetShipError()
     object ShipNotFound: GetShipError()
 }
 
 typealias GetShipResult = Either<GetShipError, Ship>
 
-// TODO: give more errors
-typealias GetShipsResult = Either<Nothing, Fleet>
+sealed class GetShipsError {
+    object GameNotFound: GetShipsError()
+}
+
+typealias GetShipsResult = Either<GetShipsError, Fleet>
 
 sealed class CreateShipError {
     object NotEnoughCurrency: CreateShipError()

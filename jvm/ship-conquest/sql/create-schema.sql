@@ -73,8 +73,8 @@ CREATE TABLE dbo.FightEvent
     tag varchar(6) NOT NULL,
     eid int GENERATED ALWAYS AS IDENTITY,
     instant int NOT NULL,
-    sidA serial NOT NULL,
-    sidB serial NOT NULL,
+    sidA INT NOT NULL,
+    sidB INT NOT NULL,
     winner INT NOT NULL,
     PRIMARY KEY (tag, eid),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
@@ -98,17 +98,13 @@ CREATE TABLE dbo.Island
     x INT NOT NULL,
     y INT NOT NULL,
     radius INT NOT NULL,
+    incomePerHour INT,
+    uid varchar(30),
+    instant INT,
+    FOREIGN KEY (uid) REFERENCES dbo.User(id),
     PRIMARY KEY (tag, islandId),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
-
-CREATE TABLE dbo.OwnedIsland
-(
-    incomePerHour INT NOT NULL,
-    uid varchar(30) NOT NULL,
-    instant INT NOT NULL,
-    FOREIGN KEY (uid) REFERENCES dbo.User(id)
-) INHERITS (dbo.Island);
 
 CREATE TABLE dbo.PlayerStatistics(
     tag varchar(6) NOT NULL,

@@ -14,12 +14,6 @@ import 'package:ship_conquest/config/router/create_router.dart';
 import 'package:ship_conquest/services/ship_services/fake_ship_services.dart';
 import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
-import 'package:ship_conquest/utils/constants.dart';
-
-import 'domain/color/color_gradient.dart';
-import 'domain/color/color_mark.dart';
-import 'domain/color/color_ramp.dart';
-import 'domain/utils/factor.dart';
 
 void main() {
   runApp(const MyApp());

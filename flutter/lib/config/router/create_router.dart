@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:ship_conquest/providers/global_state.dart';
-import 'package:ship_conquest/widgets/screens/bottom_navigation_bar/bottom_bar.dart';
 import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 import 'package:ship_conquest/widgets/screens/pages/game_ui.dart';
 import 'package:ship_conquest/widgets/screens/pages/home_screen.dart';
@@ -51,9 +48,8 @@ GoRouter createRouter() => GoRouter(initialLocation: "/", routes: [
           builder: (BuildContext context, GoRouterState state) =>
               const AuthenticationScreen()),
       GoRoute(
-          path: '/loading/:dst',
-          builder: (BuildContext context, GoRouterState state) =>
-              GameLoadingScreen(dst: state.params['dst']!)),
+          path: '/loading-game',
+          builder: (BuildContext context, GoRouterState state) => const GameLoadingScreen()),
       GoRoute(
           path: '/game',
           builder: (BuildContext context, GoRouterState state) => const GameScreen()),

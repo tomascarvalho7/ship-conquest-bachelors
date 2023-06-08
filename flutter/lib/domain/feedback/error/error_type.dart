@@ -1,0 +1,4 @@
+enum ErrorType {
+  fatal,
+  info
+}
