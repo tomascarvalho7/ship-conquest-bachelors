@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/either/either.dart';
 import 'package:ship_conquest/domain/event/unknown_event.dart';
+import 'package:ship_conquest/domain/feedback/error/utils/application_errors.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
@@ -21,11 +23,14 @@ import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/services/input_models/horizon_input_model.dart';
 import 'package:ship_conquest/services/input_models/island_input_model.dart';
 import 'package:ship_conquest/services/input_models/minimap_input_model.dart';
+import 'package:ship_conquest/services/input_models/problem/problem_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
 import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
+import '../../domain/either/future_either.dart';
+import '../../domain/feedback/error/error_feedback.dart';
 import '../../domain/horizon.dart';
 import '../../domain/lobby.dart';
 import '../../domain/user/user_info.dart';
@@ -40,7 +45,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "5de0-2001-8a0-6e2e-ba00-c1b8-f8dd-e326-e321.ngrok-free.app";
+const baseUri = "4431-2001-818-dc00-c500-e93c-baa2-63ed-fc8f.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -49,13 +54,11 @@ class RealShipServices extends ShipServices {
   RealShipServices({required this.userStorage, required this.lobbyStorage});
 
   @override
-  Future<Horizon> getNewChunk(
+  FutureEither<ErrorFeedback, Horizon> getNewChunk(
       int chunkSize, Coord2D coordinates, int sId) async {
-    final String? token = await userStorage.getToken();
-    if (token == null) throw Exception("couldn't find token");
-
-    final String? lobbyId = await lobbyStorage.getLobbyId();
-    if (lobbyId == null) throw Exception("couldn't find lobby");
+    final res = await getStorageVariables();
+    if (res.isLeft) return Left(res.left);
+    final (token, lobbyId) = res.right;
 
     final response = await http.get(
         Uri.https(baseUri, "$lobbyId/view", {'shipId': sId.toString()}),
@@ -63,9 +66,13 @@ class RealShipServices extends ShipServices {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         });
     if (response.statusCode == 200) {
-      return HorizonInputModel.fromJson(jsonDecode(response.body)).toHorizon();
+      return Right(
+        HorizonInputModel.fromJson(jsonDecode(response.body)).toHorizon()
+      );
     } else {
-      throw Exception("error fetching a new chunk");
+      return Left(
+        ProblemInputModel.fromJson(jsonDecode(response.body)).toErrorFeedback()
+      );
     }
   }
 
@@ -489,6 +496,16 @@ class RealShipServices extends ShipServices {
     userStorage.deleteToken();
     userStorage.deleteUser();
     lobbyStorage.deleteLobbyId();
+  }
+
+  FutureEither<ErrorFeedback, (String, String)> getStorageVariables() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) return const Left(tokenNotFound);
+
+    final String? lobbyId = await lobbyStorage.getLobbyId();
+    if (lobbyId == null) return const Left(lobbyNotFound);
+
+    return Right((token, lobbyId));
   }
 }
 
