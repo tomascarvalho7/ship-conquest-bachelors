@@ -17,7 +17,13 @@ class GameLoadingScreenState extends State<GameLoadingScreen> {
   @override
   void initState() {
     final gameController = context.read<GameController>();
-    gameController.load().then((_) => context.go("/game-home"));
+    gameController.load().then((feedback) {
+      if(feedback.isLeft) {
+        context.go("/home");
+      } else {
+        context.go("/game-home");
+      }
+    });
     super.initState();
   }
 

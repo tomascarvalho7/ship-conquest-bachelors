@@ -13,8 +13,9 @@ import 'package:ship_conquest/providers/game/global_controllers/minimap_controll
 import 'package:ship_conquest/providers/notification_controller.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/config/router/create_router.dart';
-import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
+import 'package:ship_conquest/services/ship_services/fake_ship_services.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
+import 'package:ship_conquest/widgets/overlay_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           Provider<LobbyStorage>(create: (_) => LobbyStorage()),
           Provider<UserStorage>(create: (_) => UserStorage()),
           ProxyProvider2<UserStorage, LobbyStorage, ShipServices>(
-              update: (_, userStorage, lobbyStorage, __) => RealShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
+              update: (_, userStorage, lobbyStorage, __) => FakeShipServices(userStorage: userStorage, lobbyStorage: lobbyStorage)
           ),
           Provider(create: (_) => GlobalState()),
           Provider(create: (_) => ScheduleController()),
@@ -40,7 +41,6 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => MinimapController()),
           ChangeNotifierProvider(create: (_) => StatisticsController()),
           ChangeNotifierProvider(create: (_) => FeedbackController()),
-          Provider(create: (_) => NotificationController()),
           Provider<GameController>(create: (gameContext) =>
               GameController(
                   shipController: gameContext.read<ShipController>(),
@@ -50,16 +50,16 @@ class MyApp extends StatelessWidget {
                   services: gameContext.read<ShipServices>(),
                   scheduleController: gameContext.read<ScheduleController>(),
                   feedbackController: gameContext.read<FeedbackController>(),
-                  notificationController: gameContext.read<NotificationController>()
               )
           ),
         ],
-        child: MaterialApp.router(
-            title: 'Ship Conquest',
-            theme: shipConquestLightTheme,
-            darkTheme: shipConquestDarkTheme,
-            routerConfig: createRouter()
-        )
-    );
+          child: MaterialApp.router(
+              scaffoldMessengerKey: GlobalKey<ScaffoldMessengerState>(),
+              title: 'Ship Conquest',
+              theme: shipConquestLightTheme,
+              darkTheme: shipConquestDarkTheme,
+              routerConfig: createRouter()
+          )
+      );
   }
 }

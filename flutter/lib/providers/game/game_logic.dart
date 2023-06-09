@@ -38,30 +38,29 @@ class GameLogic {
 
   Future loadData(Function(Sequence<Ship>) scheduleShipEvents) async {
     // fetch player fleet of ships & schedule they're events
-    _handleServiceMethod(services.getUserShips(), (ships) {
+    await _handleServiceMethod(services.getUserShips(), (ships) {
       shipController.setFleet(ships); // set fleet
       scheduleShipEvents(ships); // schedule ship events
     });
 
     // fetch player statistics
-    _handleServiceMethod(services.getPlayerStatistics(), (statistics) =>
+    await _handleServiceMethod(services.getPlayerStatistics(), (statistics) =>
       statisticsController.updateStatistics(statistics)
     );
 
     // load visited islands & get scene for current ship
-    _handleServiceMethod(services.getVisitedIslands(), (islands) =>
+    await _handleServiceMethod(services.getVisitedIslands(), (islands) =>
       sceneController.load(islands)
+    );
+
+    // fetch player minimap
+    await _handleServiceMethod(services.getMinimap(), (minimap) =>
+        minimapController.load(minimap)
     );
 
     final mainShip = shipController.getMainShip();
     final position = mainShip.getPosition(globalScale);
-    await sceneController.getScene(position, (coord) =>
-        _getHorizon(coord, mainShip.sid)
-    );
-    // fetch player minimap
-    _handleServiceMethod(services.getMinimap(), (minimap) =>
-        minimapController.load(minimap)
-    );
+    await sceneController.getScene(position, mainShip.sid, _getHorizon);
 
     // schedule game update every 2 seconds
     scheduleController.scheduleJob(const Duration(seconds: 2), update);
@@ -80,15 +79,11 @@ class GameLogic {
   }
 
   Future<void> update() async {
-    for(var ship in shipController.ships.toSequence()) {
-      // get scene for current ship
-      final position = ship.getPosition(globalScale);
-      final tiles = await sceneController.getScene(position, (coord) =>
-          _getHorizon(coord, ship.sid)
-      );
-      // add scene to minimap
-      minimapController.update(tiles);
-    }
+    final mainShip = shipController.getMainShip();
+    final position = mainShip.getPosition(globalScale);
+    final tiles = await sceneController.tryToGetScene(position, mainShip.sid, _getHorizon);
+    // add scene to minimap
+    minimapController.update(tiles);
   }
 
   void discoverEvent(int eid, int sid) async =>
@@ -107,9 +102,7 @@ class GameLogic {
   void getScene(Ship ship) async {
     // get scene for current ship
     final position = ship.getPosition(globalScale);
-    final tiles = await sceneController.getScene(position, (coord) =>
-      _getHorizon(coord, ship.sid)
-    );
+    final tiles = await sceneController.getScene(position, ship.sid, _getHorizon);
     // add scene to minimap
     minimapController.update(tiles);
   }
@@ -120,7 +113,7 @@ class GameLogic {
     return res.isRight ? res.right : null;
   }
 
-  void _handleServiceMethod<T>(
+  Future _handleServiceMethod<T>(
       FutureEither<ErrorFeedback, T> result,
       Function(T res) onSuccess
     ) =>

@@ -6,9 +6,10 @@ import 'package:ship_conquest/domain/feedback/success/success_feedback.dart';
 class FeedbackController with ChangeNotifier {
   FeedbackController();
 
-  late Either<ErrorFeedback, SuccessFeedback> _feedbackResult;
+  Either<ErrorFeedback, SuccessFeedback>? _feedbackResult;
 
-  Either<ErrorFeedback, SuccessFeedback> get feedback => _feedbackResult;
+  bool get hasFeedback => _feedbackResult != null;
+  Either<ErrorFeedback, SuccessFeedback>? get feedback => _feedbackResult;
 
   void setSuccessful(SuccessFeedback success) {
     _feedbackResult = Right(success);

@@ -19,6 +19,7 @@ import 'package:ship_conquest/providers/lobby_storage.dart';
 import '../../domain/either/future_either.dart';
 import '../../domain/event/unknown_event.dart';
 import '../../domain/feedback/error/error_feedback.dart';
+import '../../domain/feedback/error/error_type.dart';
 import '../../domain/lobby.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
@@ -50,12 +51,14 @@ class FakeShipServices extends ShipServices {
 
   @override
   FutureEither<ErrorFeedback, Minimap> getMinimap() async {
-    return Right(
+    return Left(ErrorFeedback(type: ErrorType.info, title: "teste", details: "detalhes de teste"));
+
+    /*Right(
         Minimap(
             length: 500,
             data: Grid.empty() // empty map
         )
-    );
+    );*/
   }
 
   @override
