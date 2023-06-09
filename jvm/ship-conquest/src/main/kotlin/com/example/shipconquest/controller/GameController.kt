@@ -6,6 +6,7 @@ import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.*
 import com.example.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
+import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
 import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
 import com.example.shipconquest.controller.sse.GameKey
 import com.example.shipconquest.controller.sse.GameSubscriptionKey
@@ -159,6 +160,16 @@ class GameController(val service: GameService) {
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 GetShipError.GameNotFound -> TODO()
             }
+        }
+    }
+
+    @GetMapping("/{tag}/ships")
+    fun getShips(user: User, @PathVariable tag: String): ResponseEntity<*> {
+        val result = service.getShips(tag = tag, uid = user.id)
+
+        return when (result) {
+            is Either.Right -> response(content = result.value.toFleetOutputModel())
+            is Either.Left -> TODO("bruh")
         }
     }
 

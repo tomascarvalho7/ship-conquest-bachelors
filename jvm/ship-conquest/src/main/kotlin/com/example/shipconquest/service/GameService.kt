@@ -8,7 +8,6 @@ import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.ship.*
 import com.example.shipconquest.domain.ship.movement.Mobile
-import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
@@ -90,15 +89,18 @@ class GameService(
             val currInstant = gameLogic.getInstant()
 
             val islandsCenter = mutableListOf<Vector2>()
-            val movements = mutableListOf<Movement>()
+            val movements = mutableListOf<Pair<Int, Mobile>>()
             val pathPoints = mutableListOf<Vector2>()
             // iterate in users ships
             for (ship in userShips) {
                 // get ship path
-                val paths = ship.movements
                 val events = transaction.eventRepo.getShipEvents(tag, ship.id)
-                val mobilePaths = paths.map { it.build(currInstant, events) }
-                movements.addAll(mobilePaths)
+                ship.movements.forEach {
+                    val processedMovement = it.build(currInstant, events)
+                    if (processedMovement is Mobile) {
+                        movements.add(Pair(ship.id, processedMovement))
+                    }
+                }
 
                 // get known islands TODO: eventRepo.getIslands(tag, uid)
                 transaction.eventRepo.getIslandEventsBeforeInstant(tag, ship.id, currInstant).map {
@@ -119,7 +121,7 @@ class GameService(
             }.distinct()
 
             // add paths to final response
-            pathPoints.addAll(trimPaths(movements.filterIsInstance<Mobile>(), currInstant).toVector2List())
+            pathPoints.addAll(trimPaths(movements, currInstant).toVector2List())
 
             right(value = Minimap(paths = pathPoints, islands = islands, size = game.map.size))
         }
@@ -300,15 +302,17 @@ fun formatDuration(durationString: Duration): String {
     return dateFormat.format(Date(durationMillis))
 }
 
-fun trimPaths(paths: List<Mobile>, instant: Instant): List<CubicBezier> {
+fun trimPaths(movementList: List<Pair<Int, Mobile>>, instant: Instant): List<CubicBezier> {
+    val paths = movementList.sortedBy { it.first }
     var oldPath: Mobile? = null
     val bezierList = hashMapOf<Mobile, List<CubicBezier>>()
     for (path in paths) {
-        if (oldPath != null && (oldPath.startTime + oldPath.duration).isAfter(path.startTime)) {
-            bezierList[oldPath] = oldPath.splitPathBeforeTime(path.startTime)
+        val movement = path.second
+        if (oldPath != null && (oldPath.startTime + oldPath.duration).isAfter(movement.startTime)) {
+            bezierList[oldPath] = oldPath.splitPathBeforeTime(movement.startTime)
         }
-        bezierList[path] = path.splitPathBeforeTime(instant)
-        oldPath = path
+        bezierList[movement] = movement.splitPathBeforeTime(instant)
+        oldPath = movement
     }
     return bezierList.values.flatten()
 }

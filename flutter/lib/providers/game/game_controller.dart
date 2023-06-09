@@ -6,6 +6,7 @@ import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/providers/game/game_logic.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
+import 'package:ship_conquest/providers/notification_controller.dart';
 import 'package:ship_conquest/utils/constants.dart';
 
 import '../../domain/event/known_event.dart';
@@ -37,6 +38,7 @@ class GameController {
   final ShipServices services;
   final ScheduleController scheduleController;
   final FeedbackController feedbackController;
+  final NotificationController notificationController;
   // constructor
   GameController({
     required this.shipController,
@@ -45,7 +47,8 @@ class GameController {
     required this.minimapController,
     required this.services,
     required this.scheduleController,
-    required this.feedbackController
+    required this.feedbackController,
+    required this.notificationController
 });
 
   late final gameLogic = GameLogic(
@@ -58,6 +61,15 @@ class GameController {
       feedbackController: feedbackController
   );
 
+  void handleNotification() {
+    final feedback = feedbackController.feedback;
+    if(feedback.isRight) {
+      notificationController.createGreenNotification(feedback.right.title, feedback.right.details);
+    } else {
+      notificationController.createRedNotification(feedback.left.title, feedback.left.details);
+    }
+  }
+
   Future<void> load() async { // load initial data
     // remove previous events
     scheduleController.stop();
@@ -66,6 +78,8 @@ class GameController {
     await gameLogic.loadData(scheduleShipEvents);
     // subscribe to game events
     services.subscribe(gameLogic.onEvent, gameLogic.onFleet);
+
+    feedbackController.addListener(handleNotification);
   }
 
   void exit() async {
@@ -73,6 +87,8 @@ class GameController {
     scheduleController.stop();
     // unsubscribe to game events
     services.unsubscribe();
+
+    feedbackController.removeListener(handleNotification);
   }
 
   void scheduleShipEvents(Sequence<Ship> ships) {

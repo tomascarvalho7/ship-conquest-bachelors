@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ship_conquest/services/ship_services/ship_services.dart';
-import 'package:ship_conquest/widgets/screens/initial_loading/loading_screen.dart';
+import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
+import '../../../providers/game/event_handlers/general_event.dart';
 
 class StartMenuScreen extends StatefulWidget {
   const StartMenuScreen({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class StartMenuScreen extends StatefulWidget {
 
 class _StartMenuScreenState extends State<StartMenuScreen> {
   String? userName;
-  String? patchNotes;
+  PatchNotes patchNotes = PatchNotes(notes: []);
 
   @override
   void initState() {
@@ -22,22 +21,15 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
   }
 
   Future<void> _getUserName() async {
-    final services = Provider.of<ShipServices>(context, listen: false);
-
-    final userInfo = await services.getPersonalInfo();
-    setState(() {
-      userName = userInfo.name.split(' ').first;
-    });
+    GeneralEvent.getPersonalInfo(context, (userInfo) =>
+        setState(() => userName = userInfo.name.split(' ').first)
+    );
   }
 
   Future<void> _getPatchNotes() async {
-    final services = Provider.of<ShipServices>(context, listen: false);
-
-    const notes = "Combat update!";
-    //await services.getPatchNotes();
-    setState(() {
-      patchNotes = notes;
-    });
+    GeneralEvent.getPatchNotes(context, (notes) =>
+        setState(() => patchNotes = notes)
+    );
   }
 
   @override
@@ -52,7 +44,7 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
         children: [
           Expanded(
               child: Stack(children: [
-            if (userName != null && patchNotes != null) ...[
+            if (userName != null && patchNotes.notes.isNotEmpty) ...[
               Container(
                   padding: const EdgeInsets.fromLTRB(39, 60, 75, 9),
                   width: double.infinity,
@@ -106,14 +98,14 @@ class _StartMenuScreenState extends State<StartMenuScreen> {
                             gradient: const LinearGradient(
                               begin: Alignment(-0, 1),
                               end: Alignment(-0, -1),
-                              colors: [Color(0xffe65f57), Color(0x33e77271)],
+                              colors: [Color.fromRGBO(230, 96, 87, 1), Color.fromRGBO(231, 114, 113, 0.2)],
                             ),
                           ),
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: RichText(
                               text: TextSpan(
-                                text: patchNotes,
+                                text: patchNotes.notes.first, // TODO change to a list of texts
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge

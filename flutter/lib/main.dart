@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/app_theme.dart';
+import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/providers/game/game_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/schedule_controller.dart';
@@ -9,6 +10,7 @@ import 'package:ship_conquest/providers/game/global_controllers/statistics_contr
 import 'package:ship_conquest/providers/global_state.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
+import 'package:ship_conquest/providers/notification_controller.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/config/router/create_router.dart';
 import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
@@ -37,6 +39,8 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => SceneController()),
           ChangeNotifierProvider(create: (_) => MinimapController()),
           ChangeNotifierProvider(create: (_) => StatisticsController()),
+          ChangeNotifierProvider(create: (_) => FeedbackController()),
+          Provider(create: (_) => NotificationController()),
           Provider<GameController>(create: (gameContext) =>
               GameController(
                   shipController: gameContext.read<ShipController>(),
@@ -45,7 +49,8 @@ class MyApp extends StatelessWidget {
                   sceneController: gameContext.read<SceneController>(),
                   services: gameContext.read<ShipServices>(),
                   scheduleController: gameContext.read<ScheduleController>(),
-                  feedbackController: null
+                  feedbackController: gameContext.read<FeedbackController>(),
+                  notificationController: gameContext.read<NotificationController>()
               )
           ),
         ],
