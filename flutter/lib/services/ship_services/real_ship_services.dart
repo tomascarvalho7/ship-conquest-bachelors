@@ -39,7 +39,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "0a9b-31-22-150-49.ngrok-free.app";
+const baseUri = "5a51-2001-818-dc00-c500-e493-3e37-25cc-487f.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -267,7 +267,13 @@ class RealShipServices extends ShipServices {
     });
 
     return handleResponse(response, (json) =>
-        UserInfoInputModel.fromJson(json).toUserInfo()
+        UserInfoInputModel.fromJson(
+            jsonDecode(
+                utf8.decode(
+                    response.bodyBytes
+                )
+            )
+        ).toUserInfo()
     );
   }
 
@@ -393,6 +399,6 @@ class RealShipServices extends ShipServices {
     final json = jsonDecode(response.body);
     return response.statusCode == 200
         ? Right(block(json)) // successful on status == 200
-        : Left(ProblemInputModel.fromJson(json).toErrorFeedback()); // unsuccessful on status != 200
+        : Left(ProblemInputModel.fromJson(response.statusCode, json).toErrorFeedback()); // unsuccessful on status != 200
   }
 }

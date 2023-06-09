@@ -20,4 +20,8 @@ class FeedbackController with ChangeNotifier {
     _feedbackResult = Left(error);
     notifyListeners();
   }
+
+  void clearFeedback() {
+    _feedbackResult = null;
+  }
 }

@@ -304,15 +304,16 @@ fun formatDuration(durationString: Duration): String {
 
 fun trimPaths(movementList: List<Pair<Int, Mobile>>, instant: Instant): List<CubicBezier> {
     val paths = movementList.sortedBy { it.first }
-    var oldPath: Mobile? = null
+    var oldPath: Pair<Int, Mobile>? = null
     val bezierList = hashMapOf<Mobile, List<CubicBezier>>()
     for (path in paths) {
         val movement = path.second
-        if (oldPath != null && (oldPath.startTime + oldPath.duration).isAfter(movement.startTime)) {
-            bezierList[oldPath] = oldPath.splitPathBeforeTime(movement.startTime)
+        val oldMovement = oldPath?.second
+        if (oldPath?.first == path.first && oldMovement != null && (oldMovement.startTime + oldMovement.duration).isAfter(movement.startTime)) {
+            bezierList[oldMovement] = oldMovement.splitPathBeforeTime(movement.startTime)
         }
         bezierList[movement] = movement.splitPathBeforeTime(instant)
-        oldPath = movement
+        oldPath = path
     }
     return bezierList.values.flatten()
 }

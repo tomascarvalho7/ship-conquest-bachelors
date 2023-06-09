@@ -13,8 +13,8 @@ sealed interface Movement {
             // if ship is currently not in an event, then return current movement
             if (instant.isAfter(event.instant))
                 currentMovement = when(val details = event.details) {
-                    is FightEvent -> details.updateMovement(movement = this, instant = event.instant)
-                    is IslandEvent -> details.updateMovement(movement = this, instant = event.instant)
+                    is FightEvent -> details.updateMovement(movement = currentMovement, instant = event.instant)
+                    is IslandEvent -> details.updateMovement(movement = currentMovement, instant = event.instant)
                 }
         }
 

@@ -7,12 +7,12 @@ import 'space/coord_2d.dart';
 
 class Minimap {
   final int length;
-  final Grid<Coord2D, int> data;
+  Grid<Coord2D, int> data;
 
   Minimap({required this.length, required this.data});
 
   void add({required int x, required int y, required int height})
-    => data.put(Coord2D(x: x, y: y), height);
+    => data = data.put(Coord2D(x: x, y: y), height);
 
   int? get({required int x, required int y}) => data.getOrNull(Coord2D(x: x, y: y));
 }

@@ -30,48 +30,23 @@ extension Convert on MinimapInputModel {
   Minimap toMinimap() {
     final pathsPixels = Sequence(data:
       buildBeziers(paths.data.toCoord2DList()).expand((bezier) {
-        for (double t = 0; t <= 1; t += 0.1) {
-          return pulseAndFill(bezier.get(t).toCoord2D(), 10);
+        var data = Sequence.empty();
+        for (double t = 0.0; t <= 1.0; t += 0.1) {
+          print("tominimpa");
+          data = data + pulseAndFill(bezier.get(t).toCoord2D(), 10);
         }
-        return [];
+        return data;
       }).toList()
     );
 
     return Minimap(
         length: length,
         data:
-          islands.toGrid((element) => Coord2D(x: element.x, y: element.y), (element) => element.z)
-          +
-          pathsPixels.toGrid((element) => Coord2D(x: element.x, y: element.y), (element) => 0)
+        pathsPixels.toGrid((element) => Coord2D(x: element.x, y: element.y), (element) => 0)
+        +
+        islands.toGrid((element) => Coord2D(x: element.x, y: element.y), (element) => element.z)
         );
   }
-}
-
-Sequence<Coord2D> fillEllipse(List<Coord2D> points, List<Coord2D> focusPoints, double major) {
-  var res = Sequence<Coord2D>.empty();
-  // find the ellipse's bounding box
-  int minX = points.map((p) => p.x).reduce(min);
-  int maxX = points.map((p) => p.x).reduce(max);
-  int minY = points.map((p) => p.y).reduce(min);
-  int maxY = points.map((p) => p.y).reduce(max);
-
-  // iterate in the ellipse's bounding box and add the tiles that are inside the ellipse
-  for (int x = minX; x <= maxX; x++) {
-    for (int y = minY; y <= maxY; y++) {
-      final currCoord = Coord2D(x: x, y: y);
-      if (isInsideEllipse(currCoord, focusPoints, major)) {
-        res.put(currCoord);
-      }
-    }
-  }
-  return res;
-}
-
-bool isInsideEllipse(Coord2D point, List<Coord2D> focusPoints, double a) {
-  // in an ellipse, the sum of distances of every point to the focus points is less than the semimajor
-  double l1 = euclideanDistance(point, focusPoints[0]);
-  double l2 = euclideanDistance(point, focusPoints[1]);
-  return l1 + l2 <= a;
 }
 
 Sequence<Coord2D> pulseAndFill(Coord2D center, int radius) {

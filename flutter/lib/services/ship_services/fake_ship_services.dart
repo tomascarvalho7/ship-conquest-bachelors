@@ -51,7 +51,7 @@ class FakeShipServices extends ShipServices {
 
   @override
   FutureEither<ErrorFeedback, Minimap> getMinimap() async {
-    return Left(ErrorFeedback(type: ErrorType.info, title: "teste", details: "detalhes de teste"));
+    return Left(ErrorFeedback(type: ErrorType.info, title: "teste", details: "detalhes teste"));
 
     /*Right(
         Minimap(

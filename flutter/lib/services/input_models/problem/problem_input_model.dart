@@ -10,10 +10,9 @@ class ProblemInputModel {
   final String title;
   final String details;
 
-  ProblemInputModel.fromJson(Map<String, dynamic> json):
-      status = json['status'],
+  ProblemInputModel.fromJson(this.status, Map<String, dynamic> json):
       title = json['title'],
-      details = json['details'];
+      details = json['detail'];
 }
 
 /// Convert back-end application error
