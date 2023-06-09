@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/providers/camera_controller.dart';
+import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
 import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
+import 'package:ship_conquest/utils/constants.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../domain/island/island.dart';
 import 'game_details_panel.dart';
@@ -32,8 +34,8 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
           final islands = tileManager.islands;
           manageNearbyIslands(islands);
 
-          return Consumer3<ShipController, CameraController, ShipServices>(
-              builder: (_, shipManager, camera, services,__) =>
+          return Consumer2<ShipController, CameraController>(
+              builder: (_, shipManager, camera,__) =>
                   SlidingUpPanel(
                     color: Theme.of(context).colorScheme.secondary,
                     controller: panelController,
@@ -48,10 +50,7 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
                             islands: islands,
                             camera: camera,
                             ships: shipManager.ships.toSequence(),
-                            onShipBuy: () async {
-                              final newShip = await services.createNewShip();
-                              shipManager.updateFleet(newShip);
-                            }
+                            onShipBuy: () => GameEvent.purchaseShip(context)
                         ),
                   )
             );

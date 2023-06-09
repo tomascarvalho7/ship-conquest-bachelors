@@ -20,6 +20,9 @@ class Sequence<T> extends Iterable<T> {
     return Sequence(data: _data);
   }
 
+  Sequence<T> plus(Sequence<T> other) => this + other;
+  Sequence<T> operator +(Sequence<T> other) => Sequence(data: [...data, ...other.data]);
+
   Grid<K, V> toGrid<K, V>(K Function(T element) getKey, V Function(T element) getValue) =>
     Grid(data: {
       for (var element in data) getKey(element) : getValue(element)

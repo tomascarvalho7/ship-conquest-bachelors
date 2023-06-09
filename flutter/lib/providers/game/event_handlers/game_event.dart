@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/either/future_either.dart';
+import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -30,8 +32,6 @@ class GameEvent {
   static void selectShip(BuildContext context, int index) async {
     // get controller
     final cameraController = context.read<CameraController>();
-    final services = context.read<ShipServices>();
-    final sceneController = context.read<SceneController>();
     final shipController = context.read<ShipController>();
     // select ship
     shipController.selectShip(index);
@@ -39,16 +39,29 @@ class GameEvent {
     final ship = shipController.getMainShip();
     final shipPosition = ship.getPosition(-globalScale);
     cameraController.setFocusAndUpdate(toIsometric(shipPosition));
-    // update scene
-    sceneController.getScene(shipPosition, services, ship.sid);
   }
 
   static void conquestIsland(BuildContext context, Island island) async {
-    // get controller
+    // get controllers
     final services = context.read<ShipServices>();
     final sceneController = context.read<SceneController>();
+    final feedbackController = context.read<FeedbackController>();
     // server request to conquest island, and then update current scene
-    final newIsland = await services.conquestIsland(1, island.id);
-    sceneController.updateIsland(newIsland);
+    services.conquestIsland(1, island.id).either(
+        (left) => feedbackController.setError(left),
+        (right) => sceneController.updateIsland(right)
+    );
+  }
+
+  static void purchaseShip(BuildContext context) async {
+    // get controllers
+    final shipController = context.read<ShipController>();
+    final services = context.read<ShipServices>();
+    final feedbackController = context.read<FeedbackController>();
+    // handle ship creation
+    services.createNewShip().either(
+            (left) => feedbackController.setError(left),
+            (right) => shipController.updateFleet(right)
+    );
   }
 }

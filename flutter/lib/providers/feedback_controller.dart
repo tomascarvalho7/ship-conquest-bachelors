@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/either/either.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
-import 'package:ship_conquest/domain/feedback/success_feedback.dart';
+import 'package:ship_conquest/domain/feedback/success/success_feedback.dart';
 
 class FeedbackController with ChangeNotifier {
   FeedbackController();

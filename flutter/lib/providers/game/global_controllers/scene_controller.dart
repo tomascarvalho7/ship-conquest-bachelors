@@ -51,18 +51,18 @@ class SceneController with ChangeNotifier {
     _visitedIslands = _visitedIslands.put(island.id, island);
   }
 
-  Future<Sequence<Coordinate>> tryToGetScene(Position position, ShipServices services, int sId) async {
+  Future<Sequence<Coordinate>> tryToGetScene(Position position, HorizonFn fetchHorizon) async {
     if (distance(position, _lastPos) <= 1.0) return Sequence.empty();
-    return getScene(position, services, sId);
+    return getScene(position, fetchHorizon);
   }
 
-  Future<Sequence<Coordinate>> getScene(Position position, ShipServices services, int sId) async {
+  Future<Sequence<Coordinate>> getScene(Position position, HorizonFn fetchHorizon) async {
     final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
 
     // update position
     _lastPos = position;
 
-    return shouldFetch ? fetchScene(position, services, sId) : buildEmptyScene(position);
+    return shouldFetch ? fetchScene(position, fetchHorizon) : buildEmptyScene(position);
   }
 
   Future<Sequence<Coordinate>> buildEmptyScene(Position position) async {
@@ -75,12 +75,12 @@ class SceneController with ChangeNotifier {
     return _newTiles;
   }
 
-  Future<Sequence<Coordinate>> fetchScene(Position position, ShipServices services, int sId) async {
+  Future<Sequence<Coordinate>> fetchScene(Position position, HorizonFn fetchHorizon) async {
     // save & clear previous scene
     _savePreviousScene();
     // fetch terrain tiles
     final coord = position.toCoord2D();
-    await _fetchTerrainTiles(coord, services, sId);
+    await _fetchTerrainTiles(coord, fetchHorizon);
     // generate placeholder scene
     _generateWaterScene(coord);
 
@@ -113,9 +113,10 @@ class SceneController with ChangeNotifier {
     );
   }
 
-  Future<void> _fetchTerrainTiles(Coord2D coordinate, ShipServices services, int sId) async {
+  Future<void> _fetchTerrainTiles(Coord2D coordinate, HorizonFn fetchHorizon) async {
     // fetch tiles from services
-    Horizon horizon = await services.getNewChunk(chunkSize, coordinate, sId);
+    Horizon? horizon = await fetchHorizon(coordinate);
+    if (horizon == null) return;
     // update fetched tiles from existing ones
     for(var tile in horizon.tiles) {
       _newTilesMap.putIfAbsent(Coord2D(x: tile.x, y: tile.y), () => _newTiles.length);
@@ -162,3 +163,5 @@ class SceneController with ChangeNotifier {
     return TilesOrder(tiles: globalTiles, tilesStates: tilesState);
   }
 }
+
+typedef HorizonFn = Future<Horizon?> Function(Coord2D coordinate);

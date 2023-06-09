@@ -1,3 +1,5 @@
+import 'package:ship_conquest/domain/user/user_info.dart';
+
 class UserInfoInputModel {
   final String username;
   final String name;
@@ -5,17 +7,20 @@ class UserInfoInputModel {
   final String? imageUrl;
   final String? description;
 
-  UserInfoInputModel(
-      {required this.username,
-      required this.name,
-      required this.email,
-      required this.imageUrl,
-      required this.description});
-
   UserInfoInputModel.fromJson(Map<String, dynamic> json)
       : username = json['username'],
         name = json['name'],
         email = json['email'],
         imageUrl = json['imageUrl'],
         description = json['description'];
+}
+
+extension ToDomain on UserInfoInputModel {
+  UserInfo toUserInfo() => UserInfo(
+      username: username,
+      name: name,
+      email: email,
+      imageUrl: imageUrl,
+      description: description
+  );
 }

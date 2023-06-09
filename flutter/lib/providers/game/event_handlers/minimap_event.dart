@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/config/notification/custom_notifications.dart';
 import 'package:ship_conquest/config/notification/notification_service.dart';
+import 'package:ship_conquest/domain/either/future_either.dart';
+import 'package:ship_conquest/domain/feedback/success/utils/constants.dart';
 import 'package:ship_conquest/domain/path_builder/path_builder.dart';
 import 'package:ship_conquest/providers/game/game_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
@@ -14,6 +16,7 @@ import '../../../domain/space/coord_2d.dart';
 import '../../../domain/space/position.dart';
 import '../../camera_controller.dart';
 import '../../../utils/constants.dart';
+import '../../feedback_controller.dart';
 import '../minimap_controllers/route_controller.dart';
 
 /// MinimapEvent is a static class that calls minimap
@@ -70,6 +73,7 @@ class MinimapEvent {
     final services = context.read<ShipServices>();
     final shipController = context.read<ShipController>();
     final gameController = context.read<GameController>();
+    final feedbackController = context.read<FeedbackController>();
     final landmarks = routeController.routePoints;
     routeController.confirm();
     if (landmarks.isNotEmpty) {
@@ -77,11 +81,15 @@ class MinimapEvent {
       final oldShip = shipController.getShip(routeController.selectedShipIndex);
       gameController.deleteShipEvent(oldShip);
       // post & fetch sailing ship, then schedule new ship tasks and update ship
-      Ship ship = await services.navigateTo(oldShip.sid, landmarks);
-      // build ship notification's
-      if (ship is MobileShip) buildShipNotification(ship);
-      gameController.scheduleShipEvent(ship);
-      shipController.updateShip(ship);
+      services.navigateTo(oldShip.sid, landmarks).either(
+          (left) => feedbackController.setError(left),
+          (ship) { // build ship notification's
+            feedbackController.setSuccessful(travelling);
+            if (ship is MobileShip) buildShipNotification(ship);
+            gameController.scheduleShipEvent(ship);
+            shipController.updateShip(ship);
+          }
+      );
     }
   }
 

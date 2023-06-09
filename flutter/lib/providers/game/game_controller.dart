@@ -12,6 +12,7 @@ import '../../domain/event/known_event.dart';
 import '../../domain/event/unknown_event.dart';
 import '../../domain/immutable_collections/sequence.dart';
 import '../../services/ship_services/ship_services.dart';
+import '../feedback_controller.dart';
 import 'global_controllers/schedule_controller.dart';
 import 'global_controllers/ship_controller.dart';
 import 'global_controllers/statistics_controller.dart';
@@ -35,6 +36,7 @@ class GameController {
   final MinimapController minimapController;
   final ShipServices services;
   final ScheduleController scheduleController;
+  final FeedbackController feedbackController;
   // constructor
   GameController({
     required this.shipController,
@@ -42,7 +44,8 @@ class GameController {
     required this.sceneController,
     required this.minimapController,
     required this.services,
-    required this.scheduleController
+    required this.scheduleController,
+    required this.feedbackController
 });
 
   late final gameLogic = GameLogic(
@@ -51,7 +54,8 @@ class GameController {
       sceneController: sceneController,
       minimapController: minimapController,
       services: services,
-      scheduleController: scheduleController
+      scheduleController: scheduleController,
+      feedbackController: feedbackController
   );
 
   Future<void> load() async { // load initial data
@@ -59,9 +63,7 @@ class GameController {
     scheduleController.stop();
     // initialize notifications
     NotificationService.initialize();
-    final ships = await gameLogic.loadData();
-    // schedule ship events
-    scheduleShipEvents(ships);
+    await gameLogic.loadData(scheduleShipEvents);
     // subscribe to game events
     services.subscribe(gameLogic.onEvent, gameLogic.onFleet);
   }

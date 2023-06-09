@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/widgets/screens/start_menu/start_menu.dart';
 
 import '../../../domain/lobby.dart';
-import '../../../services/ship_services/ship_services.dart';
 
 enum DateFilter {
   newer,
@@ -54,7 +55,7 @@ class LobbyScreenState extends State<LobbyScreen> {
   final FocusNode _focusNode = FocusNode();
   DateFilter _dateFilter = DateFilter.newer;
   FilterType _selectedFilterType = FilterType.all;
-  List<Lobby>? lobbies;
+  Sequence<Lobby> lobbies = Sequence.empty();
 
   final int _limit = 10;
   int _skip = 0;
@@ -73,18 +74,10 @@ class LobbyScreenState extends State<LobbyScreen> {
   }
 
   Future<void> _getLobbies() async {
-    final services = Provider.of<ShipServices>(context, listen: false);
     final searchedLobby = _lobbySearchController.text;
 
-    final result =
-        await services.getLobbyList(_skip, _limit, _dateFilter.toRequestOrder, searchedLobby);
-    setState(() {
-      if (lobbies == null) {
-        lobbies = result;
-      } else {
-        lobbies!.addAll(result);
-      }
-    });
+    final queryResult = await GeneralEvent.getLobbies(context, _skip, _limit, _dateFilter.toRequestOrder, searchedLobby);
+    setState(() => lobbies = lobbies.plus(queryResult));
   }
 
   void handleFilter(FilterType filter) {
@@ -95,7 +88,6 @@ class LobbyScreenState extends State<LobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final services = Provider.of<ShipServices>(context);
     final LobbyStorage lobbyStorage = Provider.of<LobbyStorage>(context);
 
     return GestureDetector(
@@ -184,8 +176,9 @@ class LobbyScreenState extends State<LobbyScreen> {
                       ),
                     );
                     if (name != null && name.isNotEmpty) {
-                      final String lobbyId = await services.createLobby(name);
-                      lobbyStorage.setLobbyId(lobbyId);
+                      GeneralEvent.createLobby(context, name, (lid) =>
+                          lobbyStorage.setLobbyId(lid)
+                      );
                       if (!mounted) return;
                       context.go("/loading-game");
                     }
@@ -206,7 +199,7 @@ class LobbyScreenState extends State<LobbyScreen> {
                 children: [
                   Expanded(
                       child: Stack(children: [
-                    if (lobbies != null) ...[
+                    if (lobbies.isNotEmpty) ...[
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: FractionallySizedBox(
@@ -307,11 +300,15 @@ class LobbyScreenState extends State<LobbyScreen> {
                                         ),
                                         onPressed: () async {
                                           // make search and update the list
-                                          final result =
-                                          await services.getLobbyList(0, _limit, _dateFilter.toRequestOrder, _lobbySearchController.text);
-                                          setState(() {
-                                            lobbies = result;
-                                          });
+                                          // make search and update the list
+                                          final queryResult = await GeneralEvent.getLobbies(
+                                              context,
+                                              0,
+                                              _limit,
+                                              _dateFilter.toRequestOrder,
+                                              _lobbySearchController.text
+                                          );
+                                          setState(() => lobbies = queryResult);
                                         },
                                       ),
                                     ),
@@ -365,11 +362,15 @@ class LobbyScreenState extends State<LobbyScreen> {
                                               _dateFilter = DateFilter.newer;
                                           }
                                         });
-                                        final result =
-                                            await services.getLobbyList(0, _limit, _dateFilter.toRequestOrder, _lobbySearchController.text);
-                                        setState(() {
-                                          lobbies = result;
-                                        });
+                                        // make search and update the list
+                                        final queryResult = await GeneralEvent.getLobbies(
+                                            context,
+                                            0,
+                                            _limit,
+                                            _dateFilter.toRequestOrder,
+                                            _lobbySearchController.text
+                                        );
+                                        setState(() => lobbies = queryResult);
                                       }),
                                 ],
                               ),
@@ -377,15 +378,15 @@ class LobbyScreenState extends State<LobbyScreen> {
                             Expanded(
                               child: ListView.builder(
                                 controller: _scrollController,
-                                itemCount: lobbies?.length,
+                                itemCount: lobbies.length,
                                 itemBuilder: (context, index) {
-                                  final lobby = lobbies![index];
+                                  final lobby = lobbies.get(index);
                                   return LobbyTile(
                                     lobby: lobby,
                                     onClick: () async {
-                                      final String lobbyId =
-                                          await services.joinLobby(lobby.tag);
-                                      lobbyStorage.setLobbyId(lobbyId);
+                                      GeneralEvent.joinLobby(context, lobby.tag, (lid) =>
+                                          lobbyStorage.setLobbyId(lid)
+                                      );
                                       if (!mounted) return;
                                       context.go("/loading-game");
                                     },

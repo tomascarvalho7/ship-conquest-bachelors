@@ -13,17 +13,14 @@ import '../../domain/horizon.dart';
 import '../../domain/user/token.dart';
 import '../../domain/user/user_info.dart';
 
-//all of them need to use the lobby id
 abstract class ShipServices {
   FutureEither<ErrorFeedback, Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId);
-
-  FutureEither<ErrorFeedback, PlayerStats> getPlayerStatistics();
-
-  FutureEither<ErrorFeedback, Token> signIn(String idToken, String username, String? description);
-
-  FutureEither<ErrorFeedback, Token> logIn(String idToken);
-
   FutureEither<ErrorFeedback, Minimap> getMinimap();
+
+  // authentication related routes
+  FutureEither<ErrorFeedback, Token> signIn(String idToken, String username, String? description);
+  FutureEither<ErrorFeedback, Token> logIn(String idToken);
+  Future<void> logoutUser();
 
   // Ship related routes
   FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks);
@@ -32,23 +29,25 @@ abstract class ShipServices {
   FutureEither<ErrorFeedback, Ship> createNewShip();
 
   // Lobby related routes
-  FutureEither<ErrorFeedback, List<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby);
+  FutureEither<ErrorFeedback, Sequence<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby);
   FutureEither<ErrorFeedback, String> joinLobby(String tag);
   FutureEither<ErrorFeedback, String> createLobby(String name);
   FutureEither<ErrorFeedback, Lobby> getLobby(String tag);
 
+  // statistics related routes
+  FutureEither<ErrorFeedback, PlayerStats> getPlayerStatistics();
   FutureEither<ErrorFeedback, UserInfo> getPersonalInfo();
 
-  FutureEither<ErrorFeedback, void> logoutUser();
 
   // Island related routes
   FutureEither<ErrorFeedback, Island> conquestIsland(int sId, int islandId);
   FutureEither<ErrorFeedback, Sequence<Island>> getVisitedIslands();
 
+  // server sent events related routes
   Future subscribe(
       void Function(int sid, UnknownEvent event) onEvent,
       void Function(Sequence<Ship> fleet) onFleet
-      );
+  );
 
   Future unsubscribe();
 }
