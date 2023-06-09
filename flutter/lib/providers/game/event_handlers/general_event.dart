@@ -7,7 +7,9 @@ import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
 import '../../../domain/immutable_collections/sequence.dart';
+import '../../../domain/user/token.dart';
 import '../../../domain/user/user_info.dart';
+import '../../../services/google/google_signin_api.dart';
 
 class GeneralEvent {
   static Future<Sequence<Lobby>> getLobbies(BuildContext context, int skip, int limit, String order, String query) {
@@ -54,6 +56,32 @@ class GeneralEvent {
     services.getPersonalInfo().either(
             (left) => feedbackController.setError(left),
             (right) => onUserInfo(right)
+    );
+  }
+
+  static void signIn(BuildContext context, String username, String description, Function(Token token) onToken) async {
+    // get controller's
+    final services = context.read<ShipServices>();
+    final feedbackController = context.read<FeedbackController>();
+    // make authentication requests
+    final account = await GoogleSignInApi.login();
+    final userInfo = await GoogleSignInApi.getUserInfo(account!);
+    services.signIn(userInfo, username, description).either(
+            (left) => feedbackController.setError(left),
+            (right) => onToken(right)
+    );
+  }
+
+  static void login(BuildContext context, Function(Token token) onToken) async {
+    // get controller's
+    final services = context.read<ShipServices>();
+    final feedbackController = context.read<FeedbackController>();
+    // make authentication requests
+    final account = await GoogleSignInApi.login();
+    final userInfo = await GoogleSignInApi.getUserInfo(account!);
+    services.logIn(userInfo).either(
+            (left) => feedbackController.setError(left),
+            (right) => onToken(right)
     );
   }
 

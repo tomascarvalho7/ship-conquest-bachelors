@@ -175,11 +175,10 @@ class LobbyScreenState extends State<LobbyScreen> {
                         ],
                       ),
                     );
-                    if (name != null && name.isNotEmpty) {
+                    if (name != null && name.isNotEmpty && mounted) {
                       GeneralEvent.createLobby(context, name, (lid) =>
                           lobbyStorage.setLobbyId(lid)
                       );
-                      if (!mounted) return;
                       context.go("/loading-game");
                     }
                   },

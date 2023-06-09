@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
-import 'package:ship_conquest/services/google/google_signin_api.dart';
-
-import '../../../services/ship_services/ship_services.dart';
 
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({Key? key}) : super(key: key);
@@ -20,7 +18,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ShipServices services = Provider.of<ShipServices>(context, listen: false);
     UserStorage userStorage = Provider.of<UserStorage>(context, listen: false);
 
     return Scaffold(
@@ -86,9 +83,11 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                     ),
                                     const SizedBox(height: 15),
                                     DefaultButton(
-                                      onClick: () =>
-                                          logIn(services, userStorage)
-                                              .then((_) => context.go("/home")),
+                                      onClick: () => // login event
+                                      GeneralEvent.login(context, (token) {
+                                        userStorage.setToken(token.token);
+                                        context.go("/home");
+                                      }),
                                       message: 'Log In',
                                     ),
                                   ],
@@ -212,23 +211,18 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        final username =
-                                            _usernameController.text;
-                                        final description =
-                                            _descriptionController.text;
-                                        if (username.length >= 6) {
-                                          // TODO limite por definir
-                                          signIn(
-                                                  services,
-                                                  userStorage,
-                                                  username,
-                                                  description.isEmpty
-                                                      ? null
-                                                      : description)
-                                              .then((_) => context.go("/home"));
-                                        } else {
-                                          // TODO dizer que o nome tem que ser maior
-                                        }
+                                        final username = _usernameController.text;
+                                        final description = _descriptionController.text;
+                                        // signIn event
+                                        GeneralEvent.signIn(
+                                            context,
+                                            username,
+                                            description,
+                                            (token) {
+                                              userStorage.setToken(token.token);
+                                              context.go("/home");
+                                            }
+                                        );
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.white,
@@ -271,21 +265,6 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
             ],
           )),
     );
-  }
-
-  Future signIn(ShipServices services, UserStorage userStorage, String username,
-      String? description) async {
-    final account = await GoogleSignInApi.login();
-    final userInfo = await GoogleSignInApi.getUserInfo(account!);
-    final userToken = await services.signIn(userInfo, username, description);
-    userStorage.setToken(userToken.token);
-  }
-
-  Future logIn(ShipServices services, UserStorage userStorage) async {
-    final account = await GoogleSignInApi.login();
-    final userInfo = await GoogleSignInApi.getUserInfo(account!);
-    final userToken = await services.logIn(userInfo);
-    userStorage.setToken(userToken.token);
   }
 }
 

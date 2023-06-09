@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 import 'package:ship_conquest/services/google/google_signin_api.dart';
 import 'package:ship_conquest/widgets/screens/start_menu/start_menu.dart';
 
@@ -21,16 +22,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _getUser();
-  }
-
-  Future<void> _getUser() async {
-    final services = Provider.of<ShipServices>(context, listen: false);
-
-    final userInfo = await services.getPersonalInfo();
-    setState(() {
-      user = userInfo;
-    });
+    // load user personal info
+    GeneralEvent.getPersonalInfo(context, (info) =>
+        setState(() => user = info)
+    );
   }
 
   @override
