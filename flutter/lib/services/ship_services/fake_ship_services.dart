@@ -1,13 +1,7 @@
-import 'dart:collection';
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
 import 'package:ship_conquest/domain/either/either.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
-import 'package:ship_conquest/domain/island/owned_island.dart';
-import 'package:ship_conquest/domain/island/wild_island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/ship_path.dart';
@@ -19,14 +13,12 @@ import 'package:ship_conquest/providers/lobby_storage.dart';
 import '../../domain/either/future_either.dart';
 import '../../domain/event/unknown_event.dart';
 import '../../domain/feedback/error/error_feedback.dart';
-import '../../domain/feedback/error/error_type.dart';
 import '../../domain/lobby.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
 import '../../domain/user/user_info.dart';
 import '../../domain/utils/build_bezier.dart';
 import '../../providers/user_storage.dart';
-import '../input_models/horizon_input_model.dart';
 import 'ship_services.dart';
 
 class FakeShipServices extends ShipServices {
@@ -50,16 +42,13 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Minimap> getMinimap() async {
-    return Left(ErrorFeedback(type: ErrorType.info, title: "teste", details: "detalhes teste"));
-
-    /*Right(
+  FutureEither<ErrorFeedback, Minimap> getMinimap() async =>
+    Right(
         Minimap(
             length: 500,
             data: Grid.empty() // empty map
         )
-    );*/
-  }
+    );
 
   @override
   FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
@@ -145,7 +134,8 @@ class FakeShipServices extends ShipServices {
             coordinate: Coord2D(x: 10, y: 10),
             radius: 30,
             incomePerHour: 25,
-            uid: 'FAKE-UID'
+            username: "tomascarvalho",
+            owned: true
         )
     );
   }

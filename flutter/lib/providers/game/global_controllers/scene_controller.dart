@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
+import 'package:ship_conquest/domain/island/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';

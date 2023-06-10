@@ -1,7 +1,7 @@
 package com.example.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.controller.model.output.IslandOutputModel
-import com.example.shipconquest.controller.model.output.toIslandOutputModel
+import com.example.shipconquest.controller.model.output.islands.IslandOutputModel
+import com.example.shipconquest.controller.model.output.islands.toIslandOutputModel
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.event_details.IslandEvent

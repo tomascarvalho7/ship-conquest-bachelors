@@ -9,6 +9,7 @@ import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.ship.*
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.space.Vector2
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.Horizon
 import com.example.shipconquest.domain.world.islands.Island
@@ -48,7 +49,7 @@ class GameService(
 
             val game = transaction.gameRepo.get(tag = tag) // TODO: can be optimized
             if (game != null) {
-                val islands = transaction.islandRepo.getAll(tag = tag)
+                val islands = transaction.islandRepo.getAll(tag = tag, uid = uid)
                 val nearIslands = getNearIslands(coordinate = coord, islands = islands)
                 right(
                     value = Horizon(
@@ -94,7 +95,7 @@ class GameService(
             // iterate in users ships
             for (ship in userShips) {
                 // get ship path
-                val events = transaction.eventRepo.getShipEvents(tag, ship.id)
+                val events = transaction.eventRepo.getShipEvents(tag = tag, uid = uid, sid = ship.id)
                 ship.movements.forEach {
                     val processedMovement = it.build(currInstant, events)
                     if (processedMovement is Mobile) {
@@ -103,11 +104,16 @@ class GameService(
                 }
 
                 // get known islands TODO: eventRepo.getIslands(tag, uid)
-                transaction.eventRepo.getIslandEventsBeforeInstant(tag, ship.id, currInstant).map {
+                transaction.eventRepo.getIslandEventsBeforeInstant(
+                    tag = tag,
+                    sid = ship.id,
+                    uid = uid,
+                    instant = currInstant
+                ).map {
                     val details = it.details
                     if (details is IslandEvent) {
                         // get islands center coordinates
-                        val islandCenter = transaction.islandRepo.get(tag, details.island.islandId)
+                        val islandCenter = transaction.islandRepo.get(tag = tag, uid = uid, islandId = details.island.islandId)
                         if (islandCenter != null) {
                             islandsCenter += islandCenter.coordinate
                         }
@@ -224,13 +230,13 @@ class GameService(
         }
     }
 
-    fun conquestIsland(tag: String, uid: String, shipId: String, islandId: Int): ConquestIslandResult {
+    fun conquestIsland(tag: String, user: User, shipId: String, islandId: Int): ConquestIslandResult {
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag)
                 ?: return@run left(ConquestIslandError.GameNotFound)
-            val island = transaction.islandRepo.get(tag = tag, islandId = islandId)
+            val island = transaction.islandRepo.get(tag = tag, uid = user.id, islandId = islandId)
                 ?: return@run left(ConquestIslandError.IslandNotFound)
-            val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
+            val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = user.id)
                 ?: return@run left(ConquestIslandError.PlayerStatisticsNotFound)
             // TODO: update with canSightIsland
             if (false) return@run left(ConquestIslandError.ShipTooFarAway)
@@ -239,14 +245,14 @@ class GameService(
             gameLogic.makeTransaction(playerStatistics, island.getCost()) { newCurrency, instant ->
                 transaction.statsRepo.updatePlayerCurrency(
                     tag = tag,
-                    uid = uid,
+                    uid = user.id,
                     instant = instant,
                     newStaticCurrency = newCurrency
                 )
             } ?: return@run left(ConquestIslandError.NotEnoughCurrency)
 
             val newIsland = gameLogic.conquestIsland(
-                uid = uid,
+                user = user,
                 island = island,
                 onWild = { _, newIsland ->
                     // add ownership of island and take cost from currency

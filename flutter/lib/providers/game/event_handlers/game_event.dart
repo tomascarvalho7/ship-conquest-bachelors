@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
+import 'package:ship_conquest/domain/island/utils.dart';
 import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
 import '../../../domain/island/island.dart';
@@ -45,11 +47,15 @@ class GameEvent {
     // get controllers
     final services = context.read<ShipServices>();
     final sceneController = context.read<SceneController>();
+    final statisticsController = context.read<StatisticsController>();
     final feedbackController = context.read<FeedbackController>();
     // server request to conquest island, and then update current scene
     services.conquestIsland(1, island.id).either(
         (left) => feedbackController.setError(left),
-        (right) => sceneController.updateIsland(right)
+        (right) {
+          statisticsController.makeTransaction(island.conquestCost());
+          sceneController.updateIsland(right);
+        }
     );
   }
 

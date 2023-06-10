@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:ship_conquest/domain/island/island_presentation.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/island/island_presentation.dart';
 import '../../../../domain/island/island.dart';
 import '../../../../domain/isometric/isometric.dart';
 
@@ -32,11 +32,11 @@ class IslandsView extends StatelessWidget {
               width: 300,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                  color: getIslandColor(island),
+                  color: island.getIslandColor(),
                   borderRadius: const BorderRadius.all(Radius.circular(20))
               ),
               child: Text(
-                  getIslandLabel(island),
+                  island.getIslandLabel(),
                   style: const TextStyle(
                       fontSize: 24,
                       color: Color.fromRGBO(255, 255, 255, 1.0),

@@ -2,7 +2,6 @@ import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/services/input_models/coordinate_input_model.dart';
 
 import '../../domain/horizon.dart';
-import '../../domain/island/wild_island.dart';
 import 'island_input_model.dart';
 
 class HorizonInputModel {

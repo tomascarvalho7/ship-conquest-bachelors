@@ -5,6 +5,7 @@ import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
 import com.example.shipconquest.controller.model.output.*
+import com.example.shipconquest.controller.model.output.islands.toOwnedIslandOutputModel
 import com.example.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
 import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
 import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
@@ -63,7 +64,7 @@ class GameController(val service: GameService) {
 
     @PostMapping("/{tag}/conquest")
     fun conquest(user: User, @PathVariable tag: String, @RequestBody input: ConquestInputModel): ResponseEntity<*> {
-        val result = service.conquestIsland(tag, user.id, input.shipId, input.islandId);
+        val result = service.conquestIsland(tag, user, input.shipId, input.islandId);
 
         return when(result) {
             is Either.Right -> response(content = result.value.toOwnedIslandOutputModel())

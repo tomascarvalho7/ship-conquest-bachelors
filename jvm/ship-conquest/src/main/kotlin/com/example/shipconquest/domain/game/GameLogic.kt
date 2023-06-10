@@ -15,6 +15,7 @@ import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.build
 import com.example.shipconquest.domain.toVector2
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
@@ -22,6 +23,7 @@ import com.example.shipconquest.domain.user.statistics.getCurrency
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.OwnedIsland
+import com.example.shipconquest.domain.world.islands.OwnershipDetails
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.repo.Transaction
@@ -56,19 +58,20 @@ class GameLogic(private val clock: Clock) {
     }
 
     fun conquestIsland(
-        uid: String,
+        user: User,
         island: Island,
         onWild: (old: WildIsland, new: OwnedIsland) -> Unit,
         onOwned: (old: OwnedIsland, new: OwnedIsland) -> Unit
     ): OwnedIsland? {
-        if (island is OwnedIsland && island.uid == uid) return null;
+        if (island is OwnedIsland && island.uid == user.id) return null;
         val newIsland = OwnedIsland(
             islandId = island.islandId,
             coordinate = island.coordinate,
             radius = island.radius,
             incomePerHour = incomePerHour,
             conquestDate = clock.now(),
-            uid = uid
+            uid = user.id,
+            ownershipDetails = OwnershipDetails(owned = true, username = user.name)
         )
 
         when(island) {
@@ -90,7 +93,7 @@ class GameLogic(private val clock: Clock) {
 
         val lastMovement = getMostRecentMovement(info)
         val events = if (lastMovement is Mobile) {
-            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, instant = lastMovement.startTime)
+            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, uid = uid, instant = lastMovement.startTime)
         } else emptyList()
 
         return ShipBuilder(info = info, events = events)
@@ -104,7 +107,7 @@ class GameLogic(private val clock: Clock) {
 
             val lastMovement = getMostRecentMovement(info)
             val events = if (lastMovement is Mobile) {
-                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, instant = lastMovement.startTime)
+                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, uid = uid, instant = lastMovement.startTime)
             } else emptyList()
 
             return@List ShipBuilder(info = info, events = events)
@@ -121,6 +124,7 @@ class GameLogic(private val clock: Clock) {
             val events = if (lastMovement is Mobile) {
                 transaction.eventRepo.getShipEventsAfterInstant(
                     tag = tag,
+                    uid = uid,
                     sid = info.id,
                     instant = lastMovement.startTime
                 )

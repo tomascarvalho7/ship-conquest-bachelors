@@ -9,4 +9,13 @@ class StatisticsController with ChangeNotifier {
   void updateStatistics(PlayerStats stats) {
     statistics = stats;
   }
+
+  bool canMakeTransaction(int value) => statistics.currency > value;
+
+  void makeTransaction(int value) {
+    statistics = PlayerStats(
+        currency: statistics.currency + value,
+        maxCurrency: statistics.maxCurrency
+    );
+  }
 }

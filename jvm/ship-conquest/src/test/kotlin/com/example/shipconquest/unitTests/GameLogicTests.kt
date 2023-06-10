@@ -11,10 +11,12 @@ import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.ship.movement.Stationary
+import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.IslandIncome
 import com.example.shipconquest.domain.user.statistics.PlayerIncome
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.world.islands.OwnedIsland
+import com.example.shipconquest.domain.world.islands.OwnershipDetails
 import com.example.shipconquest.domain.world.islands.WildIsland
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -58,7 +60,10 @@ class GameLogicTests {
     @Test
     fun conquestWildIsland() {
         val gameLogic = GameLogic(testClock)
-        val uid = "user123"
+        val user = User(
+            id = "FAKE-UID",
+            name = "Adam"
+        )
         val island = WildIsland(
             islandId = 123,
             coordinate = Vector2(10, 10),
@@ -67,19 +72,19 @@ class GameLogicTests {
         var onWildCalled = false
         var onOwnedCalled = false
 
-        val ownedIsland = gameLogic.conquestIsland(uid, island,
+        val ownedIsland = gameLogic.conquestIsland(user, island,
             onWild = { old, new ->
                 onWildCalled = true
                 assertEquals(island, old)
-                assertEquals(uid, new.uid)
+                assertEquals(user.id, new.uid)
                 assertEquals(testClock.now(), new.conquestDate)
             },
-            onOwned = { old, new ->
+            onOwned = { _, _ ->
                 onOwnedCalled = true
             }
         )
 
-        assertEquals(uid, ownedIsland?.uid)
+        assertEquals(user.id, ownedIsland?.uid)
         assertEquals(testClock.now(), ownedIsland?.conquestDate)
         assertEquals(false, onOwnedCalled)
         assertEquals(true, onWildCalled)
@@ -88,19 +93,23 @@ class GameLogicTests {
     @Test
     fun conquestOwnedIsland() {
         val gameLogic = GameLogic(testClock)
-        val uid = "user123"
+        val user = User(
+            id = "FAKE-UID",
+            name = "Adam"
+        )
         val island = OwnedIsland(
             islandId = 123,
             coordinate = Vector2(10, 10),
             radius = 10,
             incomePerHour = 100,
             conquestDate = Instant.parse("2022-12-31T23:59:00Z"),
-            uid = "otherUser"
+            uid = user.id,
+            ownershipDetails = OwnershipDetails(owned = false, username = user.id)
         )
         var onWildCalled = false
         var onOwnedCalled = false
 
-        val ownedIsland = gameLogic.conquestIsland(uid, island,
+        val ownedIsland = gameLogic.conquestIsland(user, island,
             onWild = { _, _ ->
                 onWildCalled = true
             },
@@ -108,12 +117,12 @@ class GameLogicTests {
                 onOwnedCalled = true
                 assertEquals(island, old)
                 assertEquals("otherUser", old.uid)
-                assertEquals(uid, new.uid)
+                assertEquals(user.id, new.uid)
                 assertEquals(testClock.now(), new.conquestDate)
             }
         )
 
-        assertEquals(uid, ownedIsland?.uid)
+        assertEquals(user.id, ownedIsland?.uid)
         assertEquals(testClock.now(), ownedIsland?.conquestDate)
         assertEquals(true, onOwnedCalled)
         assertEquals(false, onWildCalled)
@@ -122,19 +131,23 @@ class GameLogicTests {
     @Test
     fun conquestAlreadyOwnedIsland() {
         val gameLogic = GameLogic(testClock)
-        val uid = "user123"
+        val user = User(
+            id = "FAKE-UID",
+            name = "Adam"
+        )
         val island = OwnedIsland(
             islandId = 123,
             coordinate = Vector2(10, 10),
             radius = 10,
             incomePerHour = 100,
             conquestDate = Instant.parse("2022-12-31T23:59:00Z"),
-            uid = uid
+            uid = user.id,
+            ownershipDetails = OwnershipDetails(owned = false, username = user.id)
         )
         var onWildCalled = false
         var onOwnedCalled = false
 
-        val ownedIsland = gameLogic.conquestIsland(uid, island,
+        val ownedIsland = gameLogic.conquestIsland(user, island,
             onWild = { _, _ ->
                 onWildCalled = true
             },
@@ -147,20 +160,6 @@ class GameLogicTests {
         assertEquals(false, onOwnedCalled)
         assertEquals(false, onWildCalled)
     }
-
-    /*@Test
-    fun getCoordFromEmptyMobileMovement() {
-        val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
-            landmarks = emptyList(),
-            startTime = Instant.parse("2022-12-31T23:59:00Z"),
-            duration = Duration.ofHours(1)
-        )
-
-        val coordinate = gameLogic.getCoordFromMovement(movement)
-
-        assertEquals(null, coordinate)
-    }*/
 
 
     @Test

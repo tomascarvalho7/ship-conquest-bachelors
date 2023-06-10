@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/island/utils.dart';
 import 'package:ship_conquest/providers/camera_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
+import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/elements/add_ship_element.dart';
 
 import '../../../../domain/island/island.dart';
@@ -26,17 +30,27 @@ class GameDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      ListView(
-        padding: EdgeInsets.zero,
-        controller: controller,
-        children: [
-          const SizedBox(height: 10),
-          buildDragHandle(),
-          const SizedBox(height: 20),
-          ...nearbyIslands(),
-          ...ownedShips(),
-          AddShipElement(onClick: onShipBuy, shipCost: 50,)
-        ],
+      Consumer<StatisticsController>(
+          builder: (_, statistics, __) =>
+              ListView(
+                padding: EdgeInsets.zero,
+                controller: controller,
+                children: [
+                  const SizedBox(height: 10),
+                  buildDragHandle(),
+                  const SizedBox(height: 20),
+                  ...nearbyIslands(statistics),
+                  ...ownedShips(),
+                  AddShipElement(
+                      shipCost: shipCost,
+                      canBuy: statistics.canMakeTransaction(shipCost),
+                      onClick: () {
+                        statistics.makeTransaction(-shipCost);
+                        onShipBuy();
+                      }
+                  )
+                ],
+              )
       );
 
   Widget buildDragHandle() => Center(
@@ -50,7 +64,7 @@ class GameDetailsPanel extends StatelessWidget {
     )
   );
 
-  List<Widget> nearbyIslands() {
+  List<Widget> nearbyIslands(StatisticsController statistics) {
     if (islands.isEmpty) return List.empty();
 
     return [
@@ -58,7 +72,10 @@ class GameDetailsPanel extends StatelessWidget {
       const SizedBox(height: 10),
       ...List.generate(
           islands.length,
-              (index) => IslandElement(island: islands.get(index))
+              (index) => IslandElement(
+                  island: islands.get(index),
+                  canConquest: statistics.canMakeTransaction(islands.get(index).conquestCost())
+              )
       ),
       const SizedBox(height: 25)
     ];

@@ -9,5 +9,6 @@ data class OwnedIsland(
     override val radius: Int,
     val uid: String,
     val incomePerHour: Int,
-    val conquestDate: Instant
+    val conquestDate: Instant,
+    val ownershipDetails: OwnershipDetails
 ): Island

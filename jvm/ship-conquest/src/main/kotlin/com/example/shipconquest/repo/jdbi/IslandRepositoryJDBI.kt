@@ -13,32 +13,38 @@ import org.slf4j.LoggerFactory
 class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun get(tag: String, islandId: Int): Island? {
+    override fun get(tag: String, uid: String, islandId: Int): Island? {
         logger.info("Getting island from db with tag = {} and islandId = {}", tag, islandId)
 
         return handle.createQuery(
             """
-               select * from dbo.Island where tag = :tag AND islandId = :id
+               SELECT * 
+               FROM dbo.Island island LEFT JOIN dbo.User user
+               ON island.uid = user.id
+               WHERE island.tag = :tag AND island.islandId = :id
             """
         )
             .bind("tag", tag)
             .bind("id", islandId)
             .mapTo<GenericIslandDBModel>()
             .singleOrNull()
-            ?.toIsland()
+            ?.toIsland(uid)
     }
 
-    override fun getAll(tag: String): List<Island> {
+    override fun getAll(tag: String, uid: String): List<Island> {
         logger.info("Getting all island's from db with tag = {}", tag)
 
         return handle.createQuery(
             """
-               select * from dbo.Island where tag = :tag
+               SELECT * 
+               FROM dbo.Island island LEFT JOIN dbo.User user
+               ON island.uid = user.id
+               WHERE tag = :tag
             """
         )
             .bind("tag", tag)
             .mapTo<GenericIslandDBModel>()
-            .map { it.toIsland() }
+            .map { it.toIsland(uid) }
             .list()
     }
 
@@ -47,7 +53,9 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-                SELECT * FROM dbo.Island
+                SELECT * 
+                FROM dbo.Island island LEFT JOIN dbo.User user
+                ON island.uid = user.id
                 WHERE tag = :tag AND islandId IN (
                     SELECT islandId FROM dbo.IslandEvent I 
                     INNER JOIN dbo.Ship S ON I.sid = S.shipId
@@ -58,7 +66,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
             .bind("tag", tag)
             .bind("uid", uid)
             .mapTo<GenericIslandDBModel>()
-            .map { it.toIsland() }
+            .map { it.toIsland(uid) }
             .list()
     }
 
@@ -67,7 +75,9 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-                SELECT * FROM dbo.Island
+                SELECT * 
+                FROM dbo.Island island LEFT JOIN dbo.User user
+                ON island.uid = user.id
                 WHERE tag = :tag AND islandId NOT IN (
                     SELECT islandId FROM dbo.IslandEvent I 
                     INNER JOIN dbo.Ship S ON I.sid = S.shipId
@@ -78,7 +88,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
             .bind("tag", tag)
             .bind("uid", uid)
             .mapTo<GenericIslandDBModel>()
-            .map { it.toIsland() }
+            .map { it.toIsland(uid) }
             .list()
     }
 

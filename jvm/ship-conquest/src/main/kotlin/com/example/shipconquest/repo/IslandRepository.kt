@@ -7,8 +7,8 @@ import org.slf4j.Logger
 
 interface IslandRepository {
     val logger: Logger
-    fun get(tag: String, islandId: Int): Island?
-    fun getAll(tag: String): List<Island>
+    fun get(tag: String, uid: String, islandId: Int): Island?
+    fun getAll(tag: String, uid: String): List<Island>
     fun getVisitedIslands(tag: String, uid: String): List<Island>
     fun getUnvisitedIslands(tag: String, uid: String): List<Island>
     fun create(tag: String, origin: Vector2, radius: Int)
