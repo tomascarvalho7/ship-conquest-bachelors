@@ -1,6 +1,7 @@
 package com.example.shipconquest.controller.sse.publisher
 
 import org.springframework.http.MediaType
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder
 import java.util.concurrent.ConcurrentHashMap
@@ -26,10 +27,11 @@ class Publisher(private val subscriptions: ConcurrentHashMap<String, SseEmitter>
         return key
     }
 
-    override fun createEvent(id: String, name: String, data: Any): SseEventBuilder =
+    override fun createEvent(id: String, name: String, data: Any): MutableSet<ResponseBodyEmitter.DataWithMediaType> =
         SseEmitter
             .event()
             .id(id)
             .name(name)
             .data(data, MediaType.APPLICATION_JSON)
+            .build()
 }

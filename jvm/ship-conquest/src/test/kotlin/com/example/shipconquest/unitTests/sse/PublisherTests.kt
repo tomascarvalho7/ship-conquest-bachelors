@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.util.concurrent.ConcurrentHashMap
 
 class PublisherTests {
-    @Test
+   @Test
     fun `publish should send message to subscribed emitter`() {
         // setup
         val key = "user1"
@@ -63,7 +63,7 @@ class PublisherTests {
         val publisher = Publisher(subscriptions = subscriptions)
         val msg = "generic data"
         // create event
-        val res = publisher.createEvent("id", "event", msg).build()
+        val res = publisher.createEvent("id", "event", msg)
 
         assertEquals(3, res.size)
         assertEquals(true, res.any { event -> event.data == msg && event.mediaType == MediaType.APPLICATION_JSON })

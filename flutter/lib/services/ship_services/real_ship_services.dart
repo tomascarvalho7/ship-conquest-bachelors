@@ -39,7 +39,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "5a51-2001-818-dc00-c500-e493-3e37-25cc-487f.ngrok-free.app";
+const baseUri = "2d80-46-189-211-105.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;

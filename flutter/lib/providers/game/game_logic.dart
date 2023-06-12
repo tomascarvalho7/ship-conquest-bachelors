@@ -62,7 +62,8 @@ class GameLogic {
 
     final mainShip = shipController.getMainShip();
     final position = mainShip.getPosition(globalScale);
-    await sceneController.getScene(position, mainShip.sid);
+    final tiles = await sceneController.getScene(position, mainShip.sid);
+    minimapController.update(tiles);
 
     // schedule game update every 2 seconds
     scheduleController.scheduleJob(const Duration(seconds: 2), update);

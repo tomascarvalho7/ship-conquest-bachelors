@@ -160,10 +160,12 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
 
         return handle.createQuery(
             """
-               SELECT * 
-               FROM dbo.Island island LEFT JOIN dbo.User user
-               ON island.uid = user.id
-               WHERE island.tag = :tag AND island.islandId = :id
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON uid = id
+                WHERE i.tag = :tag AND i.islandId = :id
             """
         )
             .bind("tag", tag)

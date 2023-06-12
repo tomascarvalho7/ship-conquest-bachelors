@@ -18,10 +18,12 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-               SELECT * 
-               FROM dbo.Island island LEFT JOIN dbo.User user
-               ON island.uid = user.id
-               WHERE island.tag = :tag AND island.islandId = :id
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON uid = id
+                WHERE i.tag = :tag AND i.islandId = :id
             """
         )
             .bind("tag", tag)
@@ -36,10 +38,12 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-               SELECT * 
-               FROM dbo.Island island LEFT JOIN dbo.User user
-               ON island.uid = user.id
-               WHERE tag = :tag
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON uid = id
+                WHERE i.tag = :tag
             """
         )
             .bind("tag", tag)
@@ -53,13 +57,15 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-                SELECT * 
-                FROM dbo.Island island LEFT JOIN dbo.User user
-                ON island.uid = user.id
-                WHERE tag = :tag AND islandId IN (
-                    SELECT islandId FROM dbo.IslandEvent I 
-                    INNER JOIN dbo.Ship S ON I.sid = S.shipId
-                    WHERE tag = :tag AND uid = :uid
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON uid = id
+                WHERE i.tag = :tag AND i.islandId IN (
+                    SELECT e.islandId FROM dbo.IslandEvent e
+                    INNER JOIN dbo.Ship S ON e.sid = S.shipId
+                    WHERE e.tag = :tag AND S.uid = :uid
                 )
             """
         )
@@ -75,13 +81,15 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
 
         return handle.createQuery(
             """
-                SELECT * 
-                FROM dbo.Island island LEFT JOIN dbo.User user
-                ON island.uid = user.id
-                WHERE tag = :tag AND islandId NOT IN (
-                    SELECT islandId FROM dbo.IslandEvent I 
-                    INNER JOIN dbo.Ship S ON I.sid = S.shipId
-                    WHERE tag = :tag AND uid = :uid
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON uid = id
+                WHERE i.tag = :tag AND i.islandId NOT IN (
+                    SELECT e.islandId FROM dbo.IslandEvent e
+                    INNER JOIN dbo.Ship S ON e.sid = S.shipId
+                    WHERE e.tag = :tag AND S.uid = :uid
                 )
             """
         )

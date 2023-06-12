@@ -1,5 +1,6 @@
 package com.example.shipconquest.controller.sse.publisher
 
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 interface PublisherAPI {
@@ -9,5 +10,5 @@ interface PublisherAPI {
 
     fun unsubscribe(key: String): String
 
-    fun createEvent(id: String, name: String, data: Any): SseEmitter.SseEventBuilder
+    fun createEvent(id: String, name: String, data: Any): MutableSet<ResponseBodyEmitter.DataWithMediaType>
 }
