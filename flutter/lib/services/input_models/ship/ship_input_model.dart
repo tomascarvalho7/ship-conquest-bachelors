@@ -1,8 +1,8 @@
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
-import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/services/input_models/coord_2d_input_model.dart';
 
 import '../../../domain/ship/ship.dart';
+import '../../../domain/ship/utils/classes/ship_path.dart';
 import '../../../domain/utils/build_bezier.dart';
 import '../event/known_event_input_model.dart';
 import '../event/unknown_event_input_model.dart';

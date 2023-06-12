@@ -44,10 +44,7 @@ class GameDetailsPanel extends StatelessWidget {
                   AddShipElement(
                       shipCost: shipCost,
                       canBuy: statistics.canMakeTransaction(shipCost),
-                      onClick: () {
-                        statistics.makeTransaction(-shipCost);
-                        onShipBuy();
-                      }
+                      onClick: onShipBuy
                   )
                 ],
               )

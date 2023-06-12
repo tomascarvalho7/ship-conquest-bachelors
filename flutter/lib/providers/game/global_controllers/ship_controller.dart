@@ -28,9 +28,15 @@ class ShipController with ChangeNotifier {
     shipIds = Sequence(data: fleet.map((ship) => ship.sid).data);
   }
 
+  void updateFightState() {
+    // simply update widgets
+    notifyListeners();
+  }
+
   void updateFleet(Ship ship) {
     ships = ships.put(ship.sid, ship);
     shipIds = shipIds.put(ship.sid);
+    notifyListeners();
   }
 
   void updateShip(Ship ship) {
@@ -40,6 +46,7 @@ class ShipController with ChangeNotifier {
 
   void selectShip(int index) {
     selectedShip = index;
+    notifyListeners();
   }
 
   void updateFleetStatus() {

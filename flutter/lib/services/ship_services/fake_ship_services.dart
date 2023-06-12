@@ -1,10 +1,10 @@
 import 'package:ship_conquest/domain/either/either.dart';
+import 'package:ship_conquest/domain/event/known_event.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/minimap.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
-import 'package:ship_conquest/domain/ship/ship_path.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
@@ -14,6 +14,7 @@ import '../../domain/either/future_either.dart';
 import '../../domain/event/unknown_event.dart';
 import '../../domain/feedback/error/error_feedback.dart';
 import '../../domain/lobby.dart';
+import '../../domain/ship/utils/classes/ship_path.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
 import '../../domain/user/user_info.dart';
@@ -26,6 +27,7 @@ class FakeShipServices extends ShipServices {
   final LobbyStorage lobbyStorage;
   // constructor
   FakeShipServices({required this.userStorage, required this.lobbyStorage});
+  int currentId = 3;
 
   @override
   FutureEither<ErrorFeedback, Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId) async {
@@ -181,7 +183,7 @@ class FakeShipServices extends ShipServices {
           StaticShip(
               sid: 0,
               coordinate: Coord2D(x: 25, y: 25),
-              completedEvents: Grid.empty(),
+              completedEvents: Grid(data: { 1 : FightEvent(eid: 1, instant: DateTime.now(), won: true) }),
               futureEvents: Grid.empty()
           ),
           StaticShip(
@@ -219,8 +221,8 @@ class FakeShipServices extends ShipServices {
   @override
   FutureEither<ErrorFeedback, Ship> createNewShip() async {
     return Right(StaticShip(
-        sid: 5,
-        coordinate: Coord2D(x: 25, y: 25),
+        sid: currentId++,
+        coordinate: Coord2D(x: 250, y: 75 * currentId),
         completedEvents: Grid.empty(),
         futureEvents: Grid.empty()
     ));

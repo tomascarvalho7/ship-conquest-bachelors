@@ -1,19 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-
-import '../../../domain/ship/ship.dart';
+import 'package:ship_conquest/domain/ship/ship.dart';
+import 'package:ship_conquest/utils/constants.dart';
+import 'package:ship_conquest/widgets/miscellaneous/ship/dynamic_ship_widget.dart';
+import 'package:ship_conquest/widgets/miscellaneous/ship/ship_widget.dart';
 import '../../../providers/game/global_controllers/ship_controller.dart';
 
 class Fleet extends StatelessWidget {
-  final Widget Function(Ship ship) widget;
-  const Fleet({super.key, required this.widget});
+  final Animation<double> animation;
+  const Fleet({super.key, required this.animation});
 
   @override
   Widget build(BuildContext context) =>
       Consumer<ShipController>(
-          builder: (_, shipManager, __) =>
-              Stack(
-                children: shipManager.buildListFromShips(widget),
-              )
+          builder: (_, shipManager, __) => switch (shipManager.getMainShip()) {
+            (MobileShip ship) => DynamicShipWidget(
+                ship: ship,
+                waveAnim: animation,
+                tileSize: tileSize
+                ),
+            (StaticShip ship) => ShipWidget(
+                ship: ship,
+                waveAnim: animation,
+                tileSize: tileSize
+                ),
+          }
       );
 }

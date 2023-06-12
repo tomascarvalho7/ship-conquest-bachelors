@@ -1,9 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/ship/utils/logic.dart';
+import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
+import 'package:ship_conquest/widgets/miscellaneous/ship/utils.dart';
 import '../../../domain/isometric/isometric.dart';
-import '../../../domain/ship/direction.dart';
+import '../../../domain/ship/utils/classes/direction.dart';
 import '../../../domain/ship/ship.dart';
 import '../../../domain/space/position.dart';
 
@@ -27,6 +30,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
   )..forward();
   late Animation<double> animation = Tween<double>(begin: path.getStartFromTime(), end: path.landmarks.length.toDouble()).animate(controller);
   late final scale = widget.tileSize * 4;
+  late final isFighting = widget.ship.isFighting(DateTime.now());
 
   @override
   void didUpdateWidget(covariant DynamicShipWidget oldWidget) {
@@ -56,11 +60,11 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
             Direction direction = getOrientationFromAngle(angle);
             double waveOffset = (position.x + position.y) / -3;
             return Transform.translate(
-                offset: Offset(
-                    position.x,
-                    position.y + sin(waveOffset) * widget.tileSize / 8
-                ),
+                offset: (
+                    addWaveHeightToPos(position, waveAnim.value + waveOffset) - Position(x: scale / 2, y: scale / 2)
+                ).toOffset(),
                 child: ShipView(
+                  isFighting: isFighting,
                   scale: scale,
                   direction: direction
                 )

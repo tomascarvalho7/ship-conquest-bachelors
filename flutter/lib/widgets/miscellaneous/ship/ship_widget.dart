@@ -1,10 +1,13 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/ship/utils/logic.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
+import 'package:ship_conquest/widgets/miscellaneous/ship/utils.dart';
 
 import '../../../domain/isometric/isometric.dart';
 import '../../../domain/ship/ship.dart';
+import '../../../domain/space/position.dart';
 import '../../../utils/constants.dart';
 
 class ShipWidget extends StatelessWidget {
@@ -13,11 +16,10 @@ class ShipWidget extends StatelessWidget {
   final double tileSize;
   // constructor
   ShipWidget({super.key, required this.ship, required this.tileSize, required this.waveAnim});
-
   // optimizations
   late final position = toIsometric(ship.getPosition(globalScale));
   late final orientation = ship.getDirection();
-  late final shipScale = tileSize * 4;
+  late final scale = tileSize * 4;
   late final double waveOffset = (position.x + position.y) / -3;
 
   @override
@@ -25,15 +27,15 @@ class ShipWidget extends StatelessWidget {
       AnimatedBuilder(
           animation: waveAnim,
           child: ShipView(
-            scale: shipScale,
+            isFighting: ship.isFighting(DateTime.now()),
+            scale: scale,
             direction: orientation,
           ),
           builder: (context, child) =>
               Transform.translate(
-                  offset: Offset(
-                      position.x,
-                      position.y + sin(waveAnim.value + waveOffset) * tileSize / 4
-                  ),
+                  offset: (
+                      addWaveHeightToPos(position, waveAnim.value + waveOffset) - Position(x: scale / 2, y: scale / 2)
+                  ).toOffset(),
                   child: child
               )
       );

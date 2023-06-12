@@ -34,12 +34,14 @@ class GameEvent {
   static void selectShip(BuildContext context, int index) async {
     // get controller
     final cameraController = context.read<CameraController>();
+    final sceneController = context.read<SceneController>();
     final shipController = context.read<ShipController>();
     // select ship
     shipController.selectShip(index);
     // set camera focus to selected ship
     final ship = shipController.getMainShip();
     final shipPosition = ship.getPosition(-globalScale);
+    sceneController.getScene(shipPosition, ship.sid);
     cameraController.setFocusAndUpdate(toIsometric(shipPosition));
   }
 
@@ -64,10 +66,14 @@ class GameEvent {
     final shipController = context.read<ShipController>();
     final services = context.read<ShipServices>();
     final feedbackController = context.read<FeedbackController>();
+    final statisticsController = context.read<StatisticsController>();
     // handle ship creation
     services.createNewShip().either(
             (left) => feedbackController.setError(left),
-            (right) => shipController.updateFleet(right)
+            (right) {
+              shipController.updateFleet(right);
+              statisticsController.makeTransaction(-shipCost);
+            }
     );
   }
 }

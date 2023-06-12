@@ -1,6 +1,8 @@
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/event/unknown_event.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
+import 'package:ship_conquest/domain/feedback/success/utils/constants.dart';
+import 'package:ship_conquest/domain/feedback/success/utils/functions.dart';
 import 'package:ship_conquest/domain/horizon.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
@@ -50,7 +52,7 @@ class GameLogic {
 
     // load visited islands & get scene for current ship
     await _handleServiceMethod(services.getVisitedIslands(), (islands) =>
-      sceneController.load(islands)
+      sceneController.load(islands, _getHorizon)
     );
 
     // fetch player minimap
@@ -60,7 +62,7 @@ class GameLogic {
 
     final mainShip = shipController.getMainShip();
     final position = mainShip.getPosition(globalScale);
-    await sceneController.getScene(position, mainShip.sid, _getHorizon);
+    await sceneController.getScene(position, mainShip.sid);
 
     // schedule game update every 2 seconds
     scheduleController.scheduleJob(const Duration(seconds: 2), update);
@@ -81,7 +83,7 @@ class GameLogic {
   Future<void> update() async {
     final mainShip = shipController.getMainShip();
     final position = mainShip.getPosition(globalScale);
-    final tiles = await sceneController.tryToGetScene(position, mainShip.sid, _getHorizon);
+    final tiles = await sceneController.tryToGetScene(position, mainShip.sid);
     // add scene to minimap
     minimapController.update(tiles);
   }
@@ -90,19 +92,33 @@ class GameLogic {
     _handleServiceMethod(services.getShip(sid), (ship) {
       shipController.updateShip(ship);
       final event = ship.completedEvents.get(eid);
-      if (event is IslandEvent) discoverIsland(ship, event.island);
-      if (event is FightEvent) print('fighting!');
+      if (event is IslandEvent) handleIsland(ship, event.island);
+      if (event is FightEvent) handleFight(ship, event);
     });
 
-  void discoverIsland(Ship ship, Island island) {
+  void handleIsland(Ship ship, Island island) {
     sceneController.discoverIsland(island);
     getScene(ship);
+  }
+
+  /// update current fight state (& give feedback) then schedule
+  /// to again: update current fight state (& give feedback) after the
+  /// fight has ended
+  void handleFight(Ship ship, FightEvent event) {
+    shipController.updateFightState(); // update fight state
+    feedbackController.setSuccessful(fighting); // give feedback to user
+    scheduleController.scheduleEvent(event.eid, fightDuration,
+            () { // schedule to update fight state after fight is finished
+            shipController.updateFightState();
+            feedbackController.setSuccessful(fightResult(event.won));
+      }
+    );
   }
 
   void getScene(Ship ship) async {
     // get scene for current ship
     final position = ship.getPosition(globalScale);
-    final tiles = await sceneController.getScene(position, ship.sid, _getHorizon);
+    final tiles = await sceneController.getScene(position, ship.sid);
     // add scene to minimap
     minimapController.update(tiles);
   }

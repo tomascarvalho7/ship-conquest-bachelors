@@ -32,21 +32,24 @@ class _GameState extends State<Game> with TickerProviderStateMixin {
   late final animation = Tween<double>(begin: 0, end: 2 * pi).animate(controller);
 
   @override
+  void initState() {
+    GameEvent.load(context); // setup game controllers
+    super.initState();
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    GameEvent.load(context); // setup game controllers
-
-    return GameInterface(
-        gameView: GameView(
-          animation: animation,
-          colorGradient: colorGradient,
-        )
-    );
-  }
+  Widget build(BuildContext context) =>
+      GameInterface(
+          gameView: GameView(
+            animation: animation,
+            colorGradient: colorGradient,
+          )
+      );
 }
 

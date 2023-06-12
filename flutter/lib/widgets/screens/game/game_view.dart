@@ -37,25 +37,10 @@ class GameView extends StatelessWidget {
                     IslandsView(
                         islands: tileManager.islands
                     ),
-                    Fleet(
-                        widget: (ship) {
-                          if (ship is MobileShip) {
-                            return DynamicShipWidget(
-                              ship: ship,
-                              waveAnim: animation,
-                              tileSize: tileSize,
-                            );
-                          } else {
-                            return ShipWidget(
-                              ship: ship,
-                              tileSize: tileSize,
-                              waveAnim: animation,
-                            );
-                          }
-                        }
-                    )
+                    if (child != null) child
                   ],
                 ),
+            child: Fleet(animation: animation),
           )
       );
 }

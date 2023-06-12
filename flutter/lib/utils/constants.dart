@@ -13,6 +13,7 @@ const tileSizeWidthHalf = tileSize / 2;
 const tileSizeHeightHalf = tileSize / 4;
 const chunkSize = 10;
 const waterColor = Color.fromRGBO(60, 151, 207, 1.0);
+const fightDuration = Duration(seconds: 60);
 // cost
 const shipCost = 50;
 const wildIslandCost = 125;

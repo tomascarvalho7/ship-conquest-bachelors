@@ -19,6 +19,7 @@ import '../../../utils/constants.dart';
 
 class SceneController with ChangeNotifier {
   late Grid<int, Island> _visitedIslands;
+  late HorizonFn _horizonFn;
   // constructor
   SceneController();
 
@@ -28,15 +29,16 @@ class SceneController with ChangeNotifier {
   Sequence<Island> get islands => _islands.toSequence();
 
   // variables
-  Grid<int, Position> _lastPos = Grid.empty();
+  Position _lastPos = const Position(x: double.infinity, y: double.infinity);
   Grid<int, Island> _islands = Grid.empty();
   Sequence<Coordinate> _newTiles = Sequence.empty();
   Sequence<Coordinate> _oldTiles = Sequence.empty();
   final HashMap<Coord2D, int> _newTilesMap = HashMap();
   HashMap<Coord2D, int> _oldTilesMap = HashMap();
 
-  void load(Sequence<Island> islands) {
+  void load(Sequence<Island> islands, HorizonFn horizonFn) {
     _visitedIslands = Grid(data: { for(var island in islands.data) island.id : island });
+    _horizonFn = horizonFn;
   }
 
   void updateIsland(Island island) {
@@ -49,41 +51,22 @@ class SceneController with ChangeNotifier {
     _visitedIslands = _visitedIslands.put(island.id, island);
   }
 
-  Position _getOrCreate(int id) {
-    final pos = _lastPos.getOrNull(id) ?? const Position(x: double.infinity, y: double.infinity);
-    if (_lastPos.getOrNull(id) == null) _lastPos = _lastPos.put(id, pos);
-    return pos;
+  Future<Sequence<Coordinate>> tryToGetScene(Position position, int sid) async {
+    if (distance(position, _lastPos) <= 1.0) return Sequence.empty();
+
+    return getScene(position, sid);
   }
 
-  Future<Sequence<Coordinate>> tryToGetScene(Position position, int sid, HorizonFn fetchHorizon) async {
-    if (distance(position, _getOrCreate(sid)) <= 1.0) return Sequence.empty();
-    // save & clear previous scene
-    _savePreviousScene();
-    return getScene(position, sid, fetchHorizon);
-  }
-
-  Future<Sequence<Coordinate>> getMultipleScenes(Sequence<Ship> fleet, HorizonFn fetchHorizon) async {
-    var result = Sequence<Coordinate>.empty();
-
-    for (var ship in fleet) {
-      final pos = ship.getPosition(globalScale);
-      if (distance(pos, _getOrCreate(ship.sid)) > 1.0) {
-        // save & clear previous scene
-        if (result.isEmpty) _savePreviousScene();
-        result = result + await getScene(pos, ship.sid, fetchHorizon);
-      }
-    }
-
-    return result;
-  }
-
-  Future<Sequence<Coordinate>> getScene(Position position, int sid, HorizonFn fetchHorizon) async {
+  Future<Sequence<Coordinate>> getScene(Position position, int sid) async {
     final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
 
-    // update position
-    _lastPos = _lastPos.put(sid, position);
+    // save & clear previous scene
+    _savePreviousScene();
 
-    return shouldFetch ? fetchScene(position, sid, fetchHorizon) : buildEmptyScene(position);
+    // update position
+    _lastPos = position;
+
+    return shouldFetch ? fetchScene(position, sid) : buildEmptyScene(position);
   }
 
   Future<Sequence<Coordinate>> buildEmptyScene(Position position) async {
@@ -94,10 +77,10 @@ class SceneController with ChangeNotifier {
     return _newTiles;
   }
 
-  Future<Sequence<Coordinate>> fetchScene(Position position, int sid, HorizonFn fetchHorizon) async {
+  Future<Sequence<Coordinate>> fetchScene(Position position, int sid) async {
     // fetch terrain tiles
     final coord = position.toCoord2D();
-    await _fetchTerrainTiles(coord, sid, fetchHorizon);
+    await _fetchTerrainTiles(coord, sid);
     // generate placeholder scene
     _generateWaterScene(coord);
 
@@ -130,9 +113,9 @@ class SceneController with ChangeNotifier {
     );
   }
 
-  Future<void> _fetchTerrainTiles(Coord2D coordinate, int sid, HorizonFn fetchHorizon) async {
+  Future<void> _fetchTerrainTiles(Coord2D coordinate, int sid) async {
     // fetch tiles from services
-    Horizon? horizon = await fetchHorizon(coordinate, sid);
+    Horizon? horizon = await _horizonFn(coordinate, sid);
     if (horizon == null) return;
     // update fetched tiles from existing ones
     for(var tile in horizon.tiles) {

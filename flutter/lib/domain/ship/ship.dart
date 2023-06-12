@@ -1,11 +1,11 @@
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
-import 'package:ship_conquest/domain/ship/ship_path.dart';
+import 'package:ship_conquest/domain/ship/utils/classes/ship_path.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
 import '../event/known_event.dart';
 import '../event/unknown_event.dart';
 import '../space/coord_2d.dart';
-import 'direction.dart';
+import 'utils/classes/direction.dart';
 
 sealed class Ship {
   int get sid;

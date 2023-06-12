@@ -8,6 +8,7 @@ import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
 import 'package:ship_conquest/domain/feedback/success/success_feedback.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
+import 'package:ship_conquest/domain/ship/utils/logic.dart';
 import 'package:ship_conquest/providers/game/game_logic.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
@@ -99,6 +100,16 @@ class GameController {
   }
 
   void scheduleShipEvent(Ship ship) {
+    final now = DateTime.now();
+    final fightEvents = ship.completedEvents
+        .toSequence()
+        .filterInstance<FightEvent>();
+    for(var event in fightEvents) {
+      if (isInstantInFight(event.instant, now)) { // check if ship is fighting
+        gameLogic.handleFight(ship, event);
+      }
+    }
+
     for(var event in ship.futureEvents.toSequence()) {
       buildEventNotification(event);
       scheduleController.scheduleEvent(event.eid, event.duration,

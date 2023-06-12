@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:ship_conquest/domain/utils/get_time_percentage.dart';
 
-import '../space/position.dart';
-import '../space/cubic_bezier.dart';
+import '../../../space/cubic_bezier.dart';
+import '../../../space/position.dart';
 
 /// Represents a ship Path
 /// this data is global and reliable throughout the whole path
