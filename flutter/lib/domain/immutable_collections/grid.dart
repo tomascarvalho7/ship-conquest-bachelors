@@ -1,13 +1,20 @@
-import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 
+///
+/// Generic Immutable class.
+/// The [Grid] class contains a immutable [Map]
+/// with [Key] stored [Values].
+///
 class Grid<K, V> {
+  /// variables
   final Map<K, V> data;
   // constructor
   Grid({required this.data});
 
-  Grid.empty() : data = {};
-
+  /// getters
   int get length => data.length;
+
+  /// methods
+  Grid.empty() : data = {};
 
   V get(K key) => data[key]!;
 
@@ -50,6 +57,4 @@ class Grid<K, V> {
 
     return true;
   }
-
-  Sequence<V> toSequence() => Sequence(data: data.values.toList());
 }

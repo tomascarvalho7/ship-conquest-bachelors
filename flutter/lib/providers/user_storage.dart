@@ -5,6 +5,11 @@ import 'package:ship_conquest/domain/user/user_cacheable.dart';
 
 import '../domain/user/user_info.dart';
 
+///
+/// Independent Global Provider with [State] that
+/// safely encodes and stores the user [Cache] and
+/// credentials like the Back-end [Token].
+///
 class UserStorage {
   late final _storage = const FlutterSecureStorage();
 

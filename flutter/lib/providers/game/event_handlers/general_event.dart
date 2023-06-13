@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
-import 'package:ship_conquest/domain/lobby/lobby.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -12,6 +11,11 @@ import '../../../domain/user/token.dart';
 import '../../../domain/user/user_info.dart';
 import '../../../services/google/google_signin_api.dart';
 
+/// General static class uses the abroad controllers
+/// to execute events from the player's actions.
+///
+/// These providers are built like independent pieces
+/// and the GeneralEvent class combines and uses them together.
 class GeneralEvent {
   static Future<Sequence<CompleteLobby>> getLobbies(BuildContext context, int skip, int limit, String order, String name, String filterType) {
     // get controller's

@@ -1,9 +1,18 @@
 import 'dart:async';
 
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 
 import '../../../domain/immutable_collections/grid.dart';
 
+///
+/// Independent game related controller that holds [State] of
+/// the scheduled [Tasks].
+///
+/// The [ScheduleController] manages the scheduled tasks. They can be either:
+/// - A [Job] running periodically every X seconds.
+/// - A [Event] running once on a programmed [Instant].
+///
 class ScheduleController {
   Sequence<Timer> _jobs = Sequence.empty();
   Grid<int, Timer> _scheduled = Grid.empty();

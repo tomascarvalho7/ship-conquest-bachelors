@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/providers/camera_controller.dart';
 import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
 import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';

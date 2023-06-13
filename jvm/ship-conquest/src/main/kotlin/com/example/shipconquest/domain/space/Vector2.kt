@@ -4,6 +4,10 @@ import com.example.shipconquest.domain.Position
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+/**
+ * The Vector2 class represents a space in a 2D Grid with
+ * the [x] and [y] axis.
+ */
 data class Vector2(val x: Int, val y: Int) {
     operator fun plus(position: Vector2) =
         Vector2(x = this.x + position.x, y = this.y + position.y)

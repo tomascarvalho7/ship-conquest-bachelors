@@ -4,7 +4,16 @@ import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.space.Vector3
 import kotlin.math.*
 
+/**
+ * The [HeightMap] class represents a height map, which is a two-dimensional
+ * data structure that stores elevation values for each coordinate.
+ */
 data class HeightMap(val data: Map<Vector2, Int>, val size: Int)
+
+/**
+ * read Value stored at key with [Vector2] equal to [x] and [y]
+ */
+fun HeightMap.get(x: Int, y: Int) = data[Vector2(x = x, y = y)]
 
 /**
  * pulse elements inside a [HeightMap] inside a [origin] with a [radius]

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import '../../../domain/immutable_collections/grid.dart';
 import '../../../domain/immutable_collections/sequence.dart';

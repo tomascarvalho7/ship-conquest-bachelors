@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/config/notification/custom_notifications.dart';
-import 'package:ship_conquest/config/notification/notification_service.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/feedback/success/utils/constants.dart';
 import 'package:ship_conquest/domain/path_builder/path_builder.dart';
@@ -19,12 +18,12 @@ import '../../../utils/constants.dart';
 import '../../feedback_controller.dart';
 import '../minimap_controllers/route_controller.dart';
 
-/// MinimapEvent is a static class that calls minimap
-/// business logic using the Minimap related providers.
+
+/// The MinimapEvent static class uses the minimap related
+/// controllers to execute events from the player's actions.
 ///
 /// These providers are built like independent pieces
-/// and the MinimapEvent class combines them to implement
-/// the different minimap events & interactions.
+/// and the MinimapEvent class combines and uses them together.
 class MinimapEvent {
   const MinimapEvent();
 

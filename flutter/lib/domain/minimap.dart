@@ -5,6 +5,17 @@ import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 
 import 'space/coord_2d.dart';
 
+///
+/// The [Minimap] class is a mutable [Grid] that
+/// stores the visited [Voxel] data.
+///
+/// The [Data Structure] of the stored Voxels are:
+/// Key: [Coord2D] to store the Voxel position the X and Y axis.
+/// Value: [int] to store the Voxel height.
+///
+/// Notes: The height is stored as a integer, because it can
+/// only be whole numbers.
+///
 class Minimap {
   final int length;
   Grid<Coord2D, int> data;

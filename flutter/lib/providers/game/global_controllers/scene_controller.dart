@@ -3,13 +3,13 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/domain/island/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
 import '../../../domain/island/island.dart';
-import '../../../domain/ship/ship.dart';
 import '../../../domain/space/coordinate.dart';
 import '../../../domain/space/position.dart';
 import '../../../domain/horizon.dart';
@@ -17,6 +17,17 @@ import '../../../domain/tile/tile_state.dart';
 import '../../../domain/tile/tiles_order.dart';
 import '../../../utils/constants.dart';
 
+///
+/// Independent game related controller that holds [State] of
+/// the old & new rendered voxels.
+///
+/// Mixin to the [ChangeNotifier] class, so widget's can
+/// listen to changes to [State].
+///
+/// The [SceneController] handles the data that is used to build
+/// the rendered scene by managing the [KnownIslands] & current
+/// [Voxels] being rendered.
+///
 class SceneController with ChangeNotifier {
   late Grid<int, Island> _visitedIslands;
   late HorizonFn _horizonFn;

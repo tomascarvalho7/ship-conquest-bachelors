@@ -1,4 +1,5 @@
 import 'package:ship_conquest/domain/event/known_event.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/utils/constants.dart';
 

@@ -1,5 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+///
+/// Independent Global Provider with [State] that
+/// safely encodes and stores the user's current [LobbyId].
+///
 class LobbyStorage {
   late final _storage = const FlutterSecureStorage();
 

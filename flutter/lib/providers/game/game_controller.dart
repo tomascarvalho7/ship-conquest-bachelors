@@ -1,25 +1,21 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:ship_conquest/config/notification/custom_notifications.dart';
 import 'package:ship_conquest/config/notification/notification_service.dart';
 import 'package:ship_conquest/domain/either/either.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
 import 'package:ship_conquest/domain/feedback/success/success_feedback.dart';
+import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/utils/logic.dart';
 import 'package:ship_conquest/providers/game/game_logic.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';
-import 'package:ship_conquest/providers/notification_controller.dart';
-import 'package:ship_conquest/utils/constants.dart';
 
 import '../../domain/event/known_event.dart';
-import '../../domain/event/unknown_event.dart';
 import '../../domain/immutable_collections/sequence.dart';
 import '../../services/ship_services/ship_services.dart';
 import '../feedback_controller.dart';
+import '../sound_controller.dart';
 import 'global_controllers/schedule_controller.dart';
 import 'global_controllers/ship_controller.dart';
 import 'global_controllers/statistics_controller.dart';
@@ -44,6 +40,7 @@ class GameController {
   final ShipServices services;
   final ScheduleController scheduleController;
   final FeedbackController feedbackController;
+  final SoundController soundController;
   // constructor
   GameController({
     required this.shipController,
@@ -52,7 +49,8 @@ class GameController {
     required this.minimapController,
     required this.services,
     required this.scheduleController,
-    required this.feedbackController
+    required this.feedbackController,
+    required this.soundController
 });
 
   late final gameLogic = GameLogic(
@@ -83,6 +81,9 @@ class GameController {
           )
       );
     }
+    // play game background music
+    soundController.startBackgroundMusic();
+
     return feedback;
   }
 
@@ -91,6 +92,8 @@ class GameController {
     scheduleController.stop();
     // unsubscribe to game events
     services.unsubscribe();
+    // stop game background music
+    soundController.stopBackgroundMusic();
   }
 
   void scheduleShipEvents(Sequence<Ship> ships) {

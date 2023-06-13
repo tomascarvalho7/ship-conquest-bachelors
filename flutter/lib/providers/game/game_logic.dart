@@ -19,6 +19,10 @@ import '../feedback_controller.dart';
 import 'global_controllers/schedule_controller.dart';
 import 'global_controllers/statistics_controller.dart';
 
+///
+/// The [GameLogic] class holds all the game related
+/// business logic.
+///
 class GameLogic {
   final ShipController shipController;
   final StatisticsController statisticsController;
@@ -38,6 +42,7 @@ class GameLogic {
     required this.feedbackController
   });
 
+  /// load game initial data
   Future loadData(Function(Sequence<Ship>) scheduleShipEvents) async {
     // fetch player fleet of ships & schedule they're events
     await _handleServiceMethod(services.getUserShips(), (ships) {
@@ -69,6 +74,7 @@ class GameLogic {
     scheduleController.scheduleJob(const Duration(seconds: 2), update);
   }
 
+  /// callback function to run when the server-sent-events send a [UnknownEvent]
   void onEvent(int sid, UnknownEvent event) {
     print("SSE sent an event");
     scheduleController.scheduleEvent(event.eid, event.duration,
@@ -76,11 +82,13 @@ class GameLogic {
     );
   }
 
+  /// callback function to run when the server-sent-events send a [Fleet]
   void onFleet(Sequence<Ship> fleet) {
     print("SSE sent an event");
     shipController.setFleet(fleet);
   }
 
+  /// periodic function to update the game data
   Future<void> update() async {
     final mainShip = shipController.getMainShip();
     final position = mainShip.getPosition(globalScale);
@@ -89,6 +97,7 @@ class GameLogic {
     minimapController.update(tiles);
   }
 
+  /// callback function to run when a [UnknownEvent] is fetched
   void discoverEvent(int eid, int sid) async =>
     _handleServiceMethod(services.getShip(sid), (ship) {
       shipController.updateShip(ship);
@@ -97,14 +106,14 @@ class GameLogic {
       if (event is FightEvent) handleFight(ship, event);
     });
 
+  /// callback function to run on a [IslandEvent]
   void handleIsland(Ship ship, Island island) {
     sceneController.discoverIsland(island);
     getScene(ship);
   }
 
-  /// update current fight state (& give feedback) then schedule
-  /// to again: update current fight state (& give feedback) after the
-  /// fight has ended
+  /// callback function to run on a [FightEvent]
+  /// schedule to update the ship state to fighting
   void handleFight(Ship ship, FightEvent event) {
     shipController.updateFightState(); // update fight state
     feedbackController.setSuccessful(fighting); // give feedback to user
@@ -116,6 +125,7 @@ class GameLogic {
     );
   }
 
+  /// force fetch to get the scene from the back-end data
   void getScene(Ship ship) async {
     // get scene for current ship
     final position = ship.getPosition(globalScale);
@@ -124,12 +134,18 @@ class GameLogic {
     minimapController.update(tiles);
   }
 
+  /// callback function to fetch scene from the back-end data
   Future<Horizon?> _getHorizon(Coord2D coord, int sid) async {
     final res = await services.getNewChunk(chunkSize, coord, sid);
     if (res.isLeft) feedbackController.setError(res.left);
     return res.isRight ? res.right : null;
   }
 
+  /// utility function to handle methods from the [ShipServices] class.
+  /// The result from this method's can either be:
+  /// - [ErrorFeedback] and in this case the user is notified;
+  /// - [SuccessFeedback] and in this case the [onSuccess] method is
+  /// executed.
   Future _handleServiceMethod<T>(
       FutureEither<ErrorFeedback, T> result,
       Function(T res) onSuccess

@@ -4,9 +4,19 @@ import 'package:ship_conquest/domain/path/path_points.dart';
 import 'package:ship_conquest/domain/path/path_segment.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 
-import '../../../domain/minimap.dart';
 import '../../../domain/space/position.dart';
 
+///
+/// Minimap related controller that holds [State] of
+/// the player's drawn ship path.
+///
+/// Mixin to the [ChangeNotifier] class, so widget's can
+/// listen to changes to [State].
+///
+/// The [RouteController] stores and manages the player's
+/// drawn path from one of the [hooks] starter positions to
+/// any point in the map.
+///
 class RouteController with ChangeNotifier {
   // variables
   Sequence<Position> _hooks = Sequence.empty();

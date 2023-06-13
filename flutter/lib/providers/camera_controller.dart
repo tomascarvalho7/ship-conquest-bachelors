@@ -1,6 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
+///
+/// Independent game related controller that holds [State] of
+/// the player's camera position.
+///
+/// Mixin to the [ChangeNotifier] class, so widget's can
+/// listen to changes to [State].
+///
+/// The [CameraController] stores and manages the player's
+/// [Camera] 2D position.
+///
 class CameraController with ChangeNotifier {
   late Position _coordinates = const Position(x: 0, y: 0);
   double _baseScaleFactor = 1.0;

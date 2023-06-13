@@ -14,11 +14,11 @@ import '../../camera_controller.dart';
 import '../../../utils/constants.dart';
 
 /// GameEvent static class calls game business logic
-/// using the Game related providers.
+/// using the Game related providers to execute game
+/// events from the player's actions.
 ///
 /// These providers are built like independent pieces
-/// and the GameEvent class combines them to implement
-/// the different game events.
+/// and the GameEvent class combines and uses them together.
 class GameEvent {
   const GameEvent();
 
