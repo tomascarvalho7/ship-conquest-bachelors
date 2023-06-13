@@ -1,6 +1,6 @@
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
-import 'package:ship_conquest/domain/lobby.dart';
-import 'package:ship_conquest/services/input_models/lobby_input_model.dart';
+import 'package:ship_conquest/domain/lobby/lobby.dart';
+import 'package:ship_conquest/services/input_models/lobby/lobby_input_model.dart';
 
 class LobbyListInputModel {
   final List<LobbyInputModel> list;

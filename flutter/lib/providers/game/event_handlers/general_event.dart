@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
-import 'package:ship_conquest/domain/lobby.dart';
+import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
@@ -12,17 +13,43 @@ import '../../../domain/user/user_info.dart';
 import '../../../services/google/google_signin_api.dart';
 
 class GeneralEvent {
-  static Future<Sequence<Lobby>> getLobbies(BuildContext context, int skip, int limit, String order, String query) {
+  static Future<Sequence<CompleteLobby>> getLobbies(BuildContext context, int skip, int limit, String order, String name, String filterType) {
     // get controller's
     final services = context.read<ShipServices>();
     final feedbackController = context.read<FeedbackController>();
     // handle lobbies response
-    return services.getLobbyList(skip, limit, order, query).fold(
+    return services.getLobbyList(skip, limit, order, name, filterType).fold(
         (left) {
           feedbackController.setError(left);
-          return Sequence<Lobby>.empty();
+          return Sequence<CompleteLobby>.empty();
         },
         (right) => right
+    );
+  }
+
+  static Future<void> setFavoriteLobby(BuildContext context, String tag) {
+    // get controller's
+    final services = context.read<ShipServices>();
+    final feedbackController = context.read<FeedbackController>();
+    // handle lobbies response
+    return services.setFavoriteLobby(tag).fold(
+            (left) {
+          feedbackController.setError(left);
+        },
+            (right) => right
+    );
+  }
+
+  static Future<void> removeFavoriteLobby(BuildContext context, String tag) {
+    // get controller's
+    final services = context.read<ShipServices>();
+    final feedbackController = context.read<FeedbackController>();
+    // handle lobbies response
+    return services.removeFavoriteLobby(tag).fold(
+            (left) {
+          feedbackController.setError(left);
+        },
+            (right) => right
     );
   }
 
@@ -91,10 +118,9 @@ class GeneralEvent {
     final services = context.read<ShipServices>();
     final feedbackController = context.read<FeedbackController>();
     // handle user profile response
-    /*services.getPatchNotes().either(
+    services.getPatchNotes().either(
             (left) => feedbackController.setError(left),
             (right) => onPatchNotes(right)
-    );*/
-    onPatchNotes(PatchNotes(notes: ["Combat Update!"]));
+    );
   }
 }

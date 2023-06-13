@@ -8,7 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
  * the number of times it was called, like so:
  * Key          Value
  * "Method" =>  Nr of invocations
- */
+ *//*
 class PublisherMock(val data: MutableMap<String, Int>): PublisherAPI {
     override fun publish(key: String, message: Any) = incrementMethod("publish")
 
@@ -34,4 +34,4 @@ class PublisherMock(val data: MutableMap<String, Int>): PublisherAPI {
         val nrOfInvocations = data[method]
         data[method] = nrOfInvocations?.plus(1) ?: 1
     }
-}
+}*/

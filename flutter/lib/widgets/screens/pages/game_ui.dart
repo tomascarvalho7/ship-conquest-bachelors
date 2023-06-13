@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/global_state.dart';
+import 'package:ship_conquest/providers/lobby_storage.dart';
+import 'package:ship_conquest/widgets/screens/bottom_navigation_bar/game_bottom_bar.dart';
 import 'package:ship_conquest/widgets/screens/leave_game/leave_game_screen.dart';
 
-import '../game/game.dart';
 import '../game/game_screen.dart';
-import '../game_loading/game_loading_screen.dart';
 
 class GameUI extends StatefulWidget {
   const GameUI({Key? key}) : super(key: key);
@@ -23,6 +23,29 @@ class _GameUIState extends State<GameUI> {
     final globalState = Provider.of<GlobalState>(context);
 
     return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: GameBottomBar(
+          currentIndex: _currentIdx,
+          onTap: (index) {
+            if (index != 1) {
+              if (index == 2) {
+                globalState.updateGameData(null);
+              }
+              setState(() {
+                _currentIdx = index;
+                _pc.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.ease,
+                );
+              });
+            }
+          },
+        ),
+      ),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: _pc,
@@ -36,39 +59,6 @@ class _GameUIState extends State<GameUI> {
             _currentIdx = page;
           });
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIdx,
-        onTap: (index) {
-          if(index != 1) {
-            if(index == 2) {
-              print("asdsdasda");
-              globalState.updateGameData(null);
-            }
-            setState(() {
-              _currentIdx = index;
-              _pc.animateToPage(
-                0,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.ease,
-              );
-            });
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.house),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.gamepad),
-            label: 'Game',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.arrow_back),
-            label: 'Leave Game',
-          ),
-        ],
       ),
     );
   }

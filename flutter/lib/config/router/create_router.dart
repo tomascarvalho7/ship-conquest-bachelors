@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ship_conquest/widgets/overlay_widget.dart';
+import 'package:ship_conquest/widgets/screens/authentication/authentication_screen.dart';
 import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 import 'package:ship_conquest/widgets/screens/pages/game_ui.dart';
 import 'package:ship_conquest/widgets/screens/pages/home_screen.dart';
 import 'package:ship_conquest/widgets/screens/lobby/lobby.dart';
 import 'package:ship_conquest/widgets/screens/minimap/minimap_screen.dart';
 import 'package:ship_conquest/widgets/screens/profile/user_profile.dart';
-import 'package:ship_conquest/widgets/screens/signIn/authentication_screen.dart';
 
 import '../../widgets/screens/game_loading/game_loading_screen.dart';
 import '../../widgets/screens/initial_loading/initial_loading_screen.dart';

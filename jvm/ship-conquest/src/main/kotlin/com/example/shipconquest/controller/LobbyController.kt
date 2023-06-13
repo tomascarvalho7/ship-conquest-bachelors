@@ -3,13 +3,12 @@ package com.example.shipconquest.controller
 import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.LobbyInputModel
+import com.example.shipconquest.controller.model.input.LobbyTagInputModel
 import com.example.shipconquest.controller.model.output.*
+import com.example.shipconquest.controller.model.output.lobby.*
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.LobbyService
-import com.example.shipconquest.service.result.CreateLobbyError
-import com.example.shipconquest.service.result.GetAllLobbiesError
-import com.example.shipconquest.service.result.GetLobbyError
-import com.example.shipconquest.service.result.JoinLobbyError
+import com.example.shipconquest.service.result.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -57,31 +56,97 @@ class LobbyController(val service: LobbyService) {
         }
     }
 
-    @GetMapping("/lobbies")
-    fun getLobbies(
+    @GetMapping("/lobbies/all")
+    fun getAllLobbies(
         user: User,
         @RequestParam(required = false) skip: Int?,
         @RequestParam(required = false) limit: Int?,
         @RequestParam(required = false) order: String?,
         @RequestParam(required = false) name: String?,
     ): ResponseEntity<*> {
-        val result = service.getLobbies(skip, limit, order, name)
+        val result = service.getLobbies(user.id, skip, limit, order, name)
 
         return when (result) {
-            is Either.Right -> response(content = LobbyListOutputModel(lobbies = result.value.map { lobby ->
-                LobbyOutputModel(
-                    lobby.tag,
-                    lobby.name,
-                    lobby.uid,
-                    lobby.username,
-                    lobby.creationTime
-                )
-            }))
+            is Either.Right -> response(content = result.value.map { lobby ->
+                lobby.toCompleteLobbyOutputModel()
+            }.toCompleteLobbyOutputModel())
 
             is Either.Left -> when (result.value) {
-                GetAllLobbiesError.InvalidOrderParameter ->
+                GetLobbyListError.InvalidOrderParameter ->
                     Problem.response(status = 400, problem = Problem.invalidOrderParameter())
 
+            }
+        }
+    }
+
+    @GetMapping("/lobbies/favorite")
+    fun getFavoriteLobbies(
+        user: User,
+        @RequestParam(required = false) skip: Int?,
+        @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) order: String?,
+        @RequestParam(required = false) name: String?
+    ): ResponseEntity<*> {
+        val result = service.getFavoriteLobbies(user.id, skip, limit, order, name)
+
+        return when (result) {
+            is Either.Right -> response(content = result.value.map { lobby ->
+                lobby.toCompleteLobbyOutputModel()
+            }.toCompleteLobbyOutputModel())
+
+            is Either.Left -> when (result.value) {
+                GetLobbyListError.InvalidOrderParameter ->
+                    Problem.response(status = 400, problem = Problem.invalidOrderParameter())
+
+            }
+        }
+    }
+
+    @GetMapping("/lobbies/recent")
+    fun getRecentLobbies(
+        user: User,
+        @RequestParam(required = false) skip: Int?,
+        @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) order: String?,
+        @RequestParam(required = false) name: String?,
+    ): ResponseEntity<*> {
+        val result = service.getRecentLobbies(user.id, skip, limit, order, name)
+
+        return when (result) {
+            is Either.Right -> response(content = result.value.map { lobby ->
+                lobby.toCompleteLobbyOutputModel()
+            }.toCompleteLobbyOutputModel())
+
+            is Either.Left -> when (result.value) {
+                GetLobbyListError.InvalidOrderParameter ->
+                    Problem.response(status = 400, problem = Problem.invalidOrderParameter())
+
+            }
+        }
+    }
+
+    @PostMapping("/lobby/favorite")
+    fun setLobbyFavorite(user: User, @RequestBody lobby: LobbyTagInputModel): ResponseEntity<*> {
+        val result = service.setFavoriteLobby(user.id, lobby.tag)
+        return when (result) {
+            is Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
+
+            is Either.Left -> when (result.value) {
+                SetFavoriteError.LobbyNotFound ->
+                    Problem.response(status = 404, problem = Problem.lobbyNotFound())
+            }
+        }
+    }
+
+    @PostMapping("/lobby/unfavorite")
+    fun removeLobbyFavorite(user: User, @RequestBody lobby: LobbyTagInputModel): ResponseEntity<*> {
+        val result = service.removeFavoriteLobby(user.id, lobby.tag)
+        return when (result) {
+            is Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
+
+            is Either.Left -> when (result.value) {
+                SetFavoriteError.LobbyNotFound ->
+                    Problem.response(status = 404, problem = Problem.lobbyNotFound())
             }
         }
     }

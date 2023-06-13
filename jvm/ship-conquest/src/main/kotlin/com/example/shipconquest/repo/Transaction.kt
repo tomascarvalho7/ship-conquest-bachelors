@@ -8,6 +8,7 @@ interface Transaction {
     val statsRepo: StatisticsRepository
     val eventRepo: EventRepository
     val userRepo: UserRepository
+    val patchNotesRepo: PatchNotesRepository
 
     // reverse changes made by the current transaction
     fun rollback()

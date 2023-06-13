@@ -62,12 +62,8 @@ class UserService(
 
     fun getUserInfo(userId: String): GetUserInfoResult {
         return transactionManager.run { transaction ->
-            val userInfo = transaction.userRepo.getUserInfo(userId)
-            if (userInfo != null) {
-                right(userInfo)
-            } else {
-                left(GetUserInfoError.UserNotFound)
-            }
+            val userInfo = transaction.userRepo.getUserInfo(userId) ?: return@run left(GetUserInfoError.UserNotFound)
+            right(userInfo)
         }
     }
 

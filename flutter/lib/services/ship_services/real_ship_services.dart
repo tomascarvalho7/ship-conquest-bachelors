@@ -6,19 +6,30 @@ import 'package:ship_conquest/domain/event/unknown_event.dart';
 import 'package:ship_conquest/domain/feedback/error/utils/constants.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
+import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby.dart';
 import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
+import 'package:ship_conquest/domain/user/token_ping.dart';
 import 'package:ship_conquest/domain/user/user_cacheable.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/services/input_models/horizon_input_model.dart';
 import 'package:ship_conquest/services/input_models/island_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/complete_lobby_list_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/favorite_lobby_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/join_lobby_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/lobby_input_model.dart';
 import 'package:ship_conquest/services/input_models/minimap_input_model.dart';
+import 'package:ship_conquest/services/input_models/patch_notes/patch_notes_input_model.dart';
 import 'package:ship_conquest/services/input_models/problem/problem_input_model.dart';
+import 'package:ship_conquest/services/input_models/spring_error_input_model.dart';
 import 'package:ship_conquest/services/input_models/token_input_model.dart';
+import 'package:ship_conquest/services/input_models/token_ping_input_model.dart';
 import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
@@ -26,20 +37,16 @@ import 'package:http/http.dart' as http;
 import '../../domain/either/future_either.dart';
 import '../../domain/feedback/error/error_feedback.dart';
 import '../../domain/horizon.dart';
-import '../../domain/lobby.dart';
 import '../../domain/user/user_info.dart';
 import '../input_models/create_lobby_input_model.dart';
 import '../input_models/islands_input_model.dart';
-import '../input_models/join_lobby_input_model.dart';
-import '../input_models/lobby_input_model.dart';
-import '../input_models/lobby_list_input_model.dart';
 import '../input_models/notification/event_notification_input_model.dart';
 import '../input_models/player_stats_input_model.dart';
 import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "2d80-46-189-211-105.ngrok-free.app";
+const baseUri = "dc5e-2001-8a0-6e2e-ba00-3cba-94b6-66d8-12f2.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -89,6 +96,20 @@ class RealShipServices extends ShipServices {
 
     return handleResponse(response, (json) =>
         TokenInputModel.fromJson(json).toToken()
+    );
+  }
+
+  @override
+  FutureEither<ErrorFeedback, TokenPing> checkTokenValidity(String token) async {
+    final response = await http.post(Uri.https(baseUri, "check-token"),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        HttpHeaders.authorizationHeader: 'Bearer $token'
+      },
+    );
+
+    return handleResponse(response, (json) =>
+        TokenPingInputModel.fromJson(json).toTokenPing()
     );
   }
 
@@ -184,8 +205,13 @@ class RealShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Sequence<Lobby>> getLobbyList(
-      int skip, int limit, String order, String searchedLobby) async {
+  FutureEither<ErrorFeedback, Sequence<CompleteLobby>> getLobbyList(
+      int skip,
+      int limit,
+      String order,
+      String searchedLobby,
+      String filterType
+      ) async {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
@@ -196,13 +222,14 @@ class RealShipServices extends ShipServices {
       'name': searchedLobby
     };
 
-    final response = await http.get(Uri.https(baseUri, "lobbies", queryParams),
+    final response = await http.get(Uri.https(baseUri, "lobbies/$filterType", queryParams),
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
 
     return handleResponse(response, (json) =>
-        LobbyListInputModel.fromJson(json).toLobbies()
+        CompleteLobbyListInputModel.fromJson(json).toCompleteLobbies()
     );
   }
+
 
   @override
   FutureEither<ErrorFeedback, Lobby> getLobby(String tag) async {
@@ -253,6 +280,40 @@ class RealShipServices extends ShipServices {
   }
 
   @override
+  FutureEither<ErrorFeedback, bool> setFavoriteLobby(String tag) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) return const Left(tokenNotFound);
+
+    final response = await http.post(Uri.https(baseUri, "lobby/favorite"),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode({'tag': tag}));
+
+    return handleResponse(response, (json) =>
+        FavoriteLobbyInputModel.fromJson(json).toFavoriteLobby()
+    );
+  }
+
+  @override
+  FutureEither<ErrorFeedback, bool> removeFavoriteLobby(String tag) async {
+    final String? token = await userStorage.getToken();
+    if (token == null) return const Left(tokenNotFound);
+
+    final response = await http.post(Uri.https(baseUri, "lobby/unfavorite"),
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+        },
+        body: jsonEncode({'tag': tag}));
+
+    return handleResponse(response, (json) =>
+        FavoriteLobbyInputModel.fromJson(json).toFavoriteLobby()
+    );
+  }
+
+  @override
   FutureEither<ErrorFeedback, UserInfo> getPersonalInfo() async {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
@@ -266,14 +327,39 @@ class RealShipServices extends ShipServices {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
-    return handleResponse(response, (json) =>
-        UserInfoInputModel.fromJson(
-            jsonDecode(
-                utf8.decode(
-                    response.bodyBytes
-                )
-            )
-        ).toUserInfo()
+    return handleResponse(response, (json) {
+      final userInfo = UserInfoInputModel.fromJson(
+          jsonDecode(
+              utf8.decode(
+                  response.bodyBytes
+              )
+          )
+      ).toUserInfo();
+      userStorage.setUser(userInfo, const Duration(minutes: 5));
+      return userInfo;
+    }
+    );
+  }
+
+  @override
+  FutureEither<ErrorFeedback, PatchNotes> getPatchNotes() async {
+    final String? token = await userStorage.getToken();
+    if (token == null) return const Left(tokenNotFound);
+
+    final response = await http.get(Uri.https(baseUri, "patch-notes"), headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
+
+    return handleResponse(response, (json) {
+      final patchNotes = PatchNotesInputModel.fromJson(
+          jsonDecode(
+              utf8.decode(
+                  response.bodyBytes
+              )
+          )
+      ).toPatchNotes();
+      return patchNotes;
+    }
     );
   }
 
@@ -397,8 +483,12 @@ class RealShipServices extends ShipServices {
   /// on a unsuccessful response build a [ErrorFeedback] from a [ProblemInputModel]
   Either<ErrorFeedback, T> handleResponse<T>(http.Response response, T Function(Map<String, dynamic> json) block) {
     final json = jsonDecode(response.body);
-    return response.statusCode == 200
-        ? Right(block(json)) // successful on status == 200
-        : Left(ProblemInputModel.fromJson(response.statusCode, json).toErrorFeedback()); // unsuccessful on status != 200
+    if (response.statusCode == 200) {
+      return Right(block(json)); // successful on status == 200
+    } else if (response.statusCode == 401) {
+      return Left(SpringErrorInputModel.fromJson(json).toErrorFeedback());
+    } else {
+      return Left(ProblemInputModel.fromJson(response.statusCode, json).toErrorFeedback()); // unsuccessful on status != 200
+    }
   }
 }

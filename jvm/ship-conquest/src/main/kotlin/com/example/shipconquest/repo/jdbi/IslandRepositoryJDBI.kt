@@ -61,7 +61,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 o.uid, username
                 FROM dbo.Island i
                 INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
-                LEFT JOIN dbo.User ON uid = id
+                LEFT JOIN dbo.User ON i.uid = id
                 WHERE i.tag = :tag AND i.islandId IN (
                     SELECT e.islandId FROM dbo.IslandEvent e
                     INNER JOIN dbo.Ship S ON e.sid = S.shipId
@@ -85,7 +85,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 o.uid, username
                 FROM dbo.Island i
                 INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
-                LEFT JOIN dbo.User ON uid = id
+                LEFT JOIN dbo.User ON i.uid = id
                 WHERE i.tag = :tag AND i.islandId NOT IN (
                     SELECT e.islandId FROM dbo.IslandEvent e
                     INNER JOIN dbo.Ship S ON e.sid = S.shipId

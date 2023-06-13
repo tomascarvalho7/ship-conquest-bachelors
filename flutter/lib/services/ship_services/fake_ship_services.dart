@@ -3,17 +3,21 @@ import 'package:ship_conquest/domain/event/known_event.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
+import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby.dart';
 import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
+import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
+import 'package:ship_conquest/domain/user/token_ping.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 
 import '../../domain/either/future_either.dart';
 import '../../domain/event/unknown_event.dart';
 import '../../domain/feedback/error/error_feedback.dart';
-import '../../domain/lobby.dart';
 import '../../domain/ship/utils/classes/ship_path.dart';
 import '../../domain/space/coord_2d.dart';
 import '../../domain/horizon.dart';
@@ -30,17 +34,26 @@ class FakeShipServices extends ShipServices {
   int currentId = 3;
 
   @override
-  FutureEither<ErrorFeedback, Horizon> getNewChunk(int chunkSize, Coord2D coordinates, int sId) async {
-    return Right(
-        Horizon(tiles: [], islands: [])
-    ); // return empty list, so only water tiles will be rendered
-  }
+  FutureEither<ErrorFeedback, Horizon> getNewChunk(
+      int chunkSize, Coord2D
+      coordinates, int sId
+      ) async => Right(
+          Horizon(tiles: [], islands: [])
+      ); // return empty list, so only water tiles will be rendered
+
 
   @override
-  FutureEither<ErrorFeedback, Token> signIn(String idToken, String username, String? description) async {
-    return Right(
+  FutureEither<ErrorFeedback, Token> signIn(
+      String idToken,
+      String username,
+      String? description
+      ) async => Right(
         Token(token: "FAKE-ID")
     );
+
+  @override
+  FutureEither<ErrorFeedback, TokenPing> checkTokenValidity(String token) async {
+    return Right(TokenPing(result: "Successful"));
   }
 
   @override
@@ -76,21 +89,28 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Sequence<Lobby>> getLobbyList(int skip, int limit, String order, String searchedLobby) async {
-    return Right(
-      Sequence(data: List.generate(
-          5,
-          (index) => Lobby(
-              tag: "asd",
-              name: "TestLobby",
-              uid: "1",
-              username: "franciscobarreiras",
-              creationTime: 234324
-          )
-      )
-      )
+  FutureEither<ErrorFeedback, Sequence<CompleteLobby>> getLobbyList(
+      int skip,
+      int limit,
+      String order,
+      String searchedLobby,
+      String filterType
+      ) async => Right(
+        Sequence(data: List.generate(
+            5,
+                (index) => CompleteLobby(
+                tag: "asd",
+                name: "TestLobby",
+                uid: "1",
+                username: "franciscobarreiras",
+                creationTime: 234324,
+                isFavorite: true,
+                players: 1
+            )
+        )
+        )
     );
-  }
+
 
   @override
   FutureEither<ErrorFeedback, String> joinLobby(String tag) async {
@@ -226,6 +246,26 @@ class FakeShipServices extends ShipServices {
         completedEvents: Grid.empty(),
         futureEvents: Grid.empty()
     ));
+  }
+
+  @override
+  FutureEither<ErrorFeedback, bool> setFavoriteLobby(String tag) async {
+    return const Right(true);
+  }
+
+  @override
+  FutureEither<ErrorFeedback, bool> removeFavoriteLobby(String tag) async {
+    return const Right(false);
+  }
+
+  @override
+  FutureEither<ErrorFeedback, PatchNotes> getPatchNotes() async {
+    return Right(
+        PatchNotes(notes: [
+          PatchNote(title: "Version 0.9", details: ["Beta version almost complete", "Try the game now"]),
+          PatchNote(title: "Version 0.8", details: ["Beta version under work", "You'll have to wait a bit more"])
+        ])
+    );
   }
 }
 

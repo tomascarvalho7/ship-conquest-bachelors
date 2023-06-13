@@ -28,6 +28,11 @@ data class Problem(val title: String, val detail: String) {
             detail = "The game resource identified was not found."
         )
 
+        fun patchNotesNotFound() = Problem(
+            title = "Patch notes not found",
+            detail = "Could not find any patch notes."
+        )
+
         fun shipPositionNotFound() = Problem(
             title = "Ship position record doesn't exist",
             detail = "There is no record of a ship with the given id belonging to you in the given lobby."

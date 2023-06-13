@@ -1,5 +1,7 @@
+import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
+
 class PatchNotes {
-  final List<String> notes;
+  final List<PatchNote> notes;
 
   PatchNotes({required this.notes});
 }

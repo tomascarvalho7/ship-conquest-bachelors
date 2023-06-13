@@ -35,7 +35,7 @@ class StatisticsRepositoryJDBI(private val handle: Handle): StatisticsRepository
 
         val islandsIncome = handle.createQuery(
             """
-                SELECT * 
+                SELECT tag, islandid, x, y, radius, incomeperhour, uid, instant, username 
                 FROM dbo.Ownedisland o INNER JOIN dbo.User u
                 ON o.uid = u.id
                 WHERE o.tag = :tag and o.uid = :uid

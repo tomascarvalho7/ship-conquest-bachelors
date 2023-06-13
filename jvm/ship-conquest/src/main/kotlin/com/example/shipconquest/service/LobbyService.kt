@@ -5,12 +5,7 @@ import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.GameLogic
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.domain.world.WorldGenerator
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.WildIsland
-import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
@@ -20,7 +15,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
-import kotlin.random.Random
 
 @Service
 class LobbyService(
@@ -90,19 +84,67 @@ class LobbyService(
         }
     }
 
-    fun getLobbies(skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
+    fun getLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
         val newSkip = skip.toSkip()
         val newLimit = limit.toLimit()
-        val newOrder = order.toOrderOrNull() ?: return left(GetAllLobbiesError.InvalidOrderParameter)
+        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
-
-            val lobbies = if(name?.isEmpty() == true || name == null) {
-                transaction.lobbyRepo.getList(newSkip, newLimit, newOrder)
+            val lobbies = if(name.isNullOrEmpty()) {
+                    transaction.lobbyRepo.getList(uid, newSkip, newLimit, newOrder)
             } else {
-                transaction.lobbyRepo.getListByName(newSkip, newLimit, newOrder, name)
+                    transaction.lobbyRepo.getListByName(uid, newSkip, newLimit, newOrder, name)
             }
             right(lobbies)
+        }
+    }
+
+    fun getFavoriteLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
+        val newSkip = skip.toSkip()
+        val newLimit = limit.toLimit()
+        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
+
+        return transactionManager.run { transaction ->
+            // TODO check this goofy ass code
+            val lobbies = if(name.isNullOrEmpty()) {
+                    transaction.lobbyRepo.getFavoriteList(uid, newSkip, newLimit, newOrder)
+            } else {
+                    transaction.lobbyRepo.getFavoriteListByName(uid, newSkip, newLimit, newOrder, name)
+            }
+            right(lobbies)
+        }
+    }
+
+    fun getRecentLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
+        val newSkip = skip.toSkip()
+        val newLimit = limit.toLimit()
+        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
+
+        return transactionManager.run { transaction ->
+            val lobbies = if(name.isNullOrEmpty()) {
+                    transaction.lobbyRepo.getRecentList(uid, newSkip, newLimit, newOrder)
+            } else {
+                    transaction.lobbyRepo.getRecentListByName(uid, newSkip, newLimit, newOrder, name)
+            }
+            right(lobbies)
+        }
+    }
+
+    fun setFavoriteLobby(uid: String, tag: String): FavoriteOperationResult {
+        return transactionManager.run { transaction ->
+            transaction.lobbyRepo.get(tag) ?: return@run left(SetFavoriteError.LobbyNotFound)
+            transaction.lobbyRepo.setFavorite(uid, tag)
+
+            right(true)
+        }
+    }
+
+    fun removeFavoriteLobby(uid: String, tag: String): FavoriteOperationResult {
+        return transactionManager.run { transaction ->
+            transaction.lobbyRepo.get(tag) ?: return@run left(SetFavoriteError.LobbyNotFound)
+            transaction.lobbyRepo.removeFavorite(uid, tag)
+
+            right(false)
         }
     }
 

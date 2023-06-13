@@ -32,7 +32,6 @@ extension Convert on MinimapInputModel {
       buildBeziers(paths.data.toCoord2DList()).expand((bezier) {
         var data = Sequence.empty();
         for (double t = 0.0; t <= 1.0; t += 0.1) {
-          print("tominimpa");
           data = data + pulseAndFill(bezier.get(t).toCoord2D(), 10);
         }
         return data;

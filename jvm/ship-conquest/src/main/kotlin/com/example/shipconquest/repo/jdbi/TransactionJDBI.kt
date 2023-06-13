@@ -11,6 +11,7 @@ class TransactionJDBI(private val handle: Handle): Transaction {
     override val statsRepo: StatisticsRepository by lazy { StatisticsRepositoryJDBI(handle = handle)}
     override val eventRepo: EventRepository by lazy { EventRepositoryJDBI(handle = handle) }
     override val userRepo: UserRepository by lazy { UserRepositoryJDBI(handle = handle)}
+    override val patchNotesRepo: PatchNotesRepository by lazy { PatchNotesRepositoryJDBI(handle = handle) }
 
     override fun rollback() {
         handle.rollback()

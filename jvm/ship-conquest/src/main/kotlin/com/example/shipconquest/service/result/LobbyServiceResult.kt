@@ -1,6 +1,7 @@
 package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
+import com.example.shipconquest.domain.lobby.CompleteLobby
 import com.example.shipconquest.domain.lobby.Lobby
 
 sealed class GetLobbyError {
@@ -22,8 +23,14 @@ sealed class JoinLobbyError {
 
 typealias JoinLobbyResult = Either<JoinLobbyError, String>
 
-sealed class GetAllLobbiesError {
-    object InvalidOrderParameter: GetAllLobbiesError()
+sealed class GetLobbyListError {
+    object InvalidOrderParameter: GetLobbyListError()
 }
 
-typealias GetAllLobbiesResult = Either<GetAllLobbiesError, List<Lobby>>
+typealias GetAllLobbiesResult = Either<GetLobbyListError, List<CompleteLobby>>
+
+sealed class SetFavoriteError {
+    object LobbyNotFound: SetFavoriteError()
+}
+
+typealias FavoriteOperationResult = Either<SetFavoriteError, Boolean>

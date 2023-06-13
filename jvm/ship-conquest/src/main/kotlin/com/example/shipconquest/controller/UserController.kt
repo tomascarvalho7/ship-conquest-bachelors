@@ -4,6 +4,7 @@ import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.CreateUserInputModel
 import com.example.shipconquest.controller.model.output.TokenOutputModel
+import com.example.shipconquest.controller.model.output.TokenPingOutputModel
 import com.example.shipconquest.controller.model.output.UserInfoOutputModel
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.service.UserService
@@ -33,7 +34,7 @@ class UserController(val service: UserService) {
                 decodedJWT.subject,
                 decodedJWT["name"]?.toString() ?: "",
                 decodedJWT.email,
-                decodedJWT["picture"]?.toString() ?: null,
+                decodedJWT["picture"]?.toString(),
                 body.description
                 )
 
@@ -73,6 +74,13 @@ class UserController(val service: UserService) {
         } else {
             Problem.response(status = 401, problem = Problem.invalidIdToken())
         }
+    }
+
+    @PostMapping("check-token")
+    fun checkTokenIsValid(user: User): ResponseEntity<*> {
+        // no need to do any operations, if the request
+        // passes the interceptor, the token is valid
+        return response(content = TokenPingOutputModel(result = "Token is valid."))
     }
 
     @GetMapping("/userinfo")

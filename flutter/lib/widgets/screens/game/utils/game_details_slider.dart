@@ -22,8 +22,8 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
   bool isNearbyIslands = false;
 
   // constants
-  static const minSize = 50.0;
-  static const maxSize = 500.0;
+  static const minSize = 199.0; //goofy ass distance just to make it fit with the bottom bar
+  static const maxSize = 550.0;
 
   @override
   Widget build(BuildContext context) =>

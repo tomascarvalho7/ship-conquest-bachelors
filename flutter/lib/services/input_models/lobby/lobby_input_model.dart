@@ -1,4 +1,4 @@
-import '../../domain/lobby.dart';
+import '../../../domain/lobby/lobby.dart';
 
 class LobbyInputModel {
   final String tag;

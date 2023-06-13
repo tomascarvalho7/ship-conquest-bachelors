@@ -2,10 +2,7 @@ package com.example.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.repo.LobbyRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.LobbyDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.LobbyListDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toLobby
-import com.example.shipconquest.repo.jdbi.dbmodel.toLobbyList
+import com.example.shipconquest.repo.jdbi.dbmodel.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
@@ -48,11 +45,38 @@ class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
 
         handle.createUpdate(
             """
-                insert into dbo.Lobby_User(lobby_tag, uid) values(:tag, :uid)
+                insert into dbo.Lobby_User(tag, uid) values(:tag, :uid)
             """
         )
             .bind("tag", tag)
             .bind("uid", uid)
+            .execute()
+    }
+
+    override fun setFavorite(uid: String, tag: String) {
+        logger.info("Set favorite lobby for user {} with tag = {}", uid, tag)
+
+        handle.createUpdate(
+            """
+                insert into dbo.Favorite_Lobbies(tag, uid) values(:tag, :uid)
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .execute()
+    }
+
+    override fun removeFavorite(uid: String, tag: String) {
+        logger.info("Removing favorite lobby for user {} with tag = {}", uid, tag)
+
+        handle.createUpdate(
+            """
+                delete from dbo.Favorite_Lobbies where tag = :tag AND uid = :uid
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("favorite", false)
             .execute()
     }
 
@@ -61,7 +85,7 @@ class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
 
         val count = handle.createQuery(
             """
-               select count(uid) from dbo.Lobby_User where lobby_tag = :tag AND uid = :uid; 
+               select count(uid) from dbo.Lobby_User where tag = :tag AND uid = :uid; 
             """
         )
             .bind("tag", tag)
@@ -72,34 +96,241 @@ class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
         return count == 1
     }
 
-    override fun getList(skip: Skip, limit: Limit, order: Order): List<Lobby> {
+    override fun getList(uid: String, skip: Skip, limit: Limit, order: Order): List<CompleteLobby> {
         logger.info("Getting all lobbies from db")
 
-        return handle.createQuery(
+        val lobbyList = handle.createQuery(
             """
-               select * from dbo.Lobby ORDER BY creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+               SELECT lobby.*, COUNT(lobby_user.*) AS lobbyCount FROM dbo.Lobby lobby
+                LEFT JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag GROUP BY lobby.tag
+                ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
             """
         )
             .bind("limit", limit.value)
             .bind("skip", skip.value)
-            .mapTo<LobbyDBModel>()
+            .mapTo<LobbyInfoDBModel>()
             .list()
-            .toLobbyList()
+            .toLobbyInfoList()
+
+        return lobbyList.map {lobby ->
+            val isFavorite = handle.createQuery(
+                """
+                       select count(*) from dbo.Favorite_Lobbies where tag = :tag AND uid = :uid;
+                    """
+            )
+                .bind("tag", lobby.tag)
+                .bind("uid", uid)
+                .mapTo<Int>()
+                .single() == 1
+
+            return@map CompleteLobby(
+                lobby.tag,
+                lobby.name,
+                lobby.uid,
+                lobby.username,
+                lobby.creationTime,
+                isFavorite,
+                lobby.lobbyCount
+            )
+        }
     }
 
-    override fun getListByName(skip: Skip, limit: Limit, order: Order, name: String): List<Lobby> {
+    override fun getListByName(uid: String, skip: Skip, limit: Limit, order: Order, name: String): List<CompleteLobby> {
         logger.info("Getting all lobbies from db with matching name {}", name)
 
-        return handle.createQuery(
+        val lobbyList = handle.createQuery(
             """
-               select * from dbo.Lobby lobby where lobby.name ILIKE :name ORDER BY creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+               SELECT lobby.*, COUNT(lobby_user.*) AS lobbyCount FROM dbo.Lobby lobby
+                LEFT JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag
+                WHERE lobby.name ILIKE :name GROUP BY lobby.tag
+                ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
             """
         )
             .bind("name", "%$name%")
             .bind("limit", limit.value)
             .bind("skip", skip.value)
-            .mapTo<LobbyDBModel>()
+            .mapTo<LobbyInfoDBModel>()
             .list()
-            .toLobbyList()
+            .toLobbyInfoList()
+
+        return lobbyList.map {lobby ->
+            val isFavorite = handle.createQuery(
+                """
+                       select count(*) from dbo.Favorite_Lobbies where tag = :tag AND uid = :uid;
+                    """
+            )
+                .bind("tag", lobby.tag)
+                .bind("uid", uid)
+                .mapTo<Int>()
+                .single() == 1
+
+            return@map CompleteLobby(
+                lobby.tag,
+                lobby.name,
+                lobby.uid,
+                lobby.username,
+                lobby.creationTime,
+                isFavorite,
+                lobby.lobbyCount
+            )
+        }
+    }
+
+    override fun getRecentList(uid: String, skip: Skip, limit: Limit, order: Order): List<CompleteLobby> {
+        logger.info("Getting all lobbies from db")
+
+        val recentLobbies = handle.createQuery(
+            """
+               SELECT lobby.*, COUNT(*) AS lobbyCount FROM dbo.Lobby lobby
+                INNER JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag
+                WHERE lobby_user.tag = lobby.tag GROUP BY lobby.tag 
+                ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+            """
+        )
+            .bind("uid", uid)
+            .bind("limit", limit.value)
+            .bind("skip", skip.value)
+            .mapTo<LobbyInfoDBModel>()
+            .list()
+            .toLobbyInfoList()
+
+        return recentLobbies.map {lobby ->
+            val isFavorite = handle.createQuery(
+                """
+                       select count(*) from dbo.Favorite_Lobbies where tag = :tag AND uid = :uid;
+                    """
+            )
+                .bind("tag", lobby.tag)
+                .bind("uid", uid)
+                .mapTo<Int>()
+                .single() == 1
+
+            return@map CompleteLobby(
+                lobby.tag,
+                lobby.name,
+                lobby.uid,
+                lobby.username,
+                lobby.creationTime,
+                isFavorite,
+                lobby.lobbyCount
+            )
+        }
+    }
+
+    override fun getRecentListByName(
+        uid: String,
+        skip: Skip,
+        limit: Limit,
+        order: Order,
+        name: String
+    ): List<CompleteLobby> {
+        logger.info("Getting recent lobbies from db with matching name {}", name)
+
+        val lobbyList = handle.createQuery(
+            """
+               SELECT lobby.*, COUNT(*) AS lobbyCount FROM dbo.Lobby lobby
+                INNER JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag
+                WHERE lobby_user.tag = lobby.tag and lobby.name ILIKE :name and lobby_user.uid = :uid
+                GROUP BY lobby.tag ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+            """
+        )
+            .bind("uid", uid)
+            .bind("name", "%$name%")
+            .bind("limit", limit.value)
+            .bind("skip", skip.value)
+            .mapTo<LobbyInfoDBModel>()
+            .list()
+            .toLobbyInfoList()
+
+        return lobbyList.map {lobby ->
+            val isFavorite = handle.createQuery(
+                """
+                       select count(*) from dbo.Favorite_Lobbies where tag = :tag AND uid = :uid;
+                    """
+            )
+                .bind("tag", lobby.tag)
+                .bind("uid", uid)
+                .mapTo<Int>()
+                .single() == 1
+
+            return@map CompleteLobby(
+                lobby.tag,
+                lobby.name,
+                lobby.uid,
+                lobby.username,
+                lobby.creationTime,
+                isFavorite,
+                lobby.lobbyCount
+            )
+        }
+    }
+
+    override fun getFavoriteList(uid: String, skip: Skip, limit: Limit, order: Order): List<CompleteLobby> {
+        logger.info("Getting favorite lobbies from db")
+
+        val lobbyList = handle.createQuery(
+            """
+                SELECT lobby.*, COUNT(*) AS lobbyCount FROM dbo.Lobby lobby
+                INNER JOIN dbo.Favorite_Lobbies favorite ON lobby.tag = favorite.tag
+                LEFT JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag
+                WHERE lobby_user.tag = lobby.tag and favorite.uid = :uid
+                GROUP BY lobby.tag ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+            """
+        )
+            .bind("uid", uid)
+            .bind("limit", limit.value)
+            .bind("skip", skip.value)
+            .mapTo<LobbyInfoDBModel>()
+            .list()
+            .toLobbyInfoList()
+
+        return lobbyList.map { lobby -> CompleteLobby(
+            lobby.tag,
+            lobby.name,
+            lobby.uid,
+            lobby.username,
+            lobby.creationTime,
+            true,
+            lobby.lobbyCount
+        )
+        }
+    }
+
+    override fun getFavoriteListByName(
+        uid: String,
+        skip: Skip,
+        limit: Limit,
+        order: Order,
+        name: String
+    ): List<CompleteLobby> {
+        logger.info("Getting favorite lobbies from db with matching name {}", name)
+
+        val favoriteLobbies = handle.createQuery(
+            """
+                SELECT lobby.*, COUNT(*) AS lobbyCount FROM dbo.Lobby lobby
+                INNER JOIN dbo.Favorite_Lobbies favorite ON lobby.tag = favorite.tag
+                LEFT JOIN dbo.Lobby_User lobby_user ON lobby.tag = lobby_user.tag
+                WHERE lobby_user.tag = lobby.tag and favorite.uid = :uid and lobby.name ILIKE :name
+                GROUP BY lobby.tag ORDER BY lobby.creationTime ${order.toSQLOrder()} LIMIT :limit OFFSET :skip;
+            """
+        )
+            .bind("uid", uid)
+            .bind("name", "%$name%")
+            .bind("limit", limit.value)
+            .bind("skip", skip.value)
+            .mapTo<LobbyInfoDBModel>()
+            .list()
+            .toLobbyInfoList()
+
+        return favoriteLobbies.map { lobby -> CompleteLobby(
+            lobby.tag,
+            lobby.name,
+            lobby.uid,
+            lobby.username,
+            lobby.creationTime,
+            true,
+            lobby.lobbyCount
+        )
+        }
     }
 }

@@ -159,7 +159,6 @@ class GameController(val service: GameService) {
                     Problem.response(status = 404, problem = Problem.shipNotFound())
                 GetShipError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
-                GetShipError.GameNotFound -> TODO()
             }
         }
     }
@@ -170,7 +169,10 @@ class GameController(val service: GameService) {
 
         return when (result) {
             is Either.Right -> response(content = result.value.toFleetOutputModel())
-            is Either.Left -> TODO("bruh")
+            is Either.Left -> when (result.value) {
+                GetShipsError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
+            }
         }
     }
 
