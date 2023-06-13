@@ -38,11 +38,25 @@ CREATE TABLE dbo.Game
 );
 
 CREATE TABLE dbo.Lobby_User (
-  lobby_tag varchar(6),
+  tag varchar(6),
   uid varchar(30),
-  PRIMARY KEY (lobby_tag, uid),
+  PRIMARY KEY (tag, uid),
   FOREIGN KEY (uid) REFERENCES dbo.User(id),
-  FOREIGN KEY (lobby_tag) REFERENCES dbo.Lobby(tag)
+  FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.Favorite_Lobbies (
+  tag varchar(6),
+  uid varchar(30),
+  PRIMARY KEY (tag, uid),
+  FOREIGN KEY (uid) REFERENCES dbo.User(id),
+  FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
+);
+
+CREATE TABLE dbo.PatchNotes (
+  title varchar(30),
+  details varchar(500),
+  PRIMARY KEY (title)
 );
 
 CREATE TABLE dbo.Ship
@@ -105,6 +119,14 @@ CREATE TABLE dbo.Island
     PRIMARY KEY (tag, islandId),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
+
+CREATE TABLE dbo.OwnedIsland
+(
+    incomePerHour INT NOT NULL,
+    uid varchar(30) NOT NULL,
+    instant INT NOT NULL,
+    FOREIGN KEY (uid) REFERENCES dbo.User(id)
+) INHERITS (dbo.Island);
 
 CREATE TABLE dbo.PlayerStatistics(
     tag varchar(6) NOT NULL,
