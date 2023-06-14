@@ -30,7 +30,7 @@ class WorldGenerator(
     ): List<Vector2> {
         if (worldSize == 0) return emptyList()
 
-        val numIslands = 4//calculateNumberOfIslands(islandDensity)
+        val numIslands = calculateNumberOfIslands(islandDensity)
         val gridSize = worldSize / max(1, numIslands)
         val offset = gridSize / 2
 
@@ -38,7 +38,7 @@ class WorldGenerator(
             for (y in 0 until numIslands) {
                 for (x in 0 until numIslands) {
                     val position = Vector2(x = offset + x * gridSize, y = offset + y * gridSize)
-                    val safeOffset = max(offset - islandSize, islandSize)
+                    val safeOffset = max(offset - islandSize, 1)
                     val randomOffset = Vector2(
                         x = (-safeOffset..safeOffset).random(),
                         y = (-safeOffset..safeOffset).random()
