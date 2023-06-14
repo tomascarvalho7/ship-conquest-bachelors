@@ -10,5 +10,4 @@ fun FightEvent.isWinner(sid: Int) =
     sid == sidA && winner == FightInteraction.PLAYER_A ||
     sid == sidB && winner == FightInteraction.PLAYER_B
 
-// for now keep the same movement
 fun FightEvent.updateMovement(movement: Movement, instant: Instant) = movement

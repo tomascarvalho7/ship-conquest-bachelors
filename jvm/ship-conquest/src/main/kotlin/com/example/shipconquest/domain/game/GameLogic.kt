@@ -9,14 +9,11 @@ import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
 import com.example.shipconquest.domain.ship.movement.Mobile
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.ship.movement.Stationary
-import com.example.shipconquest.domain.bezier.utils.*
-import com.example.shipconquest.domain.event.logic.utils.findIntersectionPoints
 import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.build
 import com.example.shipconquest.domain.toVector2
 import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.statistics.PlayerStatistics
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
 import com.example.shipconquest.domain.user.statistics.getCurrency
@@ -149,13 +146,11 @@ class GameLogic(private val clock: Clock) {
         shipBuilders: List<ShipBuilder>,
         onEvent: (instant: Instant, fightDetails: FightEvent) -> Event
     ) = buildList<Event> {
-        // TODO: CHANGE
-        /*
         // for every ship in movement
         for (ship in shipBuilders) {
-            val event = eventLogic.buildFightEventsBetween(current = shipBuilder, enemy = ship, onEvent = onEvent)
+            val event = eventLogic.buildFightEventsBetweenShips(current = shipBuilder, enemy = ship, onEvent = onEvent)
             if (event != null) add(event)
-        }*/
+        }
     }
 
     fun buildShipMovement(points: List<Vector2>): Mobile {

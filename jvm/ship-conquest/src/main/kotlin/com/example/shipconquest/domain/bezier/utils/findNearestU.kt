@@ -7,6 +7,10 @@ import com.example.shipconquest.domain.event.logic.utils.LineIntersection
 import com.example.shipconquest.domain.ship.movement.Mobile
 import kotlin.math.sqrt
 
+/**
+ * Find nearest interpolation point between group of [CubicBezier]'s for
+ * a given point.
+ */
 fun findNearestU(intersection: LineIntersection, pathMovement: Mobile): Double {
     val iterations = 10
     val u = intersection.lineIndex.floorDiv(3)
@@ -33,6 +37,9 @@ fun findNearestU(intersection: LineIntersection, pathMovement: Mobile): Double {
     return u + bestT
 }
 
+/**
+ * [Position] utility functions for math formulas.
+ */
 fun Position.length() = sqrt(x * x + y * y)
 fun Position.lengthSquared() = x * x + y * y
 fun Position.dot(other: Position) = x * other.x + y * other.y

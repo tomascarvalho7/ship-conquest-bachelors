@@ -3,7 +3,6 @@ package com.example.shipconquest.domain.event.logic
 import com.example.shipconquest.Clock
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.FightInteraction
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
 import com.example.shipconquest.domain.event.logic.utils.plane.isOverlapping
@@ -21,8 +20,12 @@ import com.example.shipconquest.domain.world.islands.Island
 import java.time.Instant
 import kotlin.math.min
 
+/**
+ * The [EventLogic] class handles event-related logic, including building fight events and island events.
+ */
 class EventLogic(private val clock: Clock) {
-    fun buildFightEventsBetween(
+    // find the first intersection between two ships to build a fight event
+    fun buildFightEventsBetweenShips(
         current: ShipBuilder,
         enemy: ShipBuilder,
         onEvent: (instant: Instant, fightDetails: FightEvent) -> Event
@@ -36,6 +39,7 @@ class EventLogic(private val clock: Clock) {
         return onEvent(instant, fightDetails)
     }
 
+    // find the first intersection between a ship and the unknown islands
     fun buildIslandEvents(
         pathMovement: Mobile,
         islands: List<Island>,
@@ -51,6 +55,7 @@ class EventLogic(private val clock: Clock) {
         return listOf(onIslandEvent(pathMovement.getInstant(u), intersection.island))
     }
 
+    // find the closest point to the island without intersecting it
     private fun findNearestPointToIsland(points: List<Position> , island: Island): Double {
         var bestDistance = Double.MAX_VALUE
         var t = 0.0
@@ -66,6 +71,7 @@ class EventLogic(private val clock: Clock) {
         return t
     }
 
+    // get first intersection between two ships
     private fun getFirstIntersection(movement: Mobile, enemy: Mobile): Instant? {
         val pathOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
         // get enemy route info
@@ -90,6 +96,7 @@ class EventLogic(private val clock: Clock) {
         return null
     }
 
+    // split and sample line segment from [CubicBezier]
     private fun sampleSegmentOfBezier(beziers: List<CubicBezier>, u: Int): List<Position> {
         val s = u % 3
         return beziers[u / 3]
