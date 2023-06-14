@@ -56,7 +56,7 @@ class GameEvent {
     services.conquestIsland(shipController.getMainShipId(), island.id).either(
         (left) => feedbackController.setError(left),
         (right) {
-          statisticsController.makeTransaction(island.conquestCost());
+          statisticsController.makeTransaction(-island.conquestCost());
           sceneController.updateIsland(right);
         }
     );
