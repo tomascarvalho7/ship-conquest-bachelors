@@ -71,6 +71,9 @@ class GameController {
     await gameLogic.loadData(scheduleShipEvents);
     // check if any operation had an error
     final feedback = feedbackController.feedback;
+    // play game background music
+    soundController.startBackgroundMusic();
+
     if(feedback == null) {
       // subscribe to game events
       services.subscribe(gameLogic.onEvent, gameLogic.onFleet);
@@ -81,8 +84,6 @@ class GameController {
           )
       );
     }
-    // play game background music
-    soundController.startBackgroundMusic();
 
     return feedback;
   }
@@ -93,7 +94,7 @@ class GameController {
     // unsubscribe to game events
     services.unsubscribe();
     // stop game background music
-    soundController.stopBackgroundMusic();
+    soundController.stopAudio();
   }
 
   void scheduleShipEvents(Sequence<Ship> ships) {

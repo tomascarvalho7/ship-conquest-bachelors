@@ -46,7 +46,7 @@ import '../input_models/ship/ship_input_model.dart';
 import '../input_models/ship/ships_input_model.dart';
 import '../input_models/user_info_input_model.dart';
 
-const baseUri = "dc5e-2001-8a0-6e2e-ba00-3cba-94b6-66d8-12f2.ngrok-free.app";
+const baseUri = "e423-2001-8a0-6e2e-ba00-35dc-d449-6aed-3d04.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -441,7 +441,6 @@ class RealShipServices extends ShipServices {
       if (event.event == 'event') {
         final (sid, unknownEvent) =
             EventNotificationInputModel.fromJson(jsonDecode(data)).toDomain();
-
         onEvent(sid, unknownEvent);
       } else if (event.event == 'fleet') {
         onFleet(ShipsInputModel.fromJson(jsonDecode(data)).toSequenceOfShips());

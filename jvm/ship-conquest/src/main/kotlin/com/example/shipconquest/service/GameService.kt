@@ -97,7 +97,7 @@ class GameService(
                 // get ship path
                 val events = transaction.eventRepo.getShipEvents(tag = tag, uid = uid, sid = ship.id)
                 ship.movements.forEach {
-                    val processedMovement = it.build(currInstant, events)
+                    val processedMovement = it.buildEvents(currInstant, events)
                     if (processedMovement is Mobile) {
                         movements.add(Pair(ship.id, processedMovement))
                     }

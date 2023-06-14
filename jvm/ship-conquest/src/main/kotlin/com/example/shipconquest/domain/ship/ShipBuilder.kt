@@ -21,7 +21,7 @@ fun ShipBuilder.build(instant: Instant) = Ship(
     )
 
 fun ShipBuilder.getMobileMovementOrNull(instant: Instant) =
-    when(val movement = info.getCurrentMovement().build(instant = instant, events = events)) {
+    when(val movement = info.getCurrentMovement().buildEvents(instant = instant, events = events)) {
         is Mobile -> if (movement.getEndTime().isAfter(instant)) movement else null
         is Stationary -> null
     }

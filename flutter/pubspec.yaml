@@ -89,7 +89,7 @@ flutter:
     - assets/images/profile_front_mountains.png
     - assets/images/default_user_image.png
     - assets/sounds/notification.wav
-    - assets/sounds/dreamland.wav
+    - assets/sounds/dreamland.mp3
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware

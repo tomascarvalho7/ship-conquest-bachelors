@@ -148,12 +148,14 @@ class GameLogic(private val clock: Clock) {
         shipBuilder: ShipBuilder,
         shipBuilders: List<ShipBuilder>,
         onEvent: (instant: Instant, fightDetails: FightEvent) -> Event
-    ) = buildList {
+    ) = buildList<FightEvent> {
+        // TODO: CHANGE
+        /*
         // for every ship in movement
         for (ship in shipBuilders) {
             val event = eventLogic.buildFightEventsBetween(current = shipBuilder, enemy = ship, onEvent = onEvent)
             if (event != null) add(event)
-        }
+        }*/
     }
 
     fun buildShipMovement(points: List<Vector2>): Mobile {

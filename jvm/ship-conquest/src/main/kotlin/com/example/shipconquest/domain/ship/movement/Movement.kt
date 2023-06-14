@@ -7,7 +7,7 @@ import com.example.shipconquest.domain.event.event_details.updateMovement
 import java.time.Instant
 
 sealed interface Movement {
-    fun build(instant: Instant, events: List<Event>): Movement {
+    fun buildEvents(instant: Instant, events: List<Event>): Movement {
         var currentMovement: Movement = this
         for(event in events) {
             // if ship is currently not in an event, then return current movement
@@ -19,5 +19,13 @@ sealed interface Movement {
         }
 
         return currentMovement
+    }
+
+    fun build(instant: Instant, events: List<Event>): Movement {
+        val movement = buildEvents(instant = instant, events = events)
+
+        return if (movement is Mobile && movement.getEndTime().isAfter(instant))
+            Stationary(position = movement.getFinalCoord())
+        else movement
     }
 }

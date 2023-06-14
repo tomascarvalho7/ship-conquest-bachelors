@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
           ),
           Provider(create: (_) => GlobalState()),
           Provider(create: (_) => ScheduleController()),
+          Provider(create: (_) => SoundController()),
           ChangeNotifierProvider(create: (_) => ShipController()),
           ChangeNotifierProvider(create: (_) => SceneController()),
           ChangeNotifierProvider(create: (_) => MinimapController()),
