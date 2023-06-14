@@ -98,7 +98,10 @@ class GeneralEvent {
     final account = await GoogleSignInApi.login();
     final userInfo = await GoogleSignInApi.getUserInfo(account!);
     services.signIn(userInfo, username, description).either(
-            (left) => feedbackController.setError(left),
+            (left) {
+              feedbackController.setError(left);
+              GoogleSignInApi.logout();
+              },
             (right) => onToken(right)
     );
   }
@@ -111,7 +114,10 @@ class GeneralEvent {
     final account = await GoogleSignInApi.login();
     final userInfo = await GoogleSignInApi.getUserInfo(account!);
     services.logIn(userInfo).either(
-            (left) => feedbackController.setError(left),
+            (left) {
+              feedbackController.setError(left);
+              GoogleSignInApi.logout();
+            },
             (right) => onToken(right)
     );
   }

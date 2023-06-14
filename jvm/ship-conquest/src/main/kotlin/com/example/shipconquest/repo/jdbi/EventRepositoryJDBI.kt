@@ -163,8 +163,8 @@ class EventRepositoryJDBI(private val handle: Handle): EventRepository {
                 SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
                 o.uid, username
                 FROM dbo.Island i
-                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
-                LEFT JOIN dbo.User ON uid = id
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON o.uid = id
                 WHERE i.tag = :tag AND i.islandId = :id
             """
         )

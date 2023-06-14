@@ -21,8 +21,8 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
                 o.uid, username
                 FROM dbo.Island i
-                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
-                LEFT JOIN dbo.User ON uid = id
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON o.uid = id
                 WHERE i.tag = :tag AND i.islandId = :id
             """
         )
@@ -41,8 +41,8 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
                 o.uid, username
                 FROM dbo.Island i
-                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
-                LEFT JOIN dbo.User ON uid = id
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON o.uid = id
                 WHERE i.tag = :tag
             """
         )
@@ -60,7 +60,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
                 o.uid, username
                 FROM dbo.Island i
-                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
                 LEFT JOIN dbo.User ON i.uid = id
                 WHERE i.tag = :tag AND i.islandId IN (
                     SELECT e.islandId FROM dbo.IslandEvent e
@@ -84,7 +84,7 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
                 SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
                 o.uid, username
                 FROM dbo.Island i
-                INNER JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
                 LEFT JOIN dbo.User ON i.uid = id
                 WHERE i.tag = :tag AND i.islandId NOT IN (
                     SELECT e.islandId FROM dbo.IslandEvent e
