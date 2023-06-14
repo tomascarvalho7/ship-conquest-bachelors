@@ -21,7 +21,7 @@ class StatisticsController with ChangeNotifier {
     notifyListeners();
   }
 
-  bool canMakeTransaction(int value) => statistics.currency > value;
+  bool canMakeTransaction(int value) => statistics.currency >= value;
 
   void makeTransaction(int value) {
     statistics = PlayerStats(

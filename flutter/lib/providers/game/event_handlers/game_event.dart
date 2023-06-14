@@ -49,10 +49,11 @@ class GameEvent {
     // get controllers
     final services = context.read<ShipServices>();
     final sceneController = context.read<SceneController>();
+    final shipController = context.read<ShipController>();
     final statisticsController = context.read<StatisticsController>();
     final feedbackController = context.read<FeedbackController>();
     // server request to conquest island, and then update current scene
-    services.conquestIsland(1, island.id).either(
+    services.conquestIsland(shipController.getMainShipId(), island.id).either(
         (left) => feedbackController.setError(left),
         (right) {
           statisticsController.makeTransaction(island.conquestCost());

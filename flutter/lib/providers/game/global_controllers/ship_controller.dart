@@ -18,7 +18,21 @@ class ShipController with ChangeNotifier {
   Sequence<int> shipIds = Sequence.empty();
   int selectedShip = 0;
 
-  Ship getMainShip() => ships.get(shipIds.get(selectedShip));
+  Ship getMainShip() {
+    Ship ship = ships.get(shipIds.get(selectedShip));
+    if (ship is MobileShip && ship.path.hasReachedDestiny()) {
+      return StaticShip(
+          sid: ship.sid,
+          coordinate: ship.path.getPosition(ship.path.landmarks.length * 1.0).toCoord2D(),
+          completedEvents: ship.completedEvents,
+          futureEvents: ship.futureEvents
+      );
+    }
+
+    return ship;
+  }
+
+  int getMainShipId() => shipIds.get(selectedShip);
 
   Ship getShip(int index) => ships.get(shipIds.get(index));
 

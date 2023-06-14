@@ -11,7 +11,7 @@ extension Utils on Island {
   /// is close to a [Island] entity, based on a
   /// defined criteria.
   bool isCloseTo(Position position) =>
-      distance(coordinate.toPosition(), position) <= radius * 2;
+      distance(coordinate.toPosition(), position) <= radius * 1.5;
 
   bool isOwnedByUser() => switch(this) {
     OwnedIsland(owned: final o) => o,

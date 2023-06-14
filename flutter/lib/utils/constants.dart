@@ -16,8 +16,8 @@ const waterColor = Color.fromRGBO(60, 151, 207, 1.0);
 const fightDuration = Duration(seconds: 60);
 // cost
 const shipCost = 50;
-const wildIslandCost = 125;
-const ownedIslandCost = 200;
+const wildIslandCost = 60;
+const ownedIslandCost = 100;
 // scale
 const globalScale = 1.0;
 const minimapSize = 900.0;

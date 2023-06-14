@@ -1,8 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/ship/utils/logic.dart';
-import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/utils.dart';
 import '../../../domain/isometric/isometric.dart';
@@ -39,7 +36,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
           duration: path.getCurrentDuration(),
           vsync: this
       )..forward();
-      animation = Tween<double>(begin: 0, end: path.landmarks.length.toDouble()).animate(controller);
+      animation = Tween<double>(begin: path.getStartFromTime(), end: path.landmarks.length.toDouble()).animate(controller);
     }
     super.didUpdateWidget(oldWidget);
   }

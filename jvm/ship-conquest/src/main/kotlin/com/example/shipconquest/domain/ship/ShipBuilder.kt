@@ -14,7 +14,7 @@ fun ShipBuilder.addEvents(newEvents: List<Event>) =
 
 fun ShipBuilder.build(instant: Instant) = Ship(
         sid = info.id,
-        movement = info.getCurrentMovement().build(instant = instant, events = events),
+        movement = info.getCurrentMovement().buildEvents(instant = instant, events = events),
         completedEvents = events.filter { it.instant.isBefore(instant) },
         futureEvents = events.filter { it.instant.isAfter(instant) }
             .map { event -> FutureEvent(event, Duration.between(instant, event.instant)) }
