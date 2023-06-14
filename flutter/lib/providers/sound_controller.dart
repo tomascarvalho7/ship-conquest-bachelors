@@ -8,8 +8,7 @@ class SoundController {
   final _background = AudioPlayer()
     ..setPlayerMode(PlayerMode.mediaPlayer)
     ..setReleaseMode(ReleaseMode.loop);
-  final _player = AudioPlayer()
-    ..setPlayerMode(PlayerMode.lowLatency);
+  final _player = AudioPlayer();
 
   void startBackgroundMusic() {
     _background.play(AssetSource('sounds/dreamland.mp3'), volume: .5);

@@ -15,19 +15,17 @@ class OverlayWidget extends StatefulWidget {
 }
 
 class OverlayWidgetState extends State<OverlayWidget> with WidgetsBindingObserver {
-  late FeedbackController feedbackController;
-  late SoundController soundController;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    feedbackController = context.read<FeedbackController>();
-    soundController = context.read<SoundController>();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final feedbackController = context.read<FeedbackController>();
+    final soundController = context.read<SoundController>();
     if (state == AppLifecycleState.paused) {
       soundController.pauseAudio();
     }
@@ -40,19 +38,25 @@ class OverlayWidgetState extends State<OverlayWidget> with WidgetsBindingObserve
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-    soundController.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (feedbackController.hasFeedback) {
-      WidgetsBinding.instance.addPostFrameCallback((_) =>
-          displayNotification(context));
-    }
-    return widget.child;
-  }
+  Widget build(BuildContext context) =>
+      Consumer2<FeedbackController, SoundController>(
+          builder: (_, feedbackController, soundController, __)  {
+            if (feedbackController.hasFeedback) {
+              WidgetsBinding.instance.addPostFrameCallback((_) =>
+                  displayNotification(context, feedbackController, soundController));
+            }
+            return widget.child;
+          }
+      );
 
-  void displayNotification(BuildContext context) {
+  void displayNotification(
+      BuildContext context,
+      FeedbackController feedbackController,
+      SoundController soundController
+      ) {
     final feedback = feedbackController.feedback; // read feedback
     if (feedback == null) return; // do nothing if null
 

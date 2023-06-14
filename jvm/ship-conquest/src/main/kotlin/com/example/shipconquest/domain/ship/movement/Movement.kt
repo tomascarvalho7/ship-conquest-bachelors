@@ -24,7 +24,7 @@ sealed interface Movement {
     fun build(instant: Instant, events: List<Event>): Movement {
         val movement = buildEvents(instant = instant, events = events)
 
-        return if (movement is Mobile && movement.getEndTime().isAfter(instant))
+        return if (movement is Mobile && movement.getEndTime().isBefore(instant))
             Stationary(position = movement.getFinalCoord())
         else movement
     }

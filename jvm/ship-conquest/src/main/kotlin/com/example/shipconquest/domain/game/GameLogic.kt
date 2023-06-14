@@ -148,7 +148,7 @@ class GameLogic(private val clock: Clock) {
         shipBuilder: ShipBuilder,
         shipBuilders: List<ShipBuilder>,
         onEvent: (instant: Instant, fightDetails: FightEvent) -> Event
-    ) = buildList<FightEvent> {
+    ) = buildList<Event> {
         // TODO: CHANGE
         /*
         // for every ship in movement
