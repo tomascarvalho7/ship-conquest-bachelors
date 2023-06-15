@@ -3,7 +3,13 @@ package com.example.shipconquest.domain.generators
 import kotlin.math.floor
 import kotlin.math.pow
 
+/**
+ * Singleton generator to generate a falloff noise texture.
+ *
+ * Inspired by: Sebastian Lague in the "Procedural Generation Series".
+ */
 object Falloff {
+    // generate the texture with width and height of a given [size]
     fun generateFalloffMap(size: Int): Grid<Float> {
         val falloffMap = Grid<Float>(data = mutableListOf(), size = size)
         val halfSize = floor(size / 2f)
@@ -19,6 +25,7 @@ object Falloff {
         return falloffMap
     }
 
+    // handle the falloff shape
     private fun evaluate(value: Float): Float {
         val a = 3f
         val b = 1.4f

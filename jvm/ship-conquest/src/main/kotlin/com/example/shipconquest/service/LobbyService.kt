@@ -2,7 +2,7 @@ package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.Factor
 import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.game.GameLogic
+import com.example.shipconquest.domain.game.logic.GameLogic
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.domain.world.WorldGenerator

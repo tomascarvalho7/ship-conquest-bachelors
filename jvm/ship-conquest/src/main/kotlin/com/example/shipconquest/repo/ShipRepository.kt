@@ -1,10 +1,8 @@
 package com.example.shipconquest.repo
 
 
-import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.movement.Mobile
-import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.space.Vector2
 import org.slf4j.Logger
 import java.time.Duration
@@ -31,7 +29,7 @@ interface ShipRepository {
         tag: String,
         uid: String,
         shipId: Int,
-        movement: Mobile
+        movement: Kinetic
     )
 
     fun deleteShipEntry(tag: String, shipId: String, uid: String)

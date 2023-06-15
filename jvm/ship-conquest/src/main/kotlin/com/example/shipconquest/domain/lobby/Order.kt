@@ -1,4 +1,5 @@
 package com.example.shipconquest.domain.lobby
+
 /**
  * Enum class representing an Order
  */
@@ -7,6 +8,7 @@ enum class Order {
     DESCENDING
 }
 
+// [Order] builder function
 fun String?.toOrderOrNull(): Order? {
     return when (this) {
         null -> Order.DESCENDING
@@ -16,9 +18,7 @@ fun String?.toOrderOrNull(): Order? {
     }
 }
 
-/**
- * Maps an Order to a SQL valid string
- */
+// Maps an Order to a SQL valid string
 fun Order.toSQLOrder(): String {
     return when (this) {
         Order.ASCENDING -> "ASC"

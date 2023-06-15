@@ -2,14 +2,14 @@ package com.example.shipconquest.domain.event.logic
 
 import com.example.shipconquest.Clock
 import com.example.shipconquest.domain.Position
+import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
 import com.example.shipconquest.domain.event.logic.utils.plane.isOverlapping
 import com.example.shipconquest.domain.bezier.CubicBezier
 import com.example.shipconquest.domain.ship.ShipBuilder
-import com.example.shipconquest.domain.ship.getMobileMovementOrNull
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.bezier.utils.*
 import com.example.shipconquest.domain.distanceTo
 import com.example.shipconquest.domain.event.logic.utils.calculateWinner
@@ -21,7 +21,11 @@ import java.time.Instant
 import kotlin.math.min
 
 /**
- * The [EventLogic] class handles event-related logic, including building fight events and island events.
+ * The [EventLogic] class handles event-related logic, including:
+ * - Building fight events;
+ * - Building island events.
+ *
+ * This class is aware of the concept of time through the [clock] value.
  */
 class EventLogic(private val clock: Clock) {
     // find the first intersection between two ships to build a fight event
@@ -41,13 +45,14 @@ class EventLogic(private val clock: Clock) {
 
     // find the first intersection between a ship and the unknown islands
     fun buildIslandEvents(
-        pathMovement: Mobile,
+        pathMovement: Kinetic,
         islands: List<Island>,
         onIslandEvent: (instant: Instant, island: Island) -> Event
     ): List<Event> {
         val intersection = findIntersectionPoints(pathMovement.getUniquePoints(), islands) ?: return emptyList()
         val points = pathMovement
-            .landmarks[intersection.lineIndex / 3]
+            .spline
+            .segments[intersection.lineIndex / 3]
             .sample(10)
 
 
@@ -71,8 +76,8 @@ class EventLogic(private val clock: Clock) {
         return t
     }
 
-    // get first intersection between two ships
-    private fun getFirstIntersection(movement: Mobile, enemy: Mobile): Instant? {
+    // get first intersection between two ships with [Kinetic] movement
+    private fun getFirstIntersection(movement: Kinetic, enemy: Kinetic): Instant? {
         val pathOutline = buildOutlinePlanes(movement.getUniquePoints(), thickness = 5.0)
         // get enemy route info
         val index = (enemy.getU(clock.now()) * 3).toInt() // plane index
@@ -85,8 +90,8 @@ class EventLogic(private val clock: Clock) {
             val otherPlane = otherOutline[otherPlaneIndex]
             // check if planes are overlapping
             if (plane.isOverlapping(otherPlane)) {
-                val pathSegment = sampleSegmentOfBezier(beziers = movement.landmarks, u = i)
-                val otherPathSegment = sampleSegmentOfBezier(beziers = enemy.landmarks, u = otherPlaneIndex)
+                val pathSegment = sampleSegmentOfBezier(spline = movement.spline, u = i)
+                val otherPathSegment = sampleSegmentOfBezier(spline = enemy.spline, u = otherPlaneIndex)
 
                 val t = comparePoints(pathSegment, otherPathSegment)
                 val u = (t + i) / 3
@@ -96,10 +101,10 @@ class EventLogic(private val clock: Clock) {
         return null
     }
 
-    // split and sample line segment from [CubicBezier]
-    private fun sampleSegmentOfBezier(beziers: List<CubicBezier>, u: Int): List<Position> {
+    // split and sample line segment from [BezierSpline]
+    private fun sampleSegmentOfBezier(spline: BezierSpline, u: Int): List<Position> {
         val s = u % 3
-        return beziers[u / 3]
+        return spline.segments[u / 3]
             .split(start = s / 3.0, end = (s + 1) / 3.0)
             .sample(numPoints = 5)
     }

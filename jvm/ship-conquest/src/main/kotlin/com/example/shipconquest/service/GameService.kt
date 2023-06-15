@@ -1,13 +1,14 @@
 package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.*
+import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.bezier.CubicBezier
 import com.example.shipconquest.domain.bezier.utils.toVector2List
 import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.game.GameLogic
+import com.example.shipconquest.domain.game.logic.GameLogic
 import com.example.shipconquest.domain.ship.*
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.getCurrency
@@ -43,8 +44,13 @@ class GameService(
 
     fun getChunks(tag: String, shipId: Int, uid: String): GetChunksResult {
         return transactionManager.run { transaction ->
-            val shipBuilder = gameLogic.getShipBuilder(tag = tag, uid = uid, sid = shipId, transaction = transaction)
-                ?: return@run left(GetChunksError.ShipPositionNotFound)
+            val shipBuilder = gameLogic.getShipBuilder(
+                tag = tag,
+                uid = uid,
+                sid = shipId,
+                getShipInfo = transaction.shipRepo::getShipInfo,
+                getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
+            ) ?: return@run left(GetChunksError.ShipPositionNotFound)
             val coord = gameLogic.getCoordFromMovement(gameLogic.buildShip(shipBuilder).movement)
 
             val game = transaction.gameRepo.get(tag = tag) // TODO: can be optimized
@@ -53,7 +59,7 @@ class GameService(
                 val nearIslands = getNearIslands(coordinate = coord, islands = islands)
                 right(
                     value = Horizon(
-                        tiles = game.inspectIslands(nearIslands),
+                        voxels = game.inspectIslands(nearIslands),
                         islands = nearIslands
                     )
                 )
@@ -90,20 +96,25 @@ class GameService(
             val currInstant = gameLogic.getInstant()
 
             val islandsCenter = mutableListOf<Vector2>()
-            val movements = mutableListOf<Pair<Int, Mobile>>()
             val pathPoints = mutableListOf<Vector2>()
             // iterate in users ships
             for (ship in userShips) {
                 // get ship path
                 val events = transaction.eventRepo.getShipEvents(tag = tag, uid = uid, sid = ship.id)
-                ship.movements.forEach {
-                    val processedMovement = it.buildEvents(currInstant, events)
-                    if (processedMovement is Mobile) {
-                        movements.add(Pair(ship.id, processedMovement))
-                    }
-                }
+                val builtMovements = ship.movements
+                    .map { it.buildEvents(currInstant, events) }
+                    .filterIsInstance<Kinetic>()
+                // add trimmed movements to list of control points
+                pathPoints.addAll(gameLogic.trimMovements(builtMovements))
 
-                // get known islands TODO: eventRepo.getIslands(tag, uid)
+
+                // filter island events TODO: eventRepo.getIslands(tag, uid)
+                val islandEvents = events.filter { event ->
+                    event.details is IslandEvent && event.instant.isBefore(gameLogic.getInstant())
+                }
+                for (event in islandEvents) {
+
+                }
                 transaction.eventRepo.getIslandEventsBeforeInstant(
                     tag = tag,
                     sid = ship.id,
@@ -146,10 +157,8 @@ class GameService(
     }
 
     fun navigate(tag: String, uid: String, shipId: Int, points: List<Vector2>): NavigationResult {
-        val movement = gameLogic.buildShipMovement(points)
-        if (!validateNavigationPath(movement.landmarks)) {
+        val movement = gameLogic.buildMovementFromPoints(points) ?:
             return left(NavigationError.InvalidNavigationPath)
-        }
 
         return transactionManager.run { transaction ->
             val shipInfo = transaction.shipRepo.getShipInfo(tag = tag, shipId =  shipId, uid = uid)
@@ -169,8 +178,13 @@ class GameService(
                 transaction.eventRepo.createIslandEvent(tag, instant, IslandEvent(shipId, island))
             }
             val shipBuilder = ShipBuilder(info = shipInfo, events = islandEvents)
-            val ships = gameLogic.getEnemyShipsBuilder(tag = tag, uid = uid, transaction)
-            val fightEvents = gameLogic.buildFightEvents(shipBuilder, ships) { instant, details ->
+            val fleetBuilder = gameLogic.getFleetBuilder(
+                tag = tag,
+                uid = uid,
+                getFleet = transaction.shipRepo::getOtherShipsInfo,
+                getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
+            )
+            val fightEvents = gameLogic.buildFightEvents(shipBuilder, fleetBuilder) { instant, details ->
                 transaction.eventRepo.createFightingEvent(tag, instant, details)
             }
             right(gameLogic.buildShip(shipBuilder.addEvents(newEvents = fightEvents)))
@@ -181,7 +195,13 @@ class GameService(
         return transactionManager.run { transaction ->
             // check if game exists
             transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipError.GameNotFound)
-            val builder = gameLogic.getShipBuilder(tag = tag, uid = uid, sid = shipId, transaction)
+            val builder = gameLogic.getShipBuilder(
+                tag = tag,
+                uid = uid,
+                sid = shipId,
+                getShipInfo = transaction.shipRepo::getShipInfo,
+                getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
+            )
                 ?: return@run left(GetShipError.ShipNotFound)
 
             return@run right(
@@ -194,11 +214,17 @@ class GameService(
         return transactionManager.run { transaction ->
             // check if game exists
             transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipsError.GameNotFound)
-            val shipsBuilder = gameLogic.getShipsBuilder(tag = tag, uid = uid, transaction)
+            val fleetBuilder = gameLogic.getFleetBuilder(
+                tag = tag,
+                uid = uid,
+                getFleet = transaction.shipRepo::getShipsInfo,
+                getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
+
+            )
 
             return@run right(
                 value = Fleet(
-                    ships = shipsBuilder.map { builder -> gameLogic.buildShip(builder = builder) }
+                    ships = fleetBuilder.map { builder -> gameLogic.buildShip(builder = builder) }
                 )
             )
         }
@@ -281,22 +307,22 @@ class GameService(
     }
 }
 
-fun validateNavigationPath(landmarks: List<CubicBezier>): Boolean {
+fun validateNavigationPath(spline: BezierSpline): Boolean {
     //validate path
     return true
 }
 
-fun buildBeziers(points: List<Vector2>): List<CubicBezier> {
-    if (points.size % 4 != 0) return emptyList()
+fun buildSpline(points: List<Vector2>): BezierSpline? {
+    if (points.size % 4 != 0) return null
 
-    return List(points.size / 4) { index ->
+    return BezierSpline(segments = List(points.size / 4) { index ->
         CubicBezier(
             p0 = points[index * 4],
             p1 = points[(index * 4) + 1],
             p2 = points[(index * 4) + 2],
             p3 = points[(index * 4) + 3]
         )
-    }
+    })
 }
 
 fun formatDuration(durationString: Duration): String {
@@ -306,20 +332,4 @@ fun formatDuration(durationString: Duration): String {
     dateFormat.timeZone = TimeZone.getTimeZone("UTC")
 
     return dateFormat.format(Date(durationMillis))
-}
-
-fun trimPaths(movementList: List<Pair<Int, Mobile>>, instant: Instant): List<CubicBezier> {
-    val paths = movementList.sortedBy { it.first }
-    var oldPath: Pair<Int, Mobile>? = null
-    val bezierList = hashMapOf<Mobile, List<CubicBezier>>()
-    for (path in paths) {
-        val movement = path.second
-        val oldMovement = oldPath?.second
-        if (oldPath?.first == path.first && oldMovement != null && (oldMovement.startTime + oldMovement.duration).isAfter(movement.startTime)) {
-            bezierList[oldMovement] = oldMovement.splitPathBeforeTime(movement.startTime)
-        }
-        bezierList[movement] = movement.splitPathBeforeTime(instant)
-        oldPath = path
-    }
-    return bezierList.values.flatten()
 }

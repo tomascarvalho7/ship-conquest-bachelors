@@ -8,6 +8,6 @@ import com.example.shipconquest.domain.world.Horizon
 data class HorizonOutputModel(val tiles: List<Vector3OutputModel>, val islands: List<IslandOutputModel>)
 
 fun Horizon.toHorizonOutputModel() = HorizonOutputModel(
-    tiles = tiles.map { it.toVector3OutputModel() },
+    tiles = voxels.map { it.toVector3OutputModel() },
     islands = islands.map { it.toIslandOutputModel() }
 )

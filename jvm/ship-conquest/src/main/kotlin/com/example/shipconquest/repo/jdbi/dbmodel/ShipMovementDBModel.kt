@@ -1,11 +1,11 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
 
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.service.buildBeziers
+import com.example.shipconquest.service.buildSpline
 import java.time.Duration
 import java.time.Instant
 
@@ -41,8 +41,8 @@ fun ShipMovementDBModel.toMovement(): Movement {
     )
 
 
-    return Mobile(
-        landmarks = buildBeziers(points.points.map { Vector2(it.x, it.y) }),
+    return Kinetic(
+        landmarks = buildSpline(points.points.map { Vector2(it.x, it.y) }),
         startTime = startTime,
         duration = duration
     )

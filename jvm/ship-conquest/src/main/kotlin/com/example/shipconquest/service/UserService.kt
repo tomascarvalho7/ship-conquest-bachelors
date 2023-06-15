@@ -2,7 +2,7 @@ package com.example.shipconquest.service
 
 import com.example.shipconquest.domain.user.Token
 import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.UserLogic
+import com.example.shipconquest.domain.user.logic.UserLogic
 import com.example.shipconquest.domain.user.toToken
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.Transaction

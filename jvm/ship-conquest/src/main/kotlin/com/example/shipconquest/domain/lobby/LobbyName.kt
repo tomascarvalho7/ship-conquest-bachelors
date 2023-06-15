@@ -6,6 +6,7 @@ package com.example.shipconquest.domain.lobby
  */
 data class LobbyName(val name: String)
 
+// [LobbyName] builder function
 fun String.toLobbyName(): LobbyName? {
     if (this.length !in 4..16) return null
 

@@ -5,7 +5,7 @@ import com.example.shipconquest.domain.space.Vector3
 import kotlin.math.*
 
 /**
- * The [HeightMap] class represents a height map, which is a two-dimensional
+ * The [HeightMap] class represents immutable a height map, which is a two-dimensional
  * data structure that stores elevation values for each coordinate.
  */
 data class HeightMap(val data: Map<Vector2, Int>, val size: Int)

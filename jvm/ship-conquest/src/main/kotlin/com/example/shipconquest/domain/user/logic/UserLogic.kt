@@ -1,9 +1,14 @@
-package com.example.shipconquest.domain.user
+package com.example.shipconquest.domain.user.logic
 
+import com.example.shipconquest.domain.user.Token
 import org.springframework.stereotype.Component
 import java.security.SecureRandom
 import java.util.*
 
+/**
+ * The [UserLogic] class handles all the user-related logic, including:
+ * - Generating a random secure token.
+ */
 @Component
 class UserLogic {
     fun generateToken(): String = ByteArray(TOKEN_BYTE_SIZE)
@@ -11,14 +16,6 @@ class UserLogic {
             SecureRandom.getInstanceStrong().nextBytes(byteArray)
             Base64.getUrlEncoder().encodeToString(byteArray)
         }
-
-    fun canBeToken(token: Token): Boolean = try {
-        Base64.getUrlDecoder()
-            .decode(token.value).size == TOKEN_BYTE_SIZE
-    } catch (ex: IllegalArgumentException) {
-        false
-    }
-
     companion object {
         private const val TOKEN_BYTE_SIZE = 256 / 8
     }

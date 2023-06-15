@@ -3,7 +3,11 @@ package com.example.shipconquest.domain.generators
 import com.example.shipconquest.domain.space.Vector2
 import kotlin.math.sqrt
 
-// 2D Simplex noise
+/**
+ * Singleton generator to generate a 2D Simplex Noise texture.
+ *
+ * Inspired by: The https://github.com/jrenner/kotlin-voxel Simplex Noise implementation
+ */
 object SimplexNoise {
     private val grad3 = arrayOf(
         Grad(1.0, 1.0, 0.0), Grad(-1.0, 1.0, 0.0), Grad(1.0, -1.0, 0.0), Grad(-1.0, -1.0, 0.0),
@@ -11,6 +15,7 @@ object SimplexNoise {
         Grad(0.0, 1.0, 1.0), Grad(0.0, -1.0, 1.0), Grad(0.0, 1.0, -1.0), Grad(0.0, -1.0, -1.0)
     )
 
+    // list of random numbers
     private val p = shortArrayOf(
         151, 160, 137, 91, 90, 15,
         131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
@@ -112,14 +117,18 @@ object SimplexNoise {
         return 70.0 * (n0 + n1 + n2)
     }
 
+    /**
+     * Generator function to generate Simplex Noise texture with a width & height of the
+     * given [size].
+     * The [offset] value changes the space coordinates of the resulting texture, and the
+     *  [frequency] value changes the frequency and thus the size of the resulting values.
+     */
     fun generateSimplexNoise(
         size: Int,
         offset: Vector2,
         frequency: Double
     ): Grid<Double> {
         val noiseMap = Grid<Double>(data = mutableListOf(), size = size)
-
-        // build array
 
         var y = 0
         while (y < size) {

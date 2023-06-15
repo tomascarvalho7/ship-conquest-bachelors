@@ -2,7 +2,7 @@ package com.example.shipconquest.controller.model.output.ship
 
 import com.example.shipconquest.controller.model.output.Vector2OutputModel
 import com.example.shipconquest.controller.model.output.toVector2OutputModel
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.service.formatDuration
@@ -19,7 +19,7 @@ data class StationaryOutputModel(val coord: Vector2OutputModel): MovementOutputM
 
 fun Movement.toMovementOutputModel() =
     when (this) {
-        is Mobile -> MobileOutputModel(
+        is Kinetic -> MobileOutputModel(
             points = getPoints().map { it.toVector2OutputModel() },
             startTime = startTime.toString(),
             duration = formatDuration(duration)

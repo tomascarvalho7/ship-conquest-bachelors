@@ -3,6 +3,10 @@ package com.example.shipconquest.domain.world
 import com.example.shipconquest.domain.space.Vector2
 import java.util.HashMap
 
+/**
+ * The [HeightMapBuilder] class is the builder class for the immutable [HeightMap] class.
+ * Includes a mutable implementation of the [HeightMap] class.
+ */
 class HeightMapBuilder(val size: Int) {
     private val hashMap = HashMap<Vector2, Int>()
 

@@ -5,11 +5,11 @@ import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.event_details.IslandEvent
-import com.example.shipconquest.domain.game.GameLogic
+import com.example.shipconquest.domain.game.logic.GameLogic
 import com.example.shipconquest.domain.bezier.CubicBezier
 import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.IslandIncome
@@ -50,7 +50,7 @@ class GameLogicTests {
             Vector2(3, 0)
         )
 
-        val movement = gameLogic.buildShipMovement(points)
+        val movement = gameLogic.buildMovementFromPoints(points)
 
         assertEquals(1, movement.landmarks.size)
         assertEquals(testClock.now(), movement.startTime)
@@ -165,7 +165,7 @@ class GameLogicTests {
     @Test
     fun getCoordFromMobileMovementAtStart() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(2, 0), Vector2(3, 0))
             ),
@@ -181,7 +181,7 @@ class GameLogicTests {
     @Test
     fun getCoordFromMobileMovementAtMiddle() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
             ),
@@ -197,7 +197,7 @@ class GameLogicTests {
     @Test
     fun getCoordFromMobileMovementAtEnd() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
             ),
@@ -294,7 +294,7 @@ class GameLogicTests {
     @Test
     fun shipFindIsland() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(1, 0), Vector2(4, 0), Vector2(7, 0), Vector2(10, 0))
             ),
@@ -332,7 +332,7 @@ class GameLogicTests {
     @Test
     fun shipMissIsland() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(1, -5), Vector2(4, -5), Vector2(7, -5), Vector2(10, -5))
             ),
@@ -368,14 +368,14 @@ class GameLogicTests {
     @Test
     fun shipFightAnotherShip() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
         )
-        val enemyMovement = Mobile(
+        val enemyMovement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(4, -10), Vector2(4, -5), Vector2(4, 0), Vector2(4, 10))
             ),
@@ -400,14 +400,14 @@ class GameLogicTests {
     @Test
     fun shipMissFightWithAnotherShip() {
         val gameLogic = GameLogic(testClock)
-        val movement = Mobile(
+        val movement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
         )
-        val enemyMovement = Mobile(
+        val enemyMovement = Kinetic(
             landmarks = listOf(
                 CubicBezier(Vector2(4, -20), Vector2(4, -15), Vector2(4, -10), Vector2(4, -5))
             ),

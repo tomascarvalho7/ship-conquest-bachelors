@@ -16,8 +16,8 @@ const val seaLevel = 2
  * World Generator class is a tool to generate:
  * - islands: generating random points in a 2D grid;
  * - terrain: using the [SimplexNoise] generator;
- * - world: using both these generator it generates the entire
- * world. Building a terrain for each random point created.
+ * - world: using both of these generator to generate the entire world.
+ * Building a terrain for each random point created.
  */
 class WorldGenerator(
     private val worldSize: Int
@@ -25,14 +25,18 @@ class WorldGenerator(
     val islandSize = 25
     private val falloffGrid = Falloff.generateFalloffMap(islandSize)
 
+    /**
+     * function to generate the island coordinates in a space of width & height of [worldSize]
+     * in a given [islandDensity].
+     */
     fun generateIslandCoordinates(
-        islandDensity: Factor, // 0 a 100
+        islandDensity: Factor, // 0 to 100
     ): List<Vector2> {
         if (worldSize == 0) return emptyList()
 
-        val numIslands = calculateNumberOfIslands(islandDensity)
-        val gridSize = worldSize / max(1, numIslands)
-        val offset = gridSize / 2
+        val numIslands = calculateNumberOfIslands(islandDensity);
+        val gridSize = worldSize / max(1, numIslands);
+        val offset = gridSize / 2;
 
         return buildList {
             for (y in 0 until numIslands) {
@@ -49,6 +53,7 @@ class WorldGenerator(
         }
     }
 
+    // generate island terrain for every island coordinate
     fun generate(origins: List<Vector2>) =
         HeightMapBuilder(worldSize).build {
             for (origin in origins) {
@@ -56,12 +61,14 @@ class WorldGenerator(
             }
         }
 
+    // calculate number of island inside a given space with a given [density] of islands
     private fun calculateNumberOfIslands(density: Factor): Int {
         val numIslands = (worldSize * (density.value / 100.0)) / (islandSize * 2)
 
         return numIslands.toInt()
     }
 
+    // generate island-like terrain
     private fun generateIslandTerrain(origin: Vector2, builder: HeightMapBuilder) {
         val noiseMap = SimplexNoise.generateSimplexNoise(size = islandSize, offset = origin, frequency = frequency)
         val offset = origin - Vector2(islandSize / 2, islandSize / 2)

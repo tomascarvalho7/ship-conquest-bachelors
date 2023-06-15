@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.game
+package com.example.shipconquest.domain.game.logic
 
 import com.example.shipconquest.Clock
 import com.example.shipconquest.domain.space.Vector2
@@ -6,12 +6,11 @@ import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.logic.EventLogic
 import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
-import com.example.shipconquest.domain.ship.movement.Mobile
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.build
 import com.example.shipconquest.domain.toVector2
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
@@ -23,8 +22,7 @@ import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.OwnershipDetails
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.domain.world.pulse
-import com.example.shipconquest.repo.Transaction
-import com.example.shipconquest.service.buildBeziers
+import com.example.shipconquest.service.buildSpline
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -32,15 +30,31 @@ import kotlin.math.roundToLong
 import kotlin.random.Random
 
 const val incomePerHour = 25
+
+/**
+ * The [GameLogic] class handles all game-related logic, including:
+ * - Making transactions to the player's currency;
+ * - Building the player's statistics at the current [Instant];
+ * - Building the movement of a ship at the current [Instant];
+ * - Player and Island interactions;
+ * - Generating a random spawn point in the world;
+ * - All the [EventLogic] class logic.
+ *
+ * This class is aware of the concept of time through the [clock] value.
+ */
 @Component
 class GameLogic(private val clock: Clock) {
     val eventLogic = EventLogic(clock)
+
+    // get current instant
     fun getInstant() = clock.now()
 
+    // get the last movement made by a ship
     fun getMostRecentMovement(info: ShipInfo): Movement {
         return info.movements.last()
     }
 
+    // make (if possible) a transaction to the current player's currency
     fun makeTransaction(
         statistics: PlayerStatsBuilder,
         transaction: Int,
@@ -54,6 +68,7 @@ class GameLogic(private val clock: Clock) {
         return newCurrency
     }
 
+    // conquest (if possible) an island
     fun conquestIsland(
         user: User,
         island: Island,
@@ -78,69 +93,67 @@ class GameLogic(private val clock: Clock) {
         return newIsland
     }
 
+    // get X and Y axis coordinate from a ship movement at the current [Instant]
     fun getCoordFromMovement(movement: Movement) = when(movement) {
-        is Mobile -> movement.getPositionFromInstant(clock.now()).toVector2()
+        is Kinetic -> movement.getPositionFromInstant(clock.now()).toVector2()
         is Stationary -> movement.position
     }
 
+    // build the player's statistics at the current [Instant]
     fun buildPlayerStatistics(builder: PlayerStatsBuilder) = builder.build(clock.now())
 
-    fun getShipBuilder(tag: String, uid: String, sid: Int, transaction: Transaction): ShipBuilder? {
-        val info = transaction.shipRepo.getShipInfo(tag = tag, uid = uid, shipId = sid) ?: return null
+    // get an [ShipBuilder] from the ship's movements and events
+    fun getShipBuilder(
+        tag: String,
+        uid: String,
+        sid: Int,
+        getShipInfo: (tag: String, sid: Int, uid: String) -> ShipInfo?,
+        getEventsAfterInstant: (tag: String, uid: String, sid: Int, instant: Instant) -> List<Event>
+    ): ShipBuilder? {
+        val info = getShipInfo(tag, sid, uid) ?: return null
 
         val lastMovement = getMostRecentMovement(info)
-        val events = if (lastMovement is Mobile) {
-            transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = sid, uid = uid, instant = lastMovement.startTime)
+        val events = if (lastMovement is Kinetic) {
+            getEventsAfterInstant(tag, uid, sid, lastMovement.startTime)
         } else emptyList()
 
         return ShipBuilder(info = info, events = events)
     }
 
-    fun getShipsBuilder(tag: String, uid: String, transaction: Transaction): List<ShipBuilder> {
-        val fleetInfo = transaction.shipRepo.getShipsInfo(tag = tag, uid = uid)
+    // get all [ShipBuilder] from the player's fleet
+    fun getFleetBuilder(
+        tag: String,
+        uid: String,
+        getFleet: (tag: String, uid: String) -> List<ShipInfo>,
+        getEventsAfterInstant: (tag: String, uid: String, sid: Int, instant: Instant) -> List<Event>
+        ): List<ShipBuilder> {
+        val fleetInfo = getFleet(tag, uid)
 
         return List(fleetInfo.size) { index ->
             val info = fleetInfo[index]
 
             val lastMovement = getMostRecentMovement(info)
-            val events = if (lastMovement is Mobile) {
-                transaction.eventRepo.getShipEventsAfterInstant(tag = tag, sid = info.id, uid = uid, instant = lastMovement.startTime)
+            val events = if (lastMovement is Kinetic) {
+                getEventsAfterInstant(tag, uid, info.id, lastMovement.startTime)
             } else emptyList()
 
             return@List ShipBuilder(info = info, events = events)
         }
     }
 
-    fun getEnemyShipsBuilder(tag: String, uid: String, transaction: Transaction): List<ShipBuilder> {
-        val enemyFleetInfo = transaction.shipRepo.getOtherShipsInfo(tag = tag, uid = uid)
-
-        return List(enemyFleetInfo.size) { index ->
-            val info = enemyFleetInfo[index]
-
-            val lastMovement = getMostRecentMovement(info)
-            val events = if (lastMovement is Mobile) {
-                transaction.eventRepo.getShipEventsAfterInstant(
-                    tag = tag,
-                    uid = uid,
-                    sid = info.id,
-                    instant = lastMovement.startTime
-                )
-            } else emptyList()
-
-            return@List ShipBuilder(info = info, events = events)
-        }
-    }
-
+    // build a static [Ship] from an [ShipBuilder]
     fun buildShip(builder: ShipBuilder) = builder.build(clock.now())
 
+    // build island events between a ship and a group of islands
     fun buildIslandEvents(
-        pathMovement: Mobile,
+        pathMovement: Kinetic,
         islands: List<Island>,
         onIslandEvent: (instant: Instant, island: Island) -> Event
     ): List<Event> {
         return eventLogic.buildIslandEvents(pathMovement, islands, onIslandEvent)
     }
 
+    // build fight events between ships
     fun buildFightEvents(
         shipBuilder: ShipBuilder,
         shipBuilders: List<ShipBuilder>,
@@ -153,7 +166,8 @@ class GameLogic(private val clock: Clock) {
         }
     }
 
-    fun buildShipMovement(points: List<Vector2>): Mobile {
+    // build ship movement from list of points
+    fun buildMovementFromPoints(points: List<Vector2>): Kinetic? {
         var distance = 0.0;
         for (i in 0 until points.size - 1) {
             val a = points[i];
@@ -162,9 +176,12 @@ class GameLogic(private val clock: Clock) {
         }
         val duration = Duration.ofSeconds((distance * 2.5).roundToLong()) // was 10 before
 
-        return Mobile(landmarks = buildBeziers(points), startTime = clock.now(), duration = duration)
+        val spline = buildSpline(points) ?: return null
+        return Kinetic(spline = spline, startTime = clock.now(), duration = duration)
     }
 
+    // generate a random point and search for a [Vector2] coordinate that is free
+    // in a radius of 15x15
     fun generateRandomSpawnPoint(world: HeightMap): List<Vector2> {
         while(true) {
             val randomCoord = Vector2(
@@ -172,8 +189,19 @@ class GameLogic(private val clock: Clock) {
                 y = Random.nextInt(from = 0, until = world.size)
             )
 
-            if (world.pulse(origin = randomCoord, radius = 30, water = false).isEmpty())
+            if (world.pulse(origin = randomCoord, radius = 15, water = false).isEmpty())
                 return listOf(randomCoord)
         }
+    }
+
+    fun trimMovements(movements: List<Kinetic>) = buildList {
+        val instant = clock.now()
+        for (index in 0 until movements.size - 1) {
+            val first = movements[index]
+            val second = movements[index + 1]
+
+            addAll(first.shorten(instant = second.startTime).getPoints())
+        }
+        addAll(movements.last().shorten(instant).getPoints())
     }
 }

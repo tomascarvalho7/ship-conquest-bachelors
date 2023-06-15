@@ -5,6 +5,14 @@ import java.time.Instant
 import java.time.Period
 import kotlin.math.floor
 
+/**
+ * The [IslandIncome] data class holds the data for a player income
+ * from his owned island.
+ *
+ * The [incomePerHour] value represents the currency given to the
+ * player by the hour. The [conquestDate] value is the [Instant] since
+ * this island has been owned by the player.
+ */
 data class IslandIncome(val incomePerHour: Int, val conquestDate: Instant)
 
 /**

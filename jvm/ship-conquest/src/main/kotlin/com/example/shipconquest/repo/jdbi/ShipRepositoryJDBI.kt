@@ -1,9 +1,7 @@
 package com.example.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.movement.Mobile
-import com.example.shipconquest.domain.ship.movement.Movement
+import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.repo.ShipRepository
@@ -120,7 +118,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         tag: String,
         uid: String,
         shipId: Int,
-        movement: Mobile
+        movement: Kinetic
     ) {
         logger.info("Updating a ship's position of user {} in lobby {}", uid, tag)
 
