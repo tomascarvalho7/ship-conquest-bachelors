@@ -1,25 +1,20 @@
-
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/providers/game/event_handlers/minimap_event.dart';
+import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
+import 'package:ship_conquest/providers/game/global_controllers/ship_controller.dart';
+import 'package:ship_conquest/providers/game/minimap_controllers/route_controller.dart';
+import 'package:ship_conquest/utils/constants.dart';
+import 'package:ship_conquest/widgets/miscellaneous/path/path_management_interface.dart';
+import 'package:ship_conquest/widgets/miscellaneous/path/path_view.dart';
+import 'package:ship_conquest/widgets/miscellaneous/path/route_view.dart';
+import 'package:ship_conquest/widgets/screens/minimap/minimap_view.dart';
+import 'package:ship_conquest/widgets/screens/minimap/utils/camera_path_controller.dart';
 
-import '../../../providers/camera_controller.dart';
-import '../../../providers/global_state.dart';
-import '../../../providers/game/global_controllers/minimap_controller.dart';
-import '../../../providers/game/minimap_controllers/route_controller.dart';
-import '../../../providers/game/global_controllers/ship_controller.dart';
-import '../../../providers/game/global_controllers/scene_controller.dart';
-import '../../../services/ship_services/ship_services.dart';
-import '../../../utils/constants.dart';
-import 'utils/camera_path_controller.dart';
-import '../../miscellaneous/path/path_management_interface.dart';
-import '../../miscellaneous/path/path_view.dart';
-import '../../miscellaneous/path/route_view.dart';
-import '../../../providers/game/event_handlers/minimap_event.dart';
-import 'minimap_view.dart';
 
+
+/// Builds the whole minimap screen by joining the smaller parts together.
 class MinimapVisuals extends StatelessWidget {
   const MinimapVisuals({super.key});
 
@@ -69,7 +64,7 @@ class MinimapVisuals extends StatelessWidget {
   }
 
   Widget pathManagementInterfaceHolder() =>
-      const Positioned(
+       const Positioned(
           bottom: 20,
           child: PathManagementInterface()
       );

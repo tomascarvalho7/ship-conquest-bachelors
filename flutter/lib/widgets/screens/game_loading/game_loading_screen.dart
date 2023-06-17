@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/widgets/screens/initial_loading/loading_screen.dart';
+import 'package:ship_conquest/providers/game/game_controller.dart';
+import 'package:ship_conquest/widgets/screens/wave_loading_screen/loading_screen.dart';
 
-import '../../../providers/game/game_controller.dart';
 
+/// A loading screen which loads the current game's info.
+///
+/// If the game is correctly loaded then proceed to its view, else go back to home.
 class GameLoadingScreen extends StatefulWidget {
   const GameLoadingScreen({super.key});
 

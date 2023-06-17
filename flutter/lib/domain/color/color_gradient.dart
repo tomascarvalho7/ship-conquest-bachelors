@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/color/color_ramp.dart';
+import 'package:ship_conquest/domain/utils/factor.dart';
 
-import '../utils/factor.dart';
-
-/// Build a set of colors based on a transformation with a colorRamp instance
+/// Build a set of colors based on a transformation with a ColorRamp
+/// instance [colorRamp] and a [step].
 class ColorGradient {
   final ColorRamp colorRamp;
   final Factor step;
@@ -20,5 +20,6 @@ class ColorGradient {
     required this.step
   });
 
+  /// Gets the color from the gradient at a given [height].
   Color get(int height) => colors[height];
 }

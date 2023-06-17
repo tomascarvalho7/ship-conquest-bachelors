@@ -4,6 +4,7 @@ import 'package:ship_conquest/providers/camera_controller.dart';
 import 'package:ship_conquest/providers/game/minimap_controllers/route_controller.dart';
 import 'minimap_visuals.dart';
 
+/// Instantiates the necessary controllers and builds the minimap screen.
 class MinimapScreen extends StatelessWidget {
   const MinimapScreen({super.key});
 

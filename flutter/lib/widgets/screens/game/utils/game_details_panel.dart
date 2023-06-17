@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/utils.dart';
+import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/providers/camera_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
 import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/elements/add_ship_element.dart';
+import 'package:ship_conquest/widgets/screens/game/utils/elements/island_element.dart';
+import 'package:ship_conquest/widgets/screens/game/utils/elements/ship_element.dart';
 
-import '../../../../domain/island/island.dart';
-import '../../../../domain/ship/ship.dart';
-import '../../../../domain/immutable_collections/sequence.dart';
-import 'elements/island_element.dart';
-import 'elements/ship_element.dart';
 
+/// Builds all the elements inside the bottom draggable sheet of the game interface
 class GameDetailsPanel extends StatelessWidget {
   final ScrollController controller;
   final CameraController camera;
@@ -50,6 +51,7 @@ class GameDetailsPanel extends StatelessWidget {
               )
       );
 
+  /// Builds the drag handle of the slider
   Widget buildDragHandle() => Center(
     child: Container(
       width: 45,
@@ -61,6 +63,7 @@ class GameDetailsPanel extends StatelessWidget {
     )
   );
 
+  /// Builds the islands sections of the slider
   List<Widget> nearbyIslands(StatisticsController statistics) {
     if (islands.isEmpty) return List.empty();
 
@@ -78,6 +81,7 @@ class GameDetailsPanel extends StatelessWidget {
     ];
   }
 
+  /// Builds the ships section of the slider
   List<Widget> ownedShips() {
     if (ships.isEmpty) return List.empty();
 
@@ -91,6 +95,7 @@ class GameDetailsPanel extends StatelessWidget {
     ];
   }
 
+  /// Builds the title of a section, either ships, islands, or any other that might be added
   Widget listTitle(String title) =>
     Stack(
       alignment: Alignment.center,

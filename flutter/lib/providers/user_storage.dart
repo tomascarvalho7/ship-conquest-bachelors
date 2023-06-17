@@ -11,17 +11,24 @@ import '../domain/user/user_info.dart';
 /// credentials like the Back-end [Token].
 ///
 class UserStorage {
+
+  // We're using FlutterSecureStorage instead of regular shared preferences because
+  // in this way the data is encrypted and cannot be easily interpreted by third-parties.
   late final _storage = const FlutterSecureStorage();
 
+  /// Retrieves all the cached user information and parses the json into a [UserInfoCache] instance.
   Future<UserInfoCache?> getUser() async {
-    final user = await _storage.read(key: userStorageName);
+    final user = await _storage.read(key: _userStorageName);
     return userInfoFromJson(user);
   }
 
+  /// Retrieves the stored token.
   Future<String?> getToken() async {
-    return await _storage.read(key: tokenStorageName);
+    return await _storage.read(key: _tokenStorageName);
   }
 
+  /// Stores the user information as a JSON string.
+  /// Expiry time is important because we want to have a validity timeout for the stored information.
   void setUser(UserInfo user, Duration validDuration) async {
     final userInfo = UserInfoCache(
         username: user.username,
@@ -31,31 +38,40 @@ class UserStorage {
         description: user.description,
         expiryTime: DateTime.now().add(validDuration));
 
-    final userJson = userInfoToJson(userInfo);
-    await _storage.write(key: userStorageName, value: userJson);
+    await _storage.write(key: _userStorageName, value: userInfoToJson(userInfo));
   }
 
+  /// Sets the token as a String.
   void setToken(String token) async {
-    await _storage.write(key: tokenStorageName, value: token);
+    await _storage.write(key: _tokenStorageName, value: token);
   }
 
+  /// Deletes the stored token entry.
   void deleteToken() async {
-    await _storage.delete(key: tokenStorageName);
+    await _storage.delete(key: _tokenStorageName);
   }
 
+  /// Deletes the stored user entry.
   void deleteUser() async {
-    await _storage.delete(key: userStorageName);
+    await _storage.delete(key: _userStorageName);
   }
 
-  final String userStorageName = "user";
-  final String tokenStorageName = "token";
+  // storage name constant values
+  static const String _userStorageName = "user";
+  static const String _tokenStorageName = "token";
 }
 
+/// Converts a [UserInfoCache] object to a JSON string.
+///
+/// Returns a JSON-encoded string representation of the [UserInfoCache] object.
 String userInfoToJson(UserInfoCache userInfo) {
   final Map<String, dynamic> data = userInfo.toJson();
   return json.encode(data);
 }
 
+/// Converts a JSON string to a [UserInfoCache] instance.
+///
+/// Returns a [UserInfoCache] object.
 UserInfoCache? userInfoFromJson(String? jsonString) {
   if (jsonString == null) return null;
 

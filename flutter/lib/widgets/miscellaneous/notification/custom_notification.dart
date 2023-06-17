@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// Custom notification widget, used both for success and error feedbacks
+///
+/// - [title] the notification's title.
+/// - [message] the notification's main message.
+/// - [success] indicates if the notification should indicate success or error
 class CustomNotification extends StatelessWidget {
   final String title;
   final String message;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
 
+/// Builds the patch note's text to be put inside the square.
 Widget buildPatchNoteTextWidget(PatchNote note) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [

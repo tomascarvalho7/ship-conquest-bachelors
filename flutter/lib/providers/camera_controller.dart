@@ -20,16 +20,22 @@ class CameraController with ChangeNotifier {
   double get scaleFactor => _scaleFactor;
   double get baseScaleFactor => _baseScaleFactor;
 
+  /// Sets the focus of the camera to [position] and notifies the listening widgets.
   void setFocusAndUpdate(Position position, {double scale = 1.0}) {
     setFocus(position, scale: scale);
     notifyListeners();
   }
 
+  /// Sets the focus of the camera to [position].
   void setFocus(Position position, {double scale = 1.0}) {
     _coordinates = position;
     _scaleFactor = scale;
   }
 
+  /// Handles the camera updates
+  ///
+  /// [size] handles zooming in or out;
+  /// [movementOffset] handles camera panning.
   void onUpdate(double size, Offset movementOffset) {
     _scaleFactor = _baseScaleFactor * size;
     _coordinates = Position(
@@ -39,6 +45,7 @@ class CameraController with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Resets the scale factor
   void onStart() {
     _baseScaleFactor = _scaleFactor;
   }

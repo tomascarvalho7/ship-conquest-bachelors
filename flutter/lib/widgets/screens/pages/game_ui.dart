@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/global_state.dart';
-import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/widgets/screens/bottom_navigation_bar/game_bottom_bar.dart';
+import 'package:ship_conquest/widgets/screens/game/game_screen.dart';
 import 'package:ship_conquest/widgets/screens/leave_game/leave_game_screen.dart';
 
-import '../game/game_screen.dart';
-
+/// Builds the game's view with bottom bar navigation
+///
+/// PageView allows to show different screens with the same basis and also the same
+/// navigation bar. It also transitions from one to another in a smooth way.
+///
+/// Controls the screens by indexes, which can be used for the bottom bar navigation.
 class GameUI extends StatefulWidget {
   const GameUI({Key? key}) : super(key: key);
 

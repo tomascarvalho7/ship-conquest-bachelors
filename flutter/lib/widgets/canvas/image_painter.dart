@@ -1,6 +1,9 @@
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
 
+import 'package:flutter/material.dart';
+
+/// A custom painter for rendering an image on a canvas.
+/// Used to paint the minimap in the canvas.
 class ImagePainter extends CustomPainter {
   final ui.Image image;
   final int size;

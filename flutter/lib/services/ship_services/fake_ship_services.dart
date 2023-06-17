@@ -3,9 +3,10 @@ import 'package:ship_conquest/domain/event/known_event.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
-import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
-import 'package:ship_conquest/domain/lobby/lobby.dart';
-import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/lobby/create_lobby.dart';
+import 'package:ship_conquest/domain/lobby/join_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby_info.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
@@ -20,7 +21,7 @@ import '../../domain/event/unknown_event.dart';
 import '../../domain/feedback/error/error_feedback.dart';
 import '../../domain/ship/utils/classes/ship_path.dart';
 import '../../domain/space/coord_2d.dart';
-import '../../domain/horizon.dart';
+import '../../domain/game/horizon.dart';
 import '../../domain/user/user_info.dart';
 import '../../domain/utils/build_bezier.dart';
 import '../../providers/user_storage.dart';
@@ -89,7 +90,7 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Sequence<CompleteLobby>> getLobbyList(
+  FutureEither<ErrorFeedback, Sequence<LobbyInfo>> getLobbyList(
       int skip,
       int limit,
       String order,
@@ -98,7 +99,7 @@ class FakeShipServices extends ShipServices {
       ) async => Right(
         Sequence(data: List.generate(
             5,
-                (index) => CompleteLobby(
+                (index) => LobbyInfo(
                 tag: "asd",
                 name: "TestLobby",
                 uid: "1",
@@ -113,26 +114,13 @@ class FakeShipServices extends ShipServices {
 
 
   @override
-  FutureEither<ErrorFeedback, String> joinLobby(String tag) async {
-    return const Right("Joined");
+  FutureEither<ErrorFeedback, JoinLobby> joinLobby(String tag) async {
+    return const Right(JoinLobby(tag: "fake_tag", info: "fake_info"));
   }
 
   @override
-  FutureEither<ErrorFeedback, String> createLobby(String name) async {
-    return const Right("Created");
-  }
-
-  @override
-  FutureEither<ErrorFeedback, Lobby> getLobby(String tag) async {
-    return Right(
-        Lobby(
-            tag: "fake_tag",
-            name: "lobby_name",
-            uid: "1",
-            username: "gui17",
-            creationTime: 832231
-        )
-    );
+  FutureEither<ErrorFeedback, CreateLobby> createLobby(String name) async {
+    return const Right(CreateLobby(tag: "fake_tag"));
   }
 
   @override

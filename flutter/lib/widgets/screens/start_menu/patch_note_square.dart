@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
 import 'package:ship_conquest/widgets/screens/start_menu/patch_note_text.dart';
 
+/// Builds the red patch notes square with the gradient.
 Widget buildPatchNoteSquareWidget(
     BuildContext context, List<PatchNote> patchNotes) {
   return LayoutBuilder(

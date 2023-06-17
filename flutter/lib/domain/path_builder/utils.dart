@@ -1,21 +1,20 @@
 import 'dart:collection';
-import 'dart:ui';
 
-import 'package:flutter/material.dart';
-import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
+import 'package:ship_conquest/domain/path_builder/node.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
+import 'package:ship_conquest/domain/utils/distance.dart';
+import 'package:ship_conquest/domain/utils/pulse.dart';
 
-import '../../utils/constants.dart';
-import '../space/coord_2d.dart';
-import '../utils/distance.dart';
-import '../utils/pulse.dart';
-import 'node.dart';
-
+/// Calculates the heuristic value of a [Node] given the coordinates of
+/// [currPoint], [end] and [influencePoint].
 double calculateHeuristic(Coord2D currPoint, Coord2D end, Coord2D influencePoint) {
   final double distance = manhattanDistance(currPoint, end);
   final double penalty = manhattanDistance(currPoint, influencePoint) * .75;
   return distance + penalty;
 }
 
+/// Reconstructs the built path by the iterating through [lastNode]'s parent
 List<Coord2D> reconstructPath(Node lastNode) {
   final List<Node> path = List.empty(growable: true);
   Node? node = lastNode;
@@ -26,6 +25,8 @@ List<Coord2D> reconstructPath(Node lastNode) {
   return path.reversed.map((node) => node.position).toList(growable: false);
 }
 
+/// Calculates the neighbours of a [Node] present in [map] according to a [step],
+/// a [safetyRadius] and a list of nodes to ignore [ignore].
 List<Node> calculateNeighbours(
     Node node,
     Minimap map,
@@ -65,13 +66,4 @@ List<Node> calculateNeighbours(
     }
   }
   return resultList;
-}
-
-extension HMAny on HashMap<Coord2D, Node> {
-  bool any(bool Function(Node) condition) {
-    for(var node in values) {
-      if(condition(node)) return true;
-    }
-    return false;
-  }
 }

@@ -1,3 +1,5 @@
+/// Class holding a lobby's most simple information such as [tag], [name],
+/// [uid], [username] and [creationTime].
 class Lobby {
   final String tag;
   final String name;

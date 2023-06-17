@@ -7,6 +7,10 @@ import '../../../domain/space/position.dart';
 import '../../../providers/camera_controller.dart';
 import '../../../providers/game/minimap_controllers/route_controller.dart';
 
+/// Widget used to paint the ship's route chosen by the player
+///
+/// - [hooks] the anchor points of the route
+/// - [child] a child to be rendered with it
 class RouteView extends StatelessWidget {
   final Sequence<Position> hooks;
   final Widget child;
@@ -14,6 +18,7 @@ class RouteView extends StatelessWidget {
   const RouteView({super.key, required this.hooks, required this.child});
 
   // constants
+  // color used in the gradient
   static const Color startColor = Colors.yellowAccent;
   static const Color midColor = Colors.orangeAccent;
   static const Color endColor = Colors.redAccent;

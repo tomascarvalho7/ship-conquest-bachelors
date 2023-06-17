@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Builds a generic clickable text Widget.
+///
+/// - [onTap] the function to execute on the text's tap action
+/// - [text] the text to present
 Widget buildClickableTextWidget(
         BuildContext context, Function() onTap, String text) =>
     GestureDetector(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Widget holding the top part of the authentication screen
+/// Builds the text and Google image logo
 Widget buildAuthWithGoogleWidget(BuildContext context) => Container(
     padding: const EdgeInsets.fromLTRB(39, 104, 39, 154),
     child: Column(

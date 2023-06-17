@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/path/path_points.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 
-import '../../domain/path/path_points.dart';
-import '../../domain/space/position.dart';
 
+/// A custom painter for rendering the route control in the minimap.
 class RoutePainter extends CustomPainter {
   final Sequence<Position> hooks;
   final PathPoints? points;

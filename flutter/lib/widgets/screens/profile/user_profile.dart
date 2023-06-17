@@ -1,17 +1,17 @@
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/user/user_info.dart';
 import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 import 'package:ship_conquest/services/google/google_signin_api.dart';
+import 'package:ship_conquest/services/ship_services/ship_services.dart';
+import 'package:ship_conquest/widgets/screens/menu_utils/green_background.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/mountains_background.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/screen_template.dart';
-import 'package:ship_conquest/widgets/screens/start_menu/start_menu.dart';
+import 'package:ship_conquest/widgets/screens/profile/profile_top_section.dart';
 import 'package:ship_conquest/widgets/screens/wait_for_async_screen.dart';
 
-import '../../../domain/user/user_info.dart';
-import '../../../providers/user_storage.dart';
-import '../../../services/ship_services/ship_services.dart';
-
+/// Builds the whole profile screen by joining the smaller pieces in one.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -37,42 +37,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final firstName = user?.name.split(' ').first;
     return buildScreenTemplateWidget(context, [
       if (user != null && firstName != null) ...[
-        Container(
-            padding: const EdgeInsets.fromLTRB(39, 60, 75, 9),
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      "${firstName ?? ''}${firstName.endsWith('s') ? "'" : "'s"} profile",
-                      style:
-                      Theme.of(context).textTheme.titleLarge,
-                    )),
-                ElevatedButton(
-                  onPressed: () async {
-                    logout(services)
-                        .then((value) => context.go("/signIn"));
-                  },
-                  style: Theme.of(context)
-                      .elevatedButtonTheme
-                      .style
-                      ?.copyWith(
-                      backgroundColor:
-                      MaterialStatePropertyAll(
-                          Theme.of(context)
-                              .colorScheme
-                              .primary),
-                      textStyle: MaterialStatePropertyAll(
-                          Theme.of(context)
-                              .textTheme
-                              .bodySmall)),
-                  child: const Text("Logout!"),
-                )
-              ],
-            )),
+        buildProfileTopSection(
+            context,
+            () {
+              logout(services)
+                  .then((value) => context.go("/signIn"));
+            },
+            firstName),
         Align(
           alignment: Alignment.bottomCenter,
           child: FractionallySizedBox(
@@ -97,7 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         Stack(
           children: [
-            buildMountainsBackgroundWidget(context, 'assets/images/profile_back_mountain.png'),
+            buildGreenBackgroundWidget(context),
             Align(
               alignment: const Alignment(0.0, 0.0),
               child: ClipOval(
@@ -137,13 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            Align(
-              alignment: const Alignment(0, 0.5),
-              child: SizedBox(
-                  child: Image.asset(
-                      'assets/images/profile_front_mountains.png',
-                      fit: BoxFit.fill)),
-            ),
+            buildMountainsBackgroundWidget(context, 'assets/images/profile_front_mountains.png'),
           ],
         ),
       ] else ...[

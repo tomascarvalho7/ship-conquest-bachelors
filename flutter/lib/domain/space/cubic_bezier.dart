@@ -1,9 +1,11 @@
+
 import 'dart:math';
 
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
-import 'coord_2d.dart';
-
+/// Represents a cubic Bézier curve by its start and end points
+/// as well as its 2 anchor points
 class CubicBezier {
   final Coord2D p0;
   final Coord2D p1;
@@ -12,6 +14,7 @@ class CubicBezier {
   // constructor
   CubicBezier({required this.p0, required this.p1, required this.p2, required this.p3});
 
+  /// Retrieve the current position in the Bézier curve according to an interpolation value [n].
   Position get(double n) {
     double _n = 1.0 - n;
     double _n2 = _n * _n;
@@ -26,6 +29,7 @@ class CubicBezier {
     );
   }
 
+  /// Retrieves the angle of the curve according to an interpolation value [n].
   double getAngleAtPoint(double n) {
     Position tangent = getTangentAtPoint(n);
     double angle = atan2(tangent.y, tangent.x);
@@ -34,6 +38,7 @@ class CubicBezier {
     return angle * 180 / pi; // convert to degrees
   }
 
+  /// Retrieves the tangent at a point of the curve according to an interpolation value [n].
   Position getTangentAtPoint(double n) {
     Position dp0 = (p1 - p0) * 3.0;
     Position dp1 = (p2 - p1) * 3.0;

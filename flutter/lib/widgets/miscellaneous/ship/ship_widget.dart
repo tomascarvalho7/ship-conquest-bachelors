@@ -1,15 +1,20 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/isometric/isometric.dart';
+import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/ship/utils/logic.dart';
+import 'package:ship_conquest/domain/space/position.dart';
+import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/utils.dart';
 
-import '../../../domain/isometric/isometric.dart';
-import '../../../domain/ship/ship.dart';
-import '../../../domain/space/position.dart';
-import '../../../utils/constants.dart';
 
+/// Widget representing a static ship.
+///
+/// - [waveAnim] the animation of the waves
+/// - [ship] the ship to be rendered
+/// - [tileSize] the size of the tiles, to calculate ship scale
+///
+/// Builds the ship according to the wave animation and with all its properties.
 class ShipWidget extends StatelessWidget {
   final Animation<double> waveAnim;
   final Ship ship;

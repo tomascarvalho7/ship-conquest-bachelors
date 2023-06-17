@@ -1,3 +1,4 @@
+/// Holds the all the needed information of a user.
 class UserInfo {
   final String username;
   final String name;

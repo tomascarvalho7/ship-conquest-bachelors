@@ -3,9 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/game/event_handlers/minimap_event.dart';
 import 'package:ship_conquest/providers/game/minimap_controllers/route_controller.dart';
 import 'package:ship_conquest/widgets/miscellaneous/flex_button.dart';
+import 'package:ship_conquest/widgets/miscellaneous/icon_switch.dart';
 
-import '../icon_switch.dart';
-
+/// Widget to manage the paths in the minimap widget
+///
+/// Presents the actions:
+/// - [Confirm and navigate]
+/// - [Cancel]
 class PathManagementInterface extends StatelessWidget {
   // constructor
   const PathManagementInterface({super.key});
@@ -21,7 +25,7 @@ class PathManagementInterface extends StatelessWidget {
                     FlexButton(
                         onPressed: () => MinimapEvent.confirmAndNavigateTo(context),
                         child: IconSwitch(
-                            condition: pathManager.routePoints.length > 0,
+                            condition: pathManager.routePoints.isNotEmpty,
                             icon: Icons.check,
                             size: 60,
                             enabled: Colors.green,

@@ -1,4 +1,4 @@
-# ship_conquest
+# Ship Conquest
 
 ## Concept
 

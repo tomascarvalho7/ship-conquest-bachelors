@@ -9,6 +9,10 @@ import 'package:ship_conquest/widgets/screens/authentication/confirm_sign_in_but
 import 'package:ship_conquest/widgets/screens/authentication/default_button.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/mountains_background.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/screen_template.dart';
+
+/// Builds the whole authentication screen, by joining all the smaller parts together
+///
+/// Stateful because it needs to hold and manage the TextField's states.
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({Key? key}) : super(key: key);
 

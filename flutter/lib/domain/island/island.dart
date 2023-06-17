@@ -1,10 +1,10 @@
-import '../space/coord_2d.dart';
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 
-/// Represents a closed interface for other classes to implement.
+/// Represents a closed interface for other classes to implement,
+/// contains properties [id], [coordinate] and [radius].
 ///
 /// The [sealed] modifier implies it can only be extended or
 /// implemented by classes in the same file.
-/// This means it can be exhaustively matched!
 sealed class Island {
   int get id;
   Coord2D get coordinate;
@@ -13,7 +13,7 @@ sealed class Island {
 
 /// The [OwnedIsland] class implements the [Island] sealed interface.
 ///
-/// This specialized class represents a [Island] owned by another [User],
+/// This specialized class represents an [Island] owned by another [User],
 /// and thus contains the [Island] and the [User] info.
 class OwnedIsland implements Island {
   @override
@@ -32,7 +32,7 @@ class OwnedIsland implements Island {
 /// The [WildIsland] class implements the [Island] sealed interface.
 ///
 /// This specialized class represents a wild and unowned island [Island],
-/// and thus it simply implement's the [Island] interface.
+/// and thus it simply implements the [Island] interface.
 class WildIsland implements Island {
   @override
   final int id;

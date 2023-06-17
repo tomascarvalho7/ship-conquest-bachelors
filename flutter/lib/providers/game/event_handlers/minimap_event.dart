@@ -27,6 +27,7 @@ import '../minimap_controllers/route_controller.dart';
 class MinimapEvent {
   const MinimapEvent();
 
+  /// Load the minimap and set the camera focus on the main ship
   static void load(BuildContext context) {
     // get controllers
     final minimapController = context.read<MinimapController>();
@@ -40,6 +41,7 @@ class MinimapEvent {
     routeController.setupHooks(shipController.getShipPositions(scale));
   }
 
+  /// Build the path and deselect the node.
   static void deselectAndBuildPath(BuildContext context) {
     // get controllers
     final routeController = context.read<RouteController>();
@@ -65,7 +67,7 @@ class MinimapEvent {
     }
   }
 
-  // confirm route
+  /// Confirm the route and send navigation request.
   static void confirmAndNavigateTo(BuildContext context) async {
     // get controllers
     final routeController = context.read<RouteController>();

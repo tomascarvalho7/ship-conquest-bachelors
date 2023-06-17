@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/utils/factor.dart';
 
 class ColorMark {

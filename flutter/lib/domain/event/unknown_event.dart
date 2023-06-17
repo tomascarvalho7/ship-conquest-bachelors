@@ -1,3 +1,4 @@
+/// Representing an unknown event by its [eid] and [duration].
 class UnknownEvent {
   final int eid;
   final Duration duration;

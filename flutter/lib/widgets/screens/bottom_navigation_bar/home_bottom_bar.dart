@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Navigation bar specific to the home screen.
+///
+/// Stateful because it needs to hold the button's animations.
 class HomeBottomBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;

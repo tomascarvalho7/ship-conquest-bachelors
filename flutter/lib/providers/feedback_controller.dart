@@ -21,16 +21,19 @@ class FeedbackController with ChangeNotifier {
   bool get hasFeedback => _feedbackResult != null;
   Either<ErrorFeedback, SuccessFeedback>? get feedback => _feedbackResult;
 
+  /// Sets the [success] feedback and notifies the listener widgets.
   void setSuccessful(SuccessFeedback success) {
     _feedbackResult = Right(success);
     notifyListeners();
   }
 
+  /// Sets the [error] feedback and notifies the listener widgets.
   void setError(ErrorFeedback error) {
     _feedbackResult = Left(error);
     notifyListeners();
   }
 
+  /// Clears the feedback so the listeners do not have old feedbacks showing.
   void clearFeedback() {
     _feedbackResult = null;
   }

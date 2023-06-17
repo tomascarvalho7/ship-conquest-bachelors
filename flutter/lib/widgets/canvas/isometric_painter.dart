@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/isometric/isometric_tile.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/domain/tile/tile_state.dart';
 import 'package:ship_conquest/domain/tile/tiles_order.dart';
 import 'package:ship_conquest/widgets/canvas/draw_cube.dart';
-import '../../domain/color/color_gradient.dart';
-import '../../domain/isometric/isometric_tile.dart';
 
+/// A custom painter for rendering an image on a canvas.
+/// Used to paint the game's tiles in the canvas.
+///
+/// Uses the drawCube function to paint a Cube for each tile in the controller.
 class IsometricPainter extends CustomPainter {
   final double tileSize;
   final Animation<double> waveAnim;

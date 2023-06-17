@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby_info.dart';
 import 'package:ship_conquest/domain/utils/string_cap.dart';
 import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 
+/// Builds a simple lobby tile by joining the favorite button, the lobby's name and creator
+/// and the number of players.
+///
+/// Needs to hold state to present the favorite status correctly and respond to interactions nicely.
 class LobbyTile extends StatefulWidget {
-  final CompleteLobby lobby;
+  final LobbyInfo lobby;
   final void Function() onClick;
 
   const LobbyTile({super.key,  required this.lobby, required this.onClick});

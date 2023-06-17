@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Widget to represent the path management confirmation and cancel buttons
 class FlexButton extends StatelessWidget {
   final void Function() onPressed;
   final Widget child;

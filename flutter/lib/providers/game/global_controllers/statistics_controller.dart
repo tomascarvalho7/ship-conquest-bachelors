@@ -16,13 +16,16 @@ class StatisticsController with ChangeNotifier {
   //constructor
   StatisticsController();
 
+  /// Updates the statistics of the player with [stats].
   void updateStatistics(PlayerStats stats) {
     statistics = stats;
     notifyListeners();
   }
 
+  /// Checks if the player can make a transaction with their current currency.
   bool canMakeTransaction(int value) => statistics.currency >= value;
 
+  /// Makes the transaction worth [value] and updates the player's statistics.
   void makeTransaction(int value) {
     statistics = PlayerStats(
         currency: statistics.currency + value,

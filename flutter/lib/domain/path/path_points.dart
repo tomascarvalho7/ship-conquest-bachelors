@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:ship_conquest/domain/space/position.dart';
 
+/// Class holding the path's information such as [start], [mid], [end] and [distance].
 class PathPoints {
   final Position start;
   final Position mid;

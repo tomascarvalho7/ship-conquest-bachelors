@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Builds the welcome text.
 Widget buildWelcomeBackWidget(String? userName, BuildContext context) =>
     Container(
         padding: const EdgeInsets.only(bottom: 50),

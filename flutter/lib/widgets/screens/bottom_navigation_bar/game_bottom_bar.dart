@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// Navigation bar specific to the game screen.
+///
+/// Stateful because it needs to hold the button's animations.
 class GameBottomBar extends StatefulWidget {
   final int currentIndex;
   final Function(int) onTap;

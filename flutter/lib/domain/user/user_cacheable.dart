@@ -1,5 +1,6 @@
 import 'package:ship_conquest/domain/user/user_info.dart';
 
+/// Class representing the user information to be cached in memory.
 class UserInfoCache {
   final String username;
   final String name;
@@ -16,6 +17,7 @@ class UserInfoCache {
       required this.description,
       required this.expiryTime});
 
+  /// Convert [UserInfoCache] into a JSON map.
   Map<String, dynamic> toJson() {
     return {
       'username': username,
@@ -27,6 +29,7 @@ class UserInfoCache {
     };
   }
 
+  /// Convert from a JSON map to a [UserInfoCache] instance.
   factory UserInfoCache.fromJson(Map<String, dynamic> json) {
     return UserInfoCache(
       username: json['username'] as String,
@@ -39,6 +42,7 @@ class UserInfoCache {
 }
 
 extension UserInfoParsing on UserInfoCache {
+  /// Convert a [UserInfoCache] instance into a [UserInfo] instance.
   UserInfo toUserInfo() => UserInfo(
       username: username, name: name, email: email, imageUrl: imageUrl, description: description);
 }

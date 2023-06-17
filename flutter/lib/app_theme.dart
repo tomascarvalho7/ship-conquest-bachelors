@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// The application's dark theme.
 ThemeData shipConquestDarkTheme = ThemeData(
     colorScheme: const ColorScheme(
       primary: Color(0xff30a574),
@@ -31,6 +32,7 @@ ThemeData shipConquestDarkTheme = ThemeData(
       ),
     )));
 
+/// The application's light theme.
 ThemeData shipConquestLightTheme = ThemeData(
     colorScheme: const ColorScheme(
       primary: Color(0xff30a574),

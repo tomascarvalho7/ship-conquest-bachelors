@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/island/island.dart';
+import 'package:ship_conquest/domain/island/island_presentation.dart';
 import 'package:ship_conquest/domain/island/utils.dart';
-import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
+import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
 import 'package:ship_conquest/widgets/screens/game/utils/game_details_slider.dart';
 
-import '../../../../../domain/island/island.dart';
-import '../../../../../domain/island/island_presentation.dart';
-import '../../../../../providers/game/event_handlers/game_event.dart';
 
 /// [IslandElement] is a Widget to display the details and possible
 /// interactions related to a [Island].

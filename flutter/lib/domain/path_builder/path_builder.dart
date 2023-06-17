@@ -2,14 +2,19 @@
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
 import 'package:ship_conquest/domain/path_builder/node.dart';
 import 'package:ship_conquest/domain/path_builder/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
-import 'package:ship_conquest/utils/constants.dart';
 
+/// Class to hold methods related to paths.
 class PathBuilder {
+
+  /// Function to build a new path given [map], [start], [mid], [end], [step],
+  /// [radius] and [maxIterations].
+  ///
+  /// Returns a list of points containing the calculated path.
   static List<Coord2D> build(Minimap map, Coord2D start, Coord2D mid, Coord2D end, int step, int radius, int maxIterations) {
     if (end.x >= map.length || end.y >= map.length || end.x < 0 || end.y < 0) return [];
     if (map.get(x: end.x, y: end.y) != null && map.get(x: end.x, y: end.y) != 0) {
@@ -53,6 +58,8 @@ class PathBuilder {
     return [];
   }
 
+  /// Function to normalize the given list of points according to the number
+  /// of Bezier curves [size].
   static List<Coord2D> normalize(List<Coord2D> path, int size) {
     if (path.isEmpty) return [];
 

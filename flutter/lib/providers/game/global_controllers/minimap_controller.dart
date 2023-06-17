@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 
-import '../../../domain/space/coordinate.dart';
-import '../../../domain/minimap.dart';
-import '../../../domain/immutable_collections/sequence.dart';
+import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 
 ///
 /// Independent game related controller that holds [State] of
@@ -19,10 +19,12 @@ class MinimapController with ChangeNotifier {
   late Minimap minimap;
   MinimapController();
 
+  /// Load the minimap
   load(Minimap minimap) {
     this.minimap = minimap;
   }
 
+  /// Update the minimap with the new Sequence [tiles].
   update(Sequence<Coordinate> tiles) {
     final length = tiles.length;
     for(int i = 0; i < length; i++) {

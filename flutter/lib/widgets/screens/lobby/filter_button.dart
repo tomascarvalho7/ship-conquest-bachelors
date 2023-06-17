@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// Filter button to present search changing actions in the lobby screen, such as
+/// changing the search parameters.
 class FilterButton extends StatelessWidget {
   final String content;
   final bool isSelected;

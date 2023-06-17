@@ -22,6 +22,7 @@ extension Logic on Ship {
   }
 }
 
+/// Check if the ship is fighting by comparing the fight's instant to the current instant.
 bool isInstantInFight(DateTime fightInstant, DateTime instant) =>
   fightInstant.isBefore(instant) &&
       fightInstant.isAfter(instant.subtract(fightDuration));

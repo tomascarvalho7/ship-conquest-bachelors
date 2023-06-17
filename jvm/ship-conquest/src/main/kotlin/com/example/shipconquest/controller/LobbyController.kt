@@ -68,8 +68,8 @@ class LobbyController(val service: LobbyService) {
 
         return when (result) {
             is Either.Right -> response(content = result.value.map { lobby ->
-                lobby.toCompleteLobbyOutputModel()
-            }.toCompleteLobbyOutputModel())
+                lobby.toLobbyInfoOutputModel()
+            }.toLobbyInfoListOutputModel())
 
             is Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->
@@ -91,8 +91,8 @@ class LobbyController(val service: LobbyService) {
 
         return when (result) {
             is Either.Right -> response(content = result.value.map { lobby ->
-                lobby.toCompleteLobbyOutputModel()
-            }.toCompleteLobbyOutputModel())
+                lobby.toLobbyInfoOutputModel()
+            }.toLobbyInfoListOutputModel())
 
             is Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->
@@ -114,8 +114,8 @@ class LobbyController(val service: LobbyService) {
 
         return when (result) {
             is Either.Right -> response(content = result.value.map { lobby ->
-                lobby.toCompleteLobbyOutputModel()
-            }.toCompleteLobbyOutputModel())
+                lobby.toLobbyInfoOutputModel()
+            }.toLobbyInfoListOutputModel())
 
             is Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->

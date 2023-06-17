@@ -1,9 +1,8 @@
 import 'dart:ui';
-import 'package:flutter/painting.dart';
 import 'package:ship_conquest/domain/isometric/isometric_tile_paint.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
-// draw a isometric cube on [position] with specified [height] and [size] and painted with [paint]
+/// Draw an isometric cube on [position] with specified [height] and [size] and painted with [paint].
 void drawCube({
   required Position position,
   required double size,

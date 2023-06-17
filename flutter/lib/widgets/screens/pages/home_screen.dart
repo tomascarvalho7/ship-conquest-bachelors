@@ -7,6 +7,12 @@ import 'package:ship_conquest/widgets/screens/lobby/lobby.dart';
 import 'package:ship_conquest/widgets/screens/profile/user_profile.dart';
 import 'package:ship_conquest/widgets/screens/start_menu/start_menu.dart';
 
+/// Builds the home's view with bottom bar navigation
+///
+/// PageView allows to show different screens with the same basis and also the same
+/// navigation bar. It also transitions from one to another in a smooth way.
+///
+/// Controls the screens by indexes, which can be used for the bottom bar navigation.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 

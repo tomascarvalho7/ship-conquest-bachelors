@@ -3,7 +3,7 @@ import 'package:ship_conquest/domain/feedback/error/error_type.dart';
 
 
 
-/// Input Model Module class built from a Problem Json Response
+/// Input Model class built from a Spring error default Json Response
 /// Represents a back-end application error
 class SpringErrorInputModel {
   final String timestamp;
@@ -11,6 +11,7 @@ class SpringErrorInputModel {
   final String error;
   final String path;
 
+  // Constructor to deserialize the input model from a JSON map.
   SpringErrorInputModel.fromJson(Map<String, dynamic> json):
         timestamp = json['timestamp'],
         status = json['status'],
@@ -18,12 +19,12 @@ class SpringErrorInputModel {
         path = json['path'];
 }
 
-/// Convert back-end application error
-/// into Client application feedback
+// Convert back-end application error into a Client application feedback
 extension ToFeedback on SpringErrorInputModel {
+  /// Converts the [SpringErrorInputModel] to a [ErrorFeedback] object.
   toErrorFeedback() => ErrorFeedback(
-      type: status == 500 ? ErrorType.fatal : ErrorType.info,
+      type: ErrorType.fatal,
       title: error,
-      details: path + timestamp
+      details: "An error happened, please restart the application."
   );
 }

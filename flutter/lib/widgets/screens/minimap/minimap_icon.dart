@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Builds the minimap floating action button.
 class MinimapIcon extends StatelessWidget {
   final Function() onClick;
   const MinimapIcon({super.key, required this.onClick});

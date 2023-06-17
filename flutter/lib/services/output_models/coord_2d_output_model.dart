@@ -1,3 +1,4 @@
+/// Output model class representing a 2D coordinate with integer values
 class Coord2DOutputModel {
   final int x;
   final int y;

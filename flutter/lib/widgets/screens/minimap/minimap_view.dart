@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:ship_conquest/domain/color/color_gradient.dart';
-import 'package:ship_conquest/domain/minimap.dart';
 import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:typed_data';
 
-import '../../../utils/constants.dart';
-import '../../canvas/image_painter.dart';
+import 'package:flutter/material.dart';
+import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
+import 'package:ship_conquest/utils/constants.dart';
+import 'package:ship_conquest/widgets/canvas/image_painter.dart';
 
+
+/// Builds the minimap by painting the tiles in their respective [Painter].
 class MinimapView extends StatelessWidget {
   final Minimap minimap;
   final ColorGradient gradient;

@@ -2,13 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:ship_conquest/domain/either/either.dart';
+import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/event/unknown_event.dart';
+import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
 import 'package:ship_conquest/domain/feedback/error/utils/constants.dart';
+import 'package:ship_conquest/domain/game/horizon.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/island/island.dart';
-import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
-import 'package:ship_conquest/domain/lobby/lobby.dart';
-import 'package:ship_conquest/domain/minimap.dart';
+import 'package:ship_conquest/domain/lobby/create_lobby.dart';
+import 'package:ship_conquest/domain/lobby/join_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby_info.dart';
+import 'package:ship_conquest/domain/game/minimap.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
@@ -16,37 +20,32 @@ import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
 import 'package:ship_conquest/domain/user/token_ping.dart';
 import 'package:ship_conquest/domain/user/user_cacheable.dart';
+import 'package:ship_conquest/domain/user/user_info.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/providers/user_storage.dart';
-import 'package:ship_conquest/services/input_models/horizon_input_model.dart';
-import 'package:ship_conquest/services/input_models/island_input_model.dart';
-import 'package:ship_conquest/services/input_models/lobby/complete_lobby_list_input_model.dart';
+import 'package:ship_conquest/services/input_models/game/horizon_input_model.dart';
+import 'package:ship_conquest/services/input_models/game/island_input_model.dart';
+import 'package:ship_conquest/services/input_models/game/islands_input_model.dart';
+import 'package:ship_conquest/services/input_models/game/player_stats_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/create_lobby_input_model.dart';
+import 'package:ship_conquest/services/input_models/lobby/lobby_info_list_input_model.dart';
 import 'package:ship_conquest/services/input_models/lobby/favorite_lobby_input_model.dart';
 import 'package:ship_conquest/services/input_models/lobby/join_lobby_input_model.dart';
-import 'package:ship_conquest/services/input_models/lobby/lobby_input_model.dart';
-import 'package:ship_conquest/services/input_models/minimap_input_model.dart';
+import 'package:ship_conquest/services/input_models/game/minimap_input_model.dart';
+import 'package:ship_conquest/services/input_models/notification/event_notification_input_model.dart';
 import 'package:ship_conquest/services/input_models/patch_notes/patch_notes_input_model.dart';
 import 'package:ship_conquest/services/input_models/problem/problem_input_model.dart';
+import 'package:ship_conquest/services/input_models/ship/ship_input_model.dart';
+import 'package:ship_conquest/services/input_models/ship/ships_input_model.dart';
 import 'package:ship_conquest/services/input_models/spring_error_input_model.dart';
-import 'package:ship_conquest/services/input_models/token_input_model.dart';
-import 'package:ship_conquest/services/input_models/token_ping_input_model.dart';
+import 'package:ship_conquest/services/input_models/user/token_input_model.dart';
+import 'package:ship_conquest/services/input_models/user/token_ping_input_model.dart';
+import 'package:ship_conquest/services/input_models/user/user_info_input_model.dart';
 import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-import '../../domain/either/future_either.dart';
-import '../../domain/feedback/error/error_feedback.dart';
-import '../../domain/horizon.dart';
-import '../../domain/user/user_info.dart';
-import '../input_models/create_lobby_input_model.dart';
-import '../input_models/islands_input_model.dart';
-import '../input_models/notification/event_notification_input_model.dart';
-import '../input_models/player_stats_input_model.dart';
-import '../input_models/ship/ship_input_model.dart';
-import '../input_models/ship/ships_input_model.dart';
-import '../input_models/user_info_input_model.dart';
-
-const baseUri = "c2ed-194-210-196-40.ngrok-free.app";
+const baseUri = "1060-2001-8a0-6e2e-ba00-e5f3-dd3d-d86-3db0.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -205,7 +204,7 @@ class RealShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Sequence<CompleteLobby>> getLobbyList(
+  FutureEither<ErrorFeedback, Sequence<LobbyInfo>> getLobbyList(
       int skip,
       int limit,
       String order,
@@ -226,26 +225,12 @@ class RealShipServices extends ShipServices {
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
 
     return handleResponse(response, (json) =>
-        CompleteLobbyListInputModel.fromJson(json).toCompleteLobbies()
-    );
-  }
-
-
-  @override
-  FutureEither<ErrorFeedback, Lobby> getLobby(String tag) async {
-    final String? token = await userStorage.getToken();
-    if (token == null) return const Left(lobbyNotFound);
-
-    final response = await http.get(Uri.https(baseUri, "get-lobby", {'tag': tag}),
-        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
-
-    return handleResponse(response, (json) =>
-        LobbyInputModel.fromJson(json).toLobby()
+        LobbyInfoListInputModel.fromJson(json).toLobbiesInfo()
     );
   }
 
   @override
-  FutureEither<ErrorFeedback, String> joinLobby(String tag) async {
+  FutureEither<ErrorFeedback, JoinLobby> joinLobby(String tag) async {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
@@ -258,12 +243,12 @@ class RealShipServices extends ShipServices {
     );
 
     return handleResponse(response, (json) =>
-        JoinLobbyInputModel.fromJson(json).tag
+        JoinLobbyInputModel.fromJson(json).toJoinLobby()
     );
   }
 
   @override
-  FutureEither<ErrorFeedback, String> createLobby(String name) async {
+  FutureEither<ErrorFeedback, CreateLobby> createLobby(String name) async {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
@@ -275,7 +260,7 @@ class RealShipServices extends ShipServices {
         body: jsonEncode({'name': name}));
 
     return handleResponse(response, (json) =>
-        CreateLobbyInputModel.fromJson(json).tag
+        CreateLobbyInputModel.fromJson(json).toCreatedLobby()
     );
   }
 
@@ -437,7 +422,6 @@ class RealShipServices extends ShipServices {
       final data = event.data;
       if (data == null) return;
 
-      print(event.event);
       if (event.event == 'event') {
         final (sid, unknownEvent) =
             EventNotificationInputModel.fromJson(jsonDecode(data)).toDomain();

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// Icon to represent the path management buttons color switch on [enabled]
 class IconSwitch extends StatelessWidget {
   final bool condition;
   final IconData icon;

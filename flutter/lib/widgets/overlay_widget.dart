@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/feedback_controller.dart';
 import 'package:ship_conquest/providers/sound_controller.dart';
+import 'package:ship_conquest/widgets/miscellaneous/notification/custom_notification.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'miscellaneous/notification/custom_notification.dart';
 
+/// This widget sits on top of all the others via go_router's Shell Route.
+///
+/// It's used to present information that needs to be shown all over the application's
+/// screens like feedback notifications as well as their sounds.
 class OverlayWidget extends StatefulWidget {
   final Widget child;
 
@@ -24,7 +28,6 @@ class OverlayWidgetState extends State<OverlayWidget> with WidgetsBindingObserve
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final feedbackController = context.read<FeedbackController>();
     final soundController = context.read<SoundController>();
     if (state == AppLifecycleState.paused) {
       soundController.pauseAudio();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/providers/game/global_controllers/statistics_controller.dart';
 
+/// A widget representing a view for displaying currency statistics.
 class CurrencyView extends StatelessWidget {
   // constructor
   const CurrencyView({super.key});

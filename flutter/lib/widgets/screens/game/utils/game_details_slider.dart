@@ -10,6 +10,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../domain/island/island.dart';
 import 'game_details_panel.dart';
 
+/// Builds the game's slider by managing the islands to be displayed and calling the panel widget.
 class GameDetailsSlider extends StatefulWidget {
   // constructor
   const GameDetailsSlider({super.key});
@@ -23,7 +24,7 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
   bool isNearbyIslands = false;
 
   // constants
-  static const minSize = 199.0; //goofy ass distance just to make it fit with the bottom bar
+  static const minSize = 200.0;
   static const maxSize = 550.0;
 
   @override
@@ -56,6 +57,7 @@ class _GameDetailsSliderState extends State<GameDetailsSlider> {
         }
       );
 
+  /// Manages the islands in the slider
   void manageNearbyIslands(Sequence<Island> islands) {
     // if new islands are found, animate slider
     if (!isNearbyIslands && islands.isNotEmpty && panelController.isAttached) {

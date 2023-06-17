@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
+/// Class to hold the colors of an isometric tile.
+///
+/// Creates two darker shades of the given color to use in different faces.
 class IsometricTilePaint {
   late final Paint topPaint;
   late final Paint leftPaint;

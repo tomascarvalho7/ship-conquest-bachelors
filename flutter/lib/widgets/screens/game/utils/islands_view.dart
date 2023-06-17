@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/island_presentation.dart';
-import '../../../../domain/island/island.dart';
-import '../../../../domain/isometric/isometric.dart';
+import 'package:ship_conquest/domain/isometric/isometric.dart';
 
+/// Builds the islands icon
 class IslandsView extends StatelessWidget {
   final Sequence<Island> islands;
   // constructor

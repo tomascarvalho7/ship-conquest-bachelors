@@ -3,8 +3,8 @@ import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/path/path_points.dart';
 import 'package:ship_conquest/domain/path/path_segment.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 
-import '../../../domain/space/position.dart';
 
 ///
 /// Minimap related controller that holds [State] of
@@ -32,11 +32,13 @@ class RouteController with ChangeNotifier {
   // path builder
   Sequence<Coord2D> get routePoints => _routePoints;
 
+  /// Sets a new route with the [Sequence] of points [points].
   void setRoutePoints(Sequence<Coord2D> points) {
     _routePoints = points;
     notifyListeners();
   }
 
+  /// Sets the hooks with [hooks].
   void setupHooks(Sequence<Position> hooks) {
     _hooks = hooks;
     final path = pathPoints;
@@ -45,21 +47,24 @@ class RouteController with ChangeNotifier {
     }
   }
 
-  // select starter node
+  /// Selects the starter node
   void selectMainNode(int startIndex) {
     _pathSegment = PathSegment.start;
     _startIndex = startIndex;
     _pathPoints = null;
   }
 
+  /// Deselects the path.
   void deselect() {
     _pathSegment = null;
   }
 
+  /// Selects the secondary node
   void selectSecondaryNode(PathSegment segment) {
     _pathSegment = segment;
   }
 
+  /// Moves the node selected in [pathSegment].
   void moveNode(Position delta) {
     if (_pathSegment == null) return; // no nodes to move
 
@@ -72,6 +77,7 @@ class RouteController with ChangeNotifier {
     }
   }
 
+  /// Updates the points by calculating the end and middle positions given [start] and [endDelta].
   void draw(Position start, Position endDelta) {
     Position end = (_pathPoints?.end ?? start) + endDelta;
     Position mid = Position(
@@ -85,6 +91,7 @@ class RouteController with ChangeNotifier {
     notifyListeners(); // update widgets
   }
 
+  /// Updates the middle node by adding [mid] to the existing mid.
   void updateMid(Position mid) {
     PathPoints? path = pathPoints;
 
@@ -96,6 +103,7 @@ class RouteController with ChangeNotifier {
     }
   }
 
+  /// Updates the end node by adding [end] to the existing end.
   void updateEnd(Position end) {
     PathPoints? path = pathPoints;
 
@@ -107,18 +115,21 @@ class RouteController with ChangeNotifier {
     }
   }
 
+  /// Clears the data and notifies listeners.
   void confirm() {
     _routePoints = Sequence.empty(); // clear route
     _pathPoints = null; // clear path
     notifyListeners(); // update widgets
   }
 
+  /// Clears the data and notifies listeners.
   void cancel() {
     _routePoints = Sequence.empty(); // clear route
     _pathPoints = null; // clear path
     notifyListeners(); // update widgets
   }
 
+  /// Updates the path points with [points].
   void _updatePoints({required PathPoints points}) {
     _pathPoints = PathPoints(start: points.start, mid: points.mid, end: points.end);
   }

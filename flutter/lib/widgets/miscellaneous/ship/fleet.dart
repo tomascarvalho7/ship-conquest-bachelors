@@ -6,6 +6,9 @@ import 'package:ship_conquest/widgets/miscellaneous/ship/dynamic_ship_widget.dar
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_widget.dart';
 import '../../../providers/game/global_controllers/ship_controller.dart';
 
+/// Widget to represent the main ship, either mobile or static
+///
+/// - [animation] the wave animation for the ship to follow
 class Fleet extends StatelessWidget {
   final Animation<double> animation;
   const Fleet({super.key, required this.animation});

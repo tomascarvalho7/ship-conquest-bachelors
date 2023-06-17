@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
-import 'package:ship_conquest/domain/lobby/complete_lobby.dart';
+import 'package:ship_conquest/domain/lobby/lobby_info.dart';
 import 'package:ship_conquest/providers/game/event_handlers/general_event.dart';
 import 'package:ship_conquest/providers/lobby_storage.dart';
 import 'package:ship_conquest/widgets/screens/lobby/filter_button.dart';
@@ -11,6 +11,8 @@ import 'package:ship_conquest/widgets/screens/lobby/lobby_tile.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/green_background.dart';
 import 'package:ship_conquest/widgets/screens/menu_utils/mountains_background.dart';
 
+/// Builds the whole lobby screen, by joining all the individual pieces and holding
+/// the state of search and creation of lobbies.
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({Key? key}) : super(key: key);
 
@@ -25,7 +27,7 @@ class LobbyScreenState extends State<LobbyScreen> {
   final FocusNode _focusNode = FocusNode();
   DateFilter _dateFilter = DateFilter.newer;
   FilterType _selectedFilterType = FilterType.all;
-  Sequence<CompleteLobby>? lobbies;
+  Sequence<LobbyInfo>? lobbies;
 
   final int _limit = 10;
   int _skip = 0;

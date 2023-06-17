@@ -1,3 +1,6 @@
+
+/// Retrieve the percentage of time passed since [startTime] until the current
+/// instant, having [endTime].
 double getTimePercentage(DateTime startTime, DateTime endTime) {
   // Calculate the duration of the time interval in seconds
   int durationInSeconds = (endTime.difference(startTime)).inSeconds;

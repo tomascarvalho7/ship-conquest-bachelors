@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/providers/camera_controller.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../providers/camera_controller.dart';
 
+/// Controls the game's camera actions.
+/// Makes direct use of a [GestureDetector] to act with [CameraController].
+///
+/// - [background] the background color
+/// - [child] the child to be rendered under this widget in the tree
 class CameraControl extends StatelessWidget {
   final Color background;
   final Widget child;
@@ -46,17 +51,21 @@ class CameraControl extends StatelessWidget {
               )
       );
 
-  void onTap(CameraController camera, TapDownDetails details, BoxConstraints constraints) {
-    // do nothing
-  }
+  // Gesture detector control helper functions
 
+  /// Ignore a simple tap
+  void onTap(CameraController camera, TapDownDetails details, BoxConstraints constraints) { /* do nothing */ }
+
+  /// Act with the camera on the start
   void onStart(CameraController camera, ScaleStartDetails details, BoxConstraints constraints) {
     camera.onStart();
   }
 
+  /// Updates the camera information with the update details
   void onUpdate(CameraController camera, ScaleUpdateDetails details) {
     camera.onUpdate(details.scale, details.focalPointDelta);
   }
 
+  /// Do nothing
   void onEnd(ScaleEndDetails details) { /* do nothing */ }
 }

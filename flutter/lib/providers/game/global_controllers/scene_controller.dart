@@ -2,20 +2,21 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:ship_conquest/domain/game/horizon.dart';
 import 'package:ship_conquest/domain/immutable_collections/grid.dart';
 import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
+import 'package:ship_conquest/domain/island/island.dart';
 import 'package:ship_conquest/domain/island/utils.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
+import 'package:ship_conquest/domain/space/position.dart';
+import 'package:ship_conquest/domain/tile/tile_state.dart';
+import 'package:ship_conquest/domain/tile/tiles_order.dart';
 import 'package:ship_conquest/domain/utils/distance.dart';
 import 'package:ship_conquest/domain/utils/pulse.dart';
-import '../../../domain/island/island.dart';
-import '../../../domain/space/coordinate.dart';
-import '../../../domain/space/position.dart';
-import '../../../domain/horizon.dart';
-import '../../../domain/tile/tile_state.dart';
-import '../../../domain/tile/tiles_order.dart';
-import '../../../utils/constants.dart';
+import 'package:ship_conquest/utils/constants.dart';
+
 
 ///
 /// Independent game related controller that holds [State] of
@@ -47,27 +48,33 @@ class SceneController with ChangeNotifier {
   final HashMap<Coord2D, int> _newTilesMap = HashMap();
   HashMap<Coord2D, int> _oldTilesMap = HashMap();
 
+  /// Loads the scene with [islands] and sets the new [horizonFn]
   void load(Sequence<Island> islands, HorizonFn horizonFn) {
     _visitedIslands = Grid(data: { for(var island in islands.data) island.id : island });
     _horizonFn = horizonFn;
   }
 
+  /// Updates the island list with the new [island].
   void updateIsland(Island island) {
     _islands = _islands.put(island.id, island);
     // update widgets
     notifyListeners();
   }
 
+  /// Updates the visited islands list with the new [island].
   void discoverIsland(Island island) {
     _visitedIslands = _visitedIslands.put(island.id, island);
   }
 
+  /// Get the new scene if the distance between [position] and the last position is bigger than one.
   Future<Sequence<Coordinate>> tryToGetScene(Position position, int sid) async {
     if (distance(position, _lastPos) <= 1.0) return Sequence.empty();
 
     return getScene(position, sid);
   }
 
+  /// Get the new scene.
+  /// Checks if should fetch from the API, and either fetches or builds an empty scene.
   Future<Sequence<Coordinate>> getScene(Position position, int sid) async {
     final shouldFetch = _visitedIslands.any((value) => value.isCloseTo(position));
 
@@ -80,6 +87,7 @@ class SceneController with ChangeNotifier {
     return shouldFetch ? fetchScene(position, sid) : buildEmptyScene(position);
   }
 
+  /// Generates a scene with only water blocks
   Future<Sequence<Coordinate>> buildEmptyScene(Position position) async {
     // generate placeholder scene
     _generateWaterScene(position.toCoord2D());
@@ -88,6 +96,7 @@ class SceneController with ChangeNotifier {
     return _newTiles;
   }
 
+  /// Fetches the tiles from the API and builds water tiles.
   Future<Sequence<Coordinate>> fetchScene(Position position, int sid) async {
     // fetch terrain tiles
     final coord = position.toCoord2D();
@@ -99,6 +108,7 @@ class SceneController with ChangeNotifier {
     return _newTiles;
   }
 
+  /// Saves the previous scene and cleans for the new one.
   void _savePreviousScene() {
     // newTiles turn into oldTiles
     _oldTiles = _newTiles;
@@ -109,6 +119,7 @@ class SceneController with ChangeNotifier {
     _islands = Grid.empty();
   }
 
+  /// Generates a pulse of water blocks around the coordinate [origin] with radius [chunkSize].
   void _generateWaterScene(Coord2D origin) {
     pulse(
         radius: chunkSize,
@@ -124,6 +135,7 @@ class SceneController with ChangeNotifier {
     );
   }
 
+  /// Fetches the terrain tiles from the API for the coordinate [coordinate] and ship [sid].
   Future<void> _fetchTerrainTiles(Coord2D coordinate, int sid) async {
     // fetch tiles from services
     Horizon? horizon = await _horizonFn(coordinate, sid);
@@ -138,6 +150,9 @@ class SceneController with ChangeNotifier {
     }
   }
 
+  /// Builds a sequence of global tiles by merging the old and new tiles.
+  ///
+  /// Returns a new [Sequence] of [Coordinate] elements representing the global tiles.
   Sequence<Coordinate> _buildGlobalTiles() {
     final oldTiles = List<Coordinate>.empty(growable: true);
     for(var index = 0; index < _oldTiles.length; index++) {
@@ -155,6 +170,9 @@ class SceneController with ChangeNotifier {
     return Sequence(data: list);
   }
 
+  /// Retrieves the tiles and their corresponding states to construct a [TilesOrder] object.
+  ///
+  /// Returns a [TilesOrder] object containing the global tiles and their states.
   TilesOrder<Coordinate> _getTiles() {
     final globalTiles = _buildGlobalTiles();
 
@@ -166,13 +184,17 @@ class SceneController with ChangeNotifier {
 
       int? indexNew = _newTilesMap[coord];
       int? indexOld = _oldTilesMap[coord];
-      if (indexNew != null && indexOld != null) tilesState[coord] = TileState.neutral;
-      else if (indexNew != null) tilesState[coord] = TileState.fresh;
-      else if (indexOld != null) tilesState[coord] = TileState.dry;
+      if (indexNew != null && indexOld != null) {tilesState[coord] = TileState.neutral;}
+      else if (indexNew != null) {tilesState[coord] = TileState.fresh;}
+      else if (indexOld != null) {tilesState[coord] = TileState.dry;}
     }
 
     return TilesOrder(tiles: globalTiles, tilesStates: tilesState);
   }
 }
 
+/// A typedef representing a function that retrieves a [Horizon] asynchronously.
+///
+/// The function takes a [Coord2D] coordinate and an [int] sid as parameters,
+/// and returns a [Future] that resolves to a [Horizon] or `null`.
 typedef HorizonFn = Future<Horizon?> Function(Coord2D coordinate, int sid);

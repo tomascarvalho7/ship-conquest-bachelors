@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:ship_conquest/providers/lobby_storage.dart';
+import 'package:ship_conquest/providers/game/game_controller.dart';
+import 'package:ship_conquest/widgets/screens/wave_loading_screen/loading_screen.dart';
 
-import '../../../providers/game/game_controller.dart';
-import '../initial_loading/loading_screen.dart';
-
+/// A loading screen to show when exiting the game.
+///
+/// Allows for the game controller to take the necessary game stopping actions
+/// such as stopping the sounds, notifications and unsubscribing from the sse.
 class LeaveGameScreen extends StatefulWidget {
   const LeaveGameScreen({Key? key}) : super(key: key);
 

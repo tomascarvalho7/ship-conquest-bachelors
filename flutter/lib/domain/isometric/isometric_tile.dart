@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:ship_conquest/domain/isometric/isometric_tile_paint.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/space/position.dart';
 
-import '../space/coordinate.dart';
-
+/// Class to represent isometric tiles by [coord], [position], [height] and [tilePaint].
 class IsometricTile {
   final Coord2D coord; // tile coordinate
   final Position position; // tile origin
@@ -15,7 +15,7 @@ class IsometricTile {
 
   IsometricTile({required this.coord, required this.position, required this.height, required this.tilePaint});
 
-  // create a isometric tile from a static terrain tile
+  /// Creates a isometric tile from a static terrain tile.
   static IsometricTile fromTerrainTile({
     required Coordinate coordinate,
     required double tileSize,
@@ -36,7 +36,7 @@ class IsometricTile {
     );
   }
 
-  // create a isometric tile from a moving water tile
+  /// Creates a isometric tile from a moving water tile.
   static IsometricTile fromWaterTile({
     required Coordinate coordinate,
     required double tileSize,

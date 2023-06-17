@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:ship_conquest/providers/user_storage.dart';
 import 'package:ship_conquest/services/google/google_signin_api.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
-import 'package:ship_conquest/widgets/screens/initial_loading/loading_screen.dart';
+import 'package:ship_conquest/widgets/screens/wave_loading_screen/loading_screen.dart';
 
-import '../../../providers/user_storage.dart';
 
+/// Loading screen that checks if the currently stored token is valid.
+///
+/// If it is valid, proceed to the home screen,
+/// else send the user to the sign in screen.
 class InitialLoadingScreen extends StatefulWidget {
   const InitialLoadingScreen({super.key});
 

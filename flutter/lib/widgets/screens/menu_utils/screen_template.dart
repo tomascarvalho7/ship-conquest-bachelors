@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Builds a screen template to be used in other lobby screens to avoid code repetition.
 Widget buildScreenTemplateWidget(
         BuildContext context, List<Widget> childWidgets) =>
     Scaffold(

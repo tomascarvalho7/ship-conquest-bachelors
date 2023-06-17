@@ -1,13 +1,14 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/color/color_mark.dart';
-import '../utils/factor.dart';
+import 'package:ship_conquest/domain/utils/factor.dart';
 
-/// Replicate the colorRamp node from blender
+/// Replicate the colorRamp node from Blender
 class ColorRamp {
   final List<ColorMark> colors;
 
   const ColorRamp({required this.colors});
 
+  /// Gets the gradient color with a given [factor] from the list of colors [colors]
   Color getColor(Factor factor) {
     int n = 0;
     while(n < colors.length - 1) {
@@ -23,11 +24,10 @@ class ColorRamp {
 
         if (col != null) { return col; }
       }
-
       n++;
     }
 
-    // return white
+    // return transparent
     return const Color(0x00000000);
   }
 }

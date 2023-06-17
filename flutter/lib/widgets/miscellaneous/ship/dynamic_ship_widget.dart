@@ -1,12 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/isometric/isometric.dart';
+import 'package:ship_conquest/domain/ship/ship.dart';
+import 'package:ship_conquest/domain/ship/utils/classes/direction.dart';
 import 'package:ship_conquest/domain/ship/utils/logic.dart';
+import 'package:ship_conquest/domain/space/position.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/ship_view.dart';
 import 'package:ship_conquest/widgets/miscellaneous/ship/utils.dart';
-import '../../../domain/isometric/isometric.dart';
-import '../../../domain/ship/utils/classes/direction.dart';
-import '../../../domain/ship/ship.dart';
-import '../../../domain/space/position.dart';
 
+/// Widget to build a moving ship
+///
+/// Preserves state because of the animation of navigation
+///
+/// - [waveAnim] the animation of the wave, the ship needs to follow the waves
+/// - [ship] the ship to be rendered
+/// - [tileSize] the size of the tiles used
 class DynamicShipWidget extends StatefulWidget {
   final Animation<double> waveAnim;
   final MobileShip ship;

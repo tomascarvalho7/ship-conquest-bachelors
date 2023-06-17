@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/color/color_mark.dart';
+import 'package:ship_conquest/domain/color/color_ramp.dart';
 import 'package:ship_conquest/domain/utils/factor.dart';
 import 'package:ship_conquest/providers/game/event_handlers/game_event.dart';
+import 'package:ship_conquest/providers/game/event_handlers/minimap_event.dart';
 
-import '../domain/color/color_mark.dart';
-import '../domain/color/color_ramp.dart';
-import '../providers/game/event_handlers/minimap_event.dart';
 
 // defaults
 const tileSize = 32.0;

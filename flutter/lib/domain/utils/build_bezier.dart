@@ -1,7 +1,7 @@
+import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/space/cubic_bezier.dart';
 
-import '../space/coord_2d.dart';
-
+/// Builds a list of Bézier curves from a list of points.
 List<CubicBezier> buildBeziers(List<Coord2D> points) {
   if (points.length % 4 != 0) return [];
 

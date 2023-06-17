@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// Builds a generic button with rounded borders.
+///
+/// - [onTap] the function to execute on the button's tap action
+/// - [text] the text to present
 Widget buildConfirmSignInWidget(
         BuildContext context, Function() onTap, String text) =>
     ElevatedButton(

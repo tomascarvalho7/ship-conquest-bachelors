@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:ship_conquest/domain/color/color_gradient.dart';
+import 'package:ship_conquest/domain/isometric/isometric_tile.dart';
+import 'package:ship_conquest/domain/space/coordinate.dart';
 import 'package:ship_conquest/domain/tile/tiles_order.dart';
+import 'package:ship_conquest/utils/constants.dart';
+import 'package:ship_conquest/widgets/canvas/isometric_painter.dart';
 
-import '../../../../domain/color/color_gradient.dart';
-import '../../../../domain/isometric/isometric_tile.dart';
-import '../../../../domain/space/coordinate.dart';
-import '../../../../utils/constants.dart';
-import '../../../canvas/isometric_painter.dart';
 
+/// Builds a set of tiles by transforming the tiles stored in the controller
+/// into isometric tiles and painting them on the canvas by calling [IsometricPainter].
 class TilesView extends StatefulWidget {
   final Animation<double> animation;
   final TilesOrder<Coordinate> tiles;
@@ -14,6 +16,7 @@ class TilesView extends StatefulWidget {
   // constructor
   TilesView({super.key, required this.animation, required this.tiles, required this.colorGradient});
 
+  // Executes the operations in the tiles and stores them to be presented
   late final TilesOrder<IsometricTile> isoTiles = TilesOrder(
     tilesStates: tiles.tilesStates,
     tiles: tiles.tiles.map((coord) {

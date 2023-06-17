@@ -1,3 +1,6 @@
+/// Parses a duration string in the format ["mm:ss.SS"].
+///
+/// Returns a [Duration] object representing the parsed duration.
 Duration parseDuration(String durationString) {
   final parts = durationString.split(':');
   final minutes = int.parse(parts[0]);

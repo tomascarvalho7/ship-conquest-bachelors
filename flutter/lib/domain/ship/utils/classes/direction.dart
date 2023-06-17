@@ -1,3 +1,4 @@
+/// Enum class to represent a ship's direction.
 enum Direction {
   up,
   left,
@@ -5,6 +6,7 @@ enum Direction {
   right,
 }
 
+/// Retrieves the ship's orientation given the angle [ang].
 Direction getOrientationFromAngle(double ang) {
   final angle = ang + 45;
   if (angle > 0 && angle <= 90) return Direction.right;

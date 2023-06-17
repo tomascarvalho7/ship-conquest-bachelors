@@ -16,6 +16,7 @@ import 'package:ship_conquest/widgets/screens/game/game_view.dart';
 import '../../../providers/game/global_controllers/scene_controller.dart';
 import '../../../providers/camera_controller.dart';
 
+/// Builds the game interface and holds the wave animation, which needs to be synchronized through all the elements.
 class Game extends StatefulWidget {
   const Game({super.key});
 

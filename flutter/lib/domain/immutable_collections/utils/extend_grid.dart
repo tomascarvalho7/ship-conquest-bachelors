@@ -1,8 +1,8 @@
-import '../grid.dart';
-import '../sequence.dart';
+import 'package:ship_conquest/domain/immutable_collections/grid.dart';
+import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 
 ///
-/// Generic Extension methods to add functionalities
+/// Generic Extension method to add functionality
 /// to the [Grid] class that depend on other [Components]
 ///
 extension ExtendGrid<K, V> on Grid<K, V> {

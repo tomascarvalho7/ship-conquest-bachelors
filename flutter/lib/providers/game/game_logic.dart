@@ -3,7 +3,7 @@ import 'package:ship_conquest/domain/event/unknown_event.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
 import 'package:ship_conquest/domain/feedback/success/utils/constants.dart';
 import 'package:ship_conquest/domain/feedback/success/utils/functions.dart';
-import 'package:ship_conquest/domain/horizon.dart';
+import 'package:ship_conquest/domain/game/horizon.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/providers/game/global_controllers/minimap_controller.dart';
 import 'package:ship_conquest/providers/game/global_controllers/scene_controller.dart';

@@ -12,13 +12,13 @@ abstract class Either<L, R> {
   // Represents the right side of [Either] class which by convention is a "Success"
   bool get isRight => this is Right<L, R>;
 
-  // Get [Left] value, may throw an exception when the value is [Right]
+  /// Get [Left] value, may throw an exception when the value is [Right]
   L get left => this.fold<L>(
           (value) => value,
           (right) => throw Exception(
           'Illegal use. You should check isLeft before calling'));
 
-  // Get [Right] value, may throw an exception when the value is [Left]
+  /// Get [Right] value, may throw an exception when the value is [Left]
   R get right => this.fold<R>(
           (left) => throw Exception(
           'Illegal use. You should check isRight before calling'),
@@ -27,7 +27,7 @@ abstract class Either<L, R> {
   /// Transform values of [Left] and [Right]
   Either<TL, TR> either<TL, TR>(TL Function(L left) fnL, TR Function(R right) fnR);
 
-  // Fold [Left] and [Right] into the value of one type
+  /// Fold [Left] and [Right] into the value of one type
   T fold<T>(T Function(L left) fnL, T Function(R right) fnR);
 }
 
