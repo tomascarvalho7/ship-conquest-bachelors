@@ -11,7 +11,7 @@ Several technical concepts were worked on, namely *Procedural Generation* and ps
 ## Architecture
 
 In the following figure, a representative scheme of the system architecture is presented, also showing the technologies used in each module.
-![System Architecture](https://github.com/tomascarvalho7/ship_conquest/blob/main/architecture)
+![System Architecture](https://github.com/tomascarvalho7/ship_conquest/blob/main/architecture.png)
 
 ## Version 1.0
 
