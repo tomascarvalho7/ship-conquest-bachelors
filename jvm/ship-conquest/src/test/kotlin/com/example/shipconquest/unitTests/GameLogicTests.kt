@@ -1,6 +1,8 @@
 package com.example.shipconquest.unitTests
 
 import com.example.shipconquest.Clock
+import com.example.shipconquest.ClockStub
+import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
@@ -18,16 +20,10 @@ import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.OwnershipDetails
 import com.example.shipconquest.domain.world.islands.WildIsland
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
-
-class ClockStub: Clock {
-    override fun now(): Instant = Instant.parse("2023-01-01T00:00:00Z")
-}
-
 class GameLogicTests {
     private val testClock: Clock = ClockStub()
 
@@ -52,9 +48,10 @@ class GameLogicTests {
 
         val movement = gameLogic.buildMovementFromPoints(points)
 
-        assertEquals(1, movement.landmarks.size)
-        assertEquals(testClock.now(), movement.startTime)
-        assertEquals(points, movement.getPoints())
+        assertNotNull(movement)
+        assertEquals(1, movement?.spline?.segments?.size)
+        assertEquals(testClock.now(), movement?.startTime)
+        assertEquals(points, movement?.getPoints())
     }
 
     @Test
@@ -97,14 +94,19 @@ class GameLogicTests {
             id = "FAKE-UID",
             name = "Adam"
         )
+        val otherUser = User(
+            id = "OTHER-FAKE-UID",
+            name = "Alex"
+        )
+
         val island = OwnedIsland(
             islandId = 123,
             coordinate = Vector2(10, 10),
             radius = 10,
             incomePerHour = 100,
             conquestDate = Instant.parse("2022-12-31T23:59:00Z"),
-            uid = user.id,
-            ownershipDetails = OwnershipDetails(owned = false, username = user.id)
+            uid = otherUser.id,
+            ownershipDetails = OwnershipDetails(owned = false, username = otherUser.name)
         )
         var onWildCalled = false
         var onOwnedCalled = false
@@ -116,7 +118,7 @@ class GameLogicTests {
             onOwned = { old, new ->
                 onOwnedCalled = true
                 assertEquals(island, old)
-                assertEquals("otherUser", old.uid)
+                assertEquals(otherUser.id, old.uid)
                 assertEquals(user.id, new.uid)
                 assertEquals(testClock.now(), new.conquestDate)
             }
@@ -142,7 +144,7 @@ class GameLogicTests {
             incomePerHour = 100,
             conquestDate = Instant.parse("2022-12-31T23:59:00Z"),
             uid = user.id,
-            ownershipDetails = OwnershipDetails(owned = false, username = user.id)
+            ownershipDetails = OwnershipDetails(owned = true, username = user.id)
         )
         var onWildCalled = false
         var onOwnedCalled = false
@@ -166,8 +168,10 @@ class GameLogicTests {
     fun getCoordFromMobileMovementAtStart() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(2, 0), Vector2(3, 0))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(2, 0), Vector2(3, 0))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofHours(1)
@@ -182,8 +186,10 @@ class GameLogicTests {
     fun getCoordFromMobileMovementAtMiddle() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
+                )
             ),
             startTime = testClock.now() - Duration.ofMinutes(30),
             duration = Duration.ofHours(1)
@@ -198,8 +204,10 @@ class GameLogicTests {
     fun getCoordFromMobileMovementAtEnd() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(0, 0), Vector2(1, 0), Vector2(3, 0), Vector2(4, 0))
+                )
             ),
             startTime = testClock.now() - Duration.ofHours(1),
             duration = Duration.ofHours(1)
@@ -295,8 +303,10 @@ class GameLogicTests {
     fun shipFindIsland() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(1, 0), Vector2(4, 0), Vector2(7, 0), Vector2(10, 0))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(1, 0), Vector2(4, 0), Vector2(7, 0), Vector2(10, 0))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
@@ -333,8 +343,10 @@ class GameLogicTests {
     fun shipMissIsland() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(1, -5), Vector2(4, -5), Vector2(7, -5), Vector2(10, -5))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(1, -5), Vector2(4, -5), Vector2(7, -5), Vector2(10, -5))
+                ),
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
@@ -369,15 +381,19 @@ class GameLogicTests {
     fun shipFightAnotherShip() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
         )
         val enemyMovement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(4, -10), Vector2(4, -5), Vector2(4, 0), Vector2(4, 10))
+            spline = BezierSpline(
+                segments = listOf(
+                    CubicBezier(Vector2(4, -10), Vector2(4, -5), Vector2(4, 0), Vector2(4, 10))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
@@ -401,15 +417,19 @@ class GameLogicTests {
     fun shipMissFightWithAnotherShip() {
         val gameLogic = GameLogic(testClock)
         val movement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
+            spline = BezierSpline(
+                listOf(
+                    CubicBezier(Vector2(1, 4), Vector2(3, 4), Vector2(5, 4), Vector2(7, 4))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)
         )
         val enemyMovement = Kinetic(
-            landmarks = listOf(
-                CubicBezier(Vector2(4, -20), Vector2(4, -15), Vector2(4, -10), Vector2(4, -5))
+            spline = BezierSpline(
+                listOf(
+                    CubicBezier(Vector2(4, -20), Vector2(4, -15), Vector2(4, -10), Vector2(4, -5))
+                )
             ),
             startTime = testClock.now(),
             duration = Duration.ofMinutes(10)

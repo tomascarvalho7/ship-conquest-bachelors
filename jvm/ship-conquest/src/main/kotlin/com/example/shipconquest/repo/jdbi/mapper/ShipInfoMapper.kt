@@ -2,7 +2,6 @@ package com.example.shipconquest.repo.jdbi.mapper
 
 import com.example.shipconquest.repo.jdbi.ShipRepositoryJDBI
 import com.example.shipconquest.repo.jdbi.dbmodel.ShipInfoDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.ShipMovementDBModel
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
 import java.sql.ResultSet

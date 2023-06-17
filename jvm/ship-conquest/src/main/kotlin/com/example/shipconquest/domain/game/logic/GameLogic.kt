@@ -93,11 +93,8 @@ class GameLogic(private val clock: Clock) {
         return newIsland
     }
 
-    // get X and Y axis coordinate from a ship movement at the current [Instant]
-    fun getCoordFromMovement(movement: Movement) = when(movement) {
-        is Kinetic -> movement.getPositionFromInstant(clock.now()).toVector2()
-        is Stationary -> movement.position
-    }
+    // get X and Y axis coordinate from a given movement at the current [Instant]
+    fun getCoordFromMovement(movement: Movement) = movement.getCoordinateFromInstant(instant = clock.now())
 
     // build the player's statistics at the current [Instant]
     fun buildPlayerStatistics(builder: PlayerStatsBuilder) = builder.build(clock.now())

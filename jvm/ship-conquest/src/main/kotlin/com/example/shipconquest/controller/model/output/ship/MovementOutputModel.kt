@@ -24,5 +24,5 @@ fun Movement.toMovementOutputModel() =
             startTime = startTime.toString(),
             duration = formatDuration(duration)
         )
-        is Stationary -> StationaryOutputModel(coord = position.toVector2OutputModel())
+        is Stationary -> StationaryOutputModel(coord = coordinate.toVector2OutputModel())
     }

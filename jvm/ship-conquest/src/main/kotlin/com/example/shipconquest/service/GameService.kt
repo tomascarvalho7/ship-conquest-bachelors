@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.text.SimpleDateFormat
 import java.time.Duration
-import java.time.Instant
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -95,50 +94,25 @@ class GameService(
             val userShips = transaction.shipRepo.getShipsInfo(tag, uid)
             val currInstant = gameLogic.getInstant()
 
-            val islandsCenter = mutableListOf<Vector2>()
             val pathPoints = mutableListOf<Vector2>()
             // iterate in users ships
             for (ship in userShips) {
                 // get ship path
                 val events = transaction.eventRepo.getShipEvents(tag = tag, uid = uid, sid = ship.id)
                 val builtMovements = ship.movements
-                    .map { it.buildEvents(currInstant, events) }
+                    .map { buildMovementFromEvents(it, currInstant, events) }
                     .filterIsInstance<Kinetic>()
                 // add trimmed movements to list of control points
                 pathPoints.addAll(gameLogic.trimMovements(builtMovements))
-
-
-                // filter island events TODO: eventRepo.getIslands(tag, uid)
-                val islandEvents = events.filter { event ->
-                    event.details is IslandEvent && event.instant.isBefore(gameLogic.getInstant())
-                }
-                for (event in islandEvents) {
-
-                }
-                transaction.eventRepo.getIslandEventsBeforeInstant(
-                    tag = tag,
-                    sid = ship.id,
-                    uid = uid,
-                    instant = currInstant
-                ).map {
-                    val details = it.details
-                    if (details is IslandEvent) {
-                        // get islands center coordinates
-                        val islandCenter = transaction.islandRepo.get(tag = tag, uid = uid, islandId = details.island.islandId)
-                        if (islandCenter != null) {
-                            islandsCenter += islandCenter.coordinate
-                        }
-                    }
-                }
             }
 
-            // pulse island coordinates and add them to final response
-            val islands = islandsCenter.flatMap { point ->
-                game.map.pulse(origin = point, radius = viewDistance, water = true)
-            }.distinct()
+            // get visited islands
+            val visitedIslands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
 
-            // add paths to final response
-            pathPoints.addAll(trimPaths(movements, currInstant).toVector2List())
+            // get the voxels around the island's origins
+            val islands = visitedIslands.flatMap { island ->
+                game.map.pulse(origin = island.coordinate, radius = viewDistance, water = true)
+            }.distinct()
 
             right(value = Minimap(paths = pathPoints, islands = islands, size = game.map.size))
         }

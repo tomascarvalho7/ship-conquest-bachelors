@@ -5,17 +5,29 @@ import com.example.shipconquest.domain.bezier.utils.split
 import com.example.shipconquest.domain.space.toPosition
 import com.example.shipconquest.domain.toVector2
 
+/**
+ * The [BezierSpline] class represents a group of combined [CubicBezier]'s to form
+ * a continuous spline with *N* number of control points.
+ *
+ * The interpolation value changes from *T* variable to *U* variable:
+ * - The *U* variable is between 0-[segments length] and represents the **global** interpolation value
+ * between the entire spline;
+ * - Meanwhile the *T* variable becomes the **local** interpolation value to each individual [CubicBezier].
+ */
 class BezierSpline(
     val segments: List<CubicBezier>,
 ) {
+    // calculate intermediate position along the spline for a given interpolation value [u]
     fun getPosition(u: Double): Position {
-        val index = u.toInt()
-        if (index >= segments.size) return segments.last().p3.toPosition()
+        if (u < 0) return segments.first().p0.toPosition()
+        if (u >= segments.size) return segments.last().p3.toPosition()
 
+        val index = u.toInt()
         val n = u % 1
         return segments[index].get(n)
     }
 
+    // split the spline at a given interpolation value [u]
     fun split(u: Double): BezierSpline {
         if(u >= segments.size) return this // redundant split
 
@@ -33,6 +45,4 @@ class BezierSpline(
 
         return BezierSpline(bezierList)
     }
-
-    fun getFinalCoord() = getPosition(segments.size * 1.0).toVector2()
 }

@@ -10,39 +10,21 @@ import java.time.Duration
 import java.time.Instant
 
 data class ShipMovementDBModel(
-    val points: ShipPointsDBModel,
+    val spline: ShipPointsDBModel,
     val startTime: Instant?,
     val duration: Duration?
 )
 
-data class ShipPointsDBModel(
-    val points: Array<PositionDBModel>,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+data class ShipPointsDBModel(val points: List<PositionDBModel>)
 
-        other as ShipPointsDBModel
-
-        if (!points.contentEquals(other.points)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return points.contentHashCode()
-    }
-}
-
-
-fun ShipMovementDBModel.toMovement(): Movement {
+fun ShipMovementDBModel.toMovement(): Movement? {
+    if (spline.points.isEmpty()) return null // empty list of points is not acceptable
     if (startTime == null || duration == null) return Stationary(
-        position = points.points[0].toVector2()
+        coordinate = spline.points[0].toVector2()
     )
 
-
     return Kinetic(
-        landmarks = buildSpline(points.points.map { Vector2(it.x, it.y) }),
+        spline = buildSpline(spline.points.map { Vector2(it.x, it.y) }) ?: return null,
         startTime = startTime,
         duration = duration
     )

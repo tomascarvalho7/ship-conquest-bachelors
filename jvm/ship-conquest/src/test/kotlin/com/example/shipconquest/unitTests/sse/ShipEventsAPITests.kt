@@ -1,5 +1,6 @@
 package com.example.shipconquest.unitTests.sse
 
+import com.example.shipconquest.ClockStub
 import com.example.shipconquest.controller.sse.GameKey
 import com.example.shipconquest.controller.sse.GameSubscriptionKey
 import com.example.shipconquest.controller.sse.ShipEventsAPI
@@ -13,7 +14,6 @@ import com.example.shipconquest.domain.ship.Fleet
 import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.unitTests.ClockStub
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.Duration

@@ -20,16 +20,27 @@ class ShipBuilder(val info: ShipInfo, val events: List<Event>) {
     // [Ship] builder function
     fun build(instant: Instant) = Ship(
         sid = info.id,
-        movement = info.getCurrentMovement().buildEvents(instant = instant, events = events),
+        movement = buildMovementFromEvents(
+            movement = info.getCurrentMovement(),
+            instant = instant,
+            events = events
+        ),
         completedEvents = events.filter { it.instant.isBefore(instant) },
         futureEvents = events.filter { it.instant.isAfter(instant) }
             .map { event -> FutureEvent(event, Duration.between(instant, event.instant)) }
     )
 
-    // get last mobile movement or null
-    fun getMobileMovementOrNull(instant: Instant) =
-        when(val movement = info.getCurrentMovement().buildEvents(instant = instant, events = events)) {
-            is Kinetic -> if (movement.getEndTime().isAfter(instant)) movement else null
+    // get last build [Kinetic] movement or null
+    fun getMobileMovementOrNull(instant: Instant): Kinetic? {
+        val movement = buildMovementFromEvents(
+            movement = info.getCurrentMovement(),
+            instant = instant,
+            events = events
+        )
+
+        return when(movement) {
+            is Kinetic -> if (movement.endTime.isAfter(instant)) movement else null
             is Stationary -> null
         }
+    }
 }

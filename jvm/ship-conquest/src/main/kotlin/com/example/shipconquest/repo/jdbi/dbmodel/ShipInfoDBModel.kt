@@ -21,7 +21,7 @@ fun List<ShipInfoDBModel>.toShipInfo() =
 
 fun shipInfo(id: Int, dataset: List<ShipInfoDBModel>) = ShipInfo(
         id = id,
-        movements = dataset.map { info ->
+        movements = dataset.mapNotNull { info ->
             ShipMovementDBModel(info.points, info.startTime, info.duration).toMovement()
         }
     )

@@ -1,10 +1,11 @@
-package com.example.shipconquest.domain
+package com.example.shipconquest.domain.bezier
 
-import com.example.shipconquest.domain.bezier.CubicBezier
+import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.bezier.utils.sample
 import com.example.shipconquest.domain.bezier.utils.split
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.space.toPosition
+import com.example.shipconquest.domain.toVector2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -157,5 +158,49 @@ class CubicBezierTests {
         // Verify the control points of the split segment
         assertEquals(cubicBezier.get(start).toVector2(), splitBezier.p0)
         assertEquals(cubicBezier.get(end).toVector2(), splitBezier.p3)
+    }
+
+    @Test
+    fun `split CubicBezier in quarter`() {
+        // Define the control points
+        val p0 = Vector2(x = 0, y = 0)
+        val p1 = Vector2(x = 1, y = 2)
+        val p2 = Vector2(x = 2, y = 4)
+        val p3 = Vector2(x = 4, y = 6)
+
+        // Create a CubicBezier instance
+        val cubicBezier = CubicBezier(p0, p1, p2, p3)
+
+        // Test splitting the curve
+        val start = 0.0
+        val end = 0.25
+        val splitBezier = cubicBezier.split(start, end)
+
+        // Verify the control points of the split segment
+        assertEquals(cubicBezier.get(start).toVector2(), splitBezier.p0)
+        assertEquals(cubicBezier.get(end).toVector2(), splitBezier.p3)
+    }
+
+    @Test
+    fun `CubicBezier redundant split`() {
+        // Define the control points
+        val p0 = Vector2(x = 0, y = 0)
+        val p1 = Vector2(x = 1, y = 2)
+        val p2 = Vector2(x = 2, y = 4)
+        val p3 = Vector2(x = 4, y = 6)
+
+        // Create a CubicBezier instance
+        val cubicBezier = CubicBezier(p0, p1, p2, p3)
+
+        // Test splitting the curve
+        val start = 0.0
+        val end = 1.0
+        val splitBezier = cubicBezier.split(start, end)
+
+        // Verify the control points of the split segment
+        assertEquals(cubicBezier.p0, splitBezier.p0)
+        assertEquals(cubicBezier.p1, splitBezier.p1)
+        assertEquals(cubicBezier.p2, splitBezier.p2)
+        assertEquals(cubicBezier.p3, splitBezier.p3)
     }
 }

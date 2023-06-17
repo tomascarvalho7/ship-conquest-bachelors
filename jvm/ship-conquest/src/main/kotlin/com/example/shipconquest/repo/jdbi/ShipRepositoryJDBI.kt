@@ -164,8 +164,7 @@ class ShipRepositoryJDBI(private val handle: Handle): ShipRepository {
         private val objectMapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
         fun serializeShipPosition(position: List<Vector2>): String =
-            objectMapper.writeValueAsString(ShipPointsDBModel(position.map { PositionDBModel(it.x, it.y) }
-                .toTypedArray()))
+            objectMapper.writeValueAsString(ShipPointsDBModel(position.map { PositionDBModel(it.x, it.y) }))
 
         fun deserializeShipPosition(json: String) =
             objectMapper.readValue<ShipPointsDBModel>(json)
