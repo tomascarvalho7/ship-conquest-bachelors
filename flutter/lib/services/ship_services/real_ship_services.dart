@@ -44,10 +44,11 @@ import 'package:ship_conquest/services/input_models/user/user_info_input_model.d
 import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
+import 'package:ship_conquest/services/utils/event_model.dart';
 
 import '../output_models/navigation_path_output_model.dart';
 
-const baseUri = "6547-46-189-174-32.ngrok-free.app";
+const baseUri = "b1d5-2001-8a0-6e2e-ba00-c82e-824d-5ecf-9f6b.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -416,16 +417,20 @@ class RealShipServices extends ShipServices {
           HttpHeaders.authorizationHeader: 'Bearer $token',
           HttpHeaders.acceptHeader: "text/event-stream",
           HttpHeaders.cacheControlHeader: "no-cache",
-        }).listen((event) {
-      final data = event.data;
+        }).listen((encodedEvent) {
+      final data = encodedEvent.data;
       if (data == null) return;
+
+      // decode data to event format
+      final event = EventModel.fromTextStream(data);
+      if (event == null) return;
 
       if (event.event == 'event') {
         final (sid, unknownEvent) =
             EventNotificationInputModel.fromJson(jsonDecode(data)).toDomain();
         onEvent(sid, unknownEvent);
       } else if (event.event == 'fleet') {
-        onFleet(ShipsInputModel.fromJson(jsonDecode(data)).toSequenceOfShips());
+        onFleet(ShipsInputModel.fromJson(jsonDecode(event.data)).toSequenceOfShips());
       }
     });
   }

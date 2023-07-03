@@ -53,6 +53,7 @@ class ShipController with ChangeNotifier {
   /// Simply notifies the listeners to force the fighting sate update.
   void updateFightState() {
     // simply update widgets
+    print("update");
     notifyListeners();
   }
 

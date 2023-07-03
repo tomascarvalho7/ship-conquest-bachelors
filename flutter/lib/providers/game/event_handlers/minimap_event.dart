@@ -84,7 +84,6 @@ class MinimapEvent {
       final oldShip = shipController.getShip(routeController.selectedShipIndex);
       gameController.deleteShipEvent(oldShip);
       invertScale(Position pos) => Coord2D(x: (pos.x * invScale).round(), y: (pos.y * invScale).round());
-      shipController.updateShip();
       // post & fetch sailing ship, then schedule new ship tasks and update ship
       services.navigateTo(
           oldShip.sid,
