@@ -4,6 +4,7 @@ import com.example.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.ConquestInputModel
 import com.example.shipconquest.controller.model.input.NavigationPathInputModel
+import com.example.shipconquest.controller.model.input.toPathPoints
 import com.example.shipconquest.controller.model.output.*
 import com.example.shipconquest.controller.model.output.islands.toOwnedIslandOutputModel
 import com.example.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
@@ -106,10 +107,10 @@ class GameController(val service: GameService) {
     fun navigate(
         user: User,
         @PathVariable tag: String,
-        @RequestBody bodyObj: NavigationPathInputModel,
+        @RequestBody path: NavigationPathInputModel,
         @RequestParam shipId: Int
     ): ResponseEntity<*> {
-        val result = service.navigate(tag, user.id, shipId, bodyObj.points)
+        val result = service.navigate(tag, user.id, shipId, path.toPathPoints())
 
         return when (result) {
             is Either.Right -> {
@@ -123,6 +124,8 @@ class GameController(val service: GameService) {
                     Problem.response(status = 400, problem = Problem.invalidNavigation())
                 NavigationError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
+                NavigationError.GameNotFound ->
+                    Problem.response(status = 404, problem = Problem.gameNotFound())
             }
         }
     }

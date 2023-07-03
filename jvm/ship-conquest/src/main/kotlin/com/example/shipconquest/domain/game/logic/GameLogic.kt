@@ -1,17 +1,18 @@
 package com.example.shipconquest.domain.game.logic
 
 import com.example.shipconquest.Clock
+import com.example.shipconquest.domain.bezier.utils.buildSpline
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent
 import com.example.shipconquest.domain.event.logic.EventLogic
-import com.example.shipconquest.domain.path_finding.calculateEuclideanDistance
+import com.example.shipconquest.domain.path_builder.PathBuilder
+import com.example.shipconquest.domain.path_builder.PathPoints
 import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement
-import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.ship.ShipBuilder
 import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.toVector2
+import com.example.shipconquest.domain.space.distanceTo
 import com.example.shipconquest.domain.user.User
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import com.example.shipconquest.domain.user.statistics.build
@@ -22,7 +23,6 @@ import com.example.shipconquest.domain.world.islands.OwnedIsland
 import com.example.shipconquest.domain.world.islands.OwnershipDetails
 import com.example.shipconquest.domain.world.islands.WildIsland
 import com.example.shipconquest.domain.world.pulse
-import com.example.shipconquest.service.buildSpline
 import org.springframework.stereotype.Component
 import java.time.Duration
 import java.time.Instant
@@ -163,13 +163,25 @@ class GameLogic(private val clock: Clock) {
         }
     }
 
-    // build ship movement from list of points
-    fun buildMovementFromPoints(points: List<Vector2>): Kinetic? {
+    fun buildMovementFromPoints(pathPoints: PathPoints, map: HeightMap): Kinetic? {
+        val path = PathBuilder.build(
+            map = map,
+            points = pathPoints,
+            settings = PathBuilder.defaultSettings()
+        )
+        val size = if (path.size > 10) path.size / 10 else 1
+        val points = PathBuilder.normalize(path = path, size = size)
+
+        return buildMovementFromPath(points = points)
+    }
+
+    // build ship movement from a path
+    fun buildMovementFromPath(points: List<Vector2>): Kinetic? {
         var distance = 0.0;
         for (i in 0 until points.size - 1) {
-            val a = points[i];
-            val b = points[i + 1];
-            distance += calculateEuclideanDistance(a, b)
+            val a = points[i]
+            val b = points[i + 1]
+            distance += a.distanceTo(b)
         }
         val duration = Duration.ofSeconds((distance * 2.5).roundToLong()) // was 10 before
 

@@ -16,7 +16,7 @@ class Publisher(private val subscriptions: ConcurrentHashMap<String, SseEmitter>
     }
 
     override fun subscribe(key: String): SseEmitter {
-        val sse = SseEmitter()
+        val sse = SseEmitter(-1) // set no timeout
         subscriptions.putIfAbsent(key, sse)
         return sse
     }

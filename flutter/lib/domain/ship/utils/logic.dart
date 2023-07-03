@@ -1,7 +1,11 @@
 import 'package:ship_conquest/domain/event/known_event.dart';
 import 'package:ship_conquest/domain/immutable_collections/utils/extend_grid.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
+import 'package:ship_conquest/domain/ship/utils/classes/ship_path.dart';
 import 'package:ship_conquest/utils/constants.dart';
+
+import '../../immutable_collections/sequence.dart';
+import '../../space/coord_2d.dart';
 
 /// Helpful logical functions for the all the classes
 /// that implement the [Ship] interface.

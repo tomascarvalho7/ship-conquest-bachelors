@@ -1,4 +1,4 @@
-package com.example.shipconquest.unitTests
+package com.example.shipconquest.domain.logic
 
 import com.example.shipconquest.Clock
 import com.example.shipconquest.ClockStub
@@ -46,7 +46,7 @@ class GameLogicTests {
             Vector2(3, 0)
         )
 
-        val movement = gameLogic.buildMovementFromPoints(points)
+        val movement = gameLogic.buildMovementFromPath(points)
 
         assertNotNull(movement)
         assertEquals(1, movement?.spline?.segments?.size)

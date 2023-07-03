@@ -9,6 +9,8 @@ import 'package:ship_conquest/domain/lobby/lobby_info.dart';
 import 'package:ship_conquest/domain/game/minimap.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
+import 'package:ship_conquest/domain/path/path_points.dart';
+import 'package:ship_conquest/domain/path_builder/path_builder.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
 import 'package:ship_conquest/domain/user/token.dart';
@@ -33,6 +35,7 @@ class FakeShipServices extends ShipServices {
   // constructor
   FakeShipServices({required this.userStorage, required this.lobbyStorage});
   int currentId = 3;
+  late Minimap minimap;
 
   @override
   FutureEither<ErrorFeedback, Horizon> getNewChunk(
@@ -58,20 +61,24 @@ class FakeShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Minimap> getMinimap() async =>
-    Right(
-        Minimap(
-            length: 500,
-            data: Grid.empty() // empty map
-        )
+  FutureEither<ErrorFeedback, Minimap> getMinimap() async {
+    minimap = Minimap(
+        length: 500,
+        data: Grid.empty() // empty map
     );
+    return Right(minimap);
+  }
 
   @override
-  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
+  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Coord2D start, Coord2D mid, Coord2D end) async {
+    final path = PathBuilder.build(minimap, start, mid, end, 10, 10, 250);
+    final size = (path.length > 10) ? (path.length / 10).round() : 1;
+    final landmarks = PathBuilder.normalize(path, size);
+
     double distance = 0.0;
     for(int i = 0; i < landmarks.length - 1; i++) {
-      final a = landmarks.get(i);
-      final b = landmarks.get(i + 1);
+      final a = landmarks[i];
+      final b = landmarks[i + 1];
       distance += euclideanDistance(a, b);
     }
 
@@ -79,7 +86,7 @@ class FakeShipServices extends ShipServices {
         MobileShip(
             sid: sId,
             path: ShipPath(
-                landmarks: buildBeziers(landmarks.data),
+                landmarks: buildBeziers(landmarks),
                 startTime: DateTime.now(),
                 duration: Duration(seconds: (distance * 10).round())
             ),

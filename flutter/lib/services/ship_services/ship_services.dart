@@ -10,6 +10,7 @@ import 'package:ship_conquest/domain/lobby/join_lobby.dart';
 import 'package:ship_conquest/domain/lobby/lobby.dart';
 import 'package:ship_conquest/domain/lobby/lobby_info.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
+import 'package:ship_conquest/domain/path/path_points.dart';
 import 'package:ship_conquest/domain/ship/ship.dart';
 import 'package:ship_conquest/domain/space/coord_2d.dart';
 import 'package:ship_conquest/domain/stats/player_stats.dart';
@@ -72,11 +73,11 @@ abstract class ShipServices {
   /// Retrieves the ship information after navigating.
   ///
   /// - [sId] is the identifier of the ship to navigate.
-  /// - [landmarks] is the list of 2D coordinates that compose the path.
+  /// - [start], [mid], [end] are the navigation path control points.
   ///
   /// Returns a [FutureEither] that resolves to a [Ship] object if the operation is successful,
   /// or an [ErrorFeedback] object in case of an error.
-  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks);
+  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Coord2D start, Coord2D mid, Coord2D end);
 
   /// Retrieves a specific ship's information.
   ///

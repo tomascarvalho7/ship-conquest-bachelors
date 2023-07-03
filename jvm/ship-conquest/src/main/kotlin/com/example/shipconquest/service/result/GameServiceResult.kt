@@ -1,7 +1,7 @@
 package com.example.shipconquest.service.result
 
 import com.example.shipconquest.Either
-import com.example.shipconquest.domain.Minimap
+import com.example.shipconquest.domain.minimap.Minimap
 import com.example.shipconquest.domain.ship.Fleet
 import com.example.shipconquest.domain.ship.Ship
 import com.example.shipconquest.domain.user.statistics.PlayerStatistics
@@ -31,6 +31,7 @@ sealed class GetMinimapError {
 typealias GetMinimapResult = Either<GetMinimapError, Minimap>
 
 sealed class NavigationError {
+    object GameNotFound: NavigationError()
     object InvalidNavigationPath: NavigationError()
     object ShipNotFound: NavigationError()
 }

@@ -59,7 +59,7 @@ class PathBuilder {
   }
 
   /// Function to normalize the given list of points according to the number
-  /// of Bezier curves [size].
+  /// of Bézier curves [size].
   static List<Coord2D> normalize(List<Coord2D> path, int size) {
     if (path.isEmpty) return [];
 

@@ -1,12 +1,10 @@
 package com.example.shipconquest.service
 
-import com.example.shipconquest.domain.*
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.bezier.utils.toVector2List
 import com.example.shipconquest.domain.event.event_details.IslandEvent
 import com.example.shipconquest.domain.game.Game
 import com.example.shipconquest.domain.game.logic.GameLogic
+import com.example.shipconquest.domain.minimap.Minimap
+import com.example.shipconquest.domain.path_builder.PathPoints
 import com.example.shipconquest.domain.ship.*
 import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.space.Vector2
@@ -17,6 +15,7 @@ import com.example.shipconquest.domain.world.islands.Island
 import com.example.shipconquest.domain.world.islands.IslandList
 import com.example.shipconquest.domain.world.islands.getCost
 import com.example.shipconquest.domain.world.islands.getNearIslands
+import com.example.shipconquest.domain.world.islandsToHeightMap
 import com.example.shipconquest.domain.world.pulse
 import com.example.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
@@ -25,14 +24,10 @@ import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.text.SimpleDateFormat
-import java.time.Duration
-import java.util.*
 import kotlin.math.roundToInt
 
-//take these out of here
-const val chunkSize = 20.0
 const val viewDistance = 15
+const val shipCost = 50
 
 @Service
 class GameService(
@@ -103,7 +98,8 @@ class GameService(
                     .map { buildMovementFromEvents(it, currInstant, events) }
                     .filterIsInstance<Kinetic>()
                 // add trimmed movements to list of control points
-                pathPoints.addAll(gameLogic.trimMovements(builtMovements))
+                if (builtMovements.isNotEmpty())
+                    pathPoints.addAll(gameLogic.trimMovements(builtMovements))
             }
 
             // get visited islands
@@ -130,11 +126,22 @@ class GameService(
         }
     }
 
-    fun navigate(tag: String, uid: String, shipId: Int, points: List<Vector2>): NavigationResult {
-        val movement = gameLogic.buildMovementFromPoints(points) ?:
-            return left(NavigationError.InvalidNavigationPath)
-
+    fun navigate(tag: String, uid: String, shipId: Int, points: PathPoints): NavigationResult {
         return transactionManager.run { transaction ->
+            val game = transaction.gameRepo.get(tag = tag) ?:
+                return@run left(NavigationError.GameNotFound)
+            val visitedIslands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
+            // build a heightmap from only the visited islands
+            val map = islandsToHeightMap(
+                islands = visitedIslands.flatMap { island ->
+                    game.map.pulse(origin = island.coordinate, radius = viewDistance, water = false)
+                }.distinct(),
+                size = game.map.size
+            )
+            // build a kinetic movement from path points
+            val movement = gameLogic.buildMovementFromPoints(points, map) ?:
+                return@run left(NavigationError.InvalidNavigationPath)
+
             val shipInfo = transaction.shipRepo.getShipInfo(tag = tag, shipId =  shipId, uid = uid)
                 ?.addMovement(movement) ?: return@run left(NavigationError.ShipNotFound)
             // delete future events since ship path has changed
@@ -175,8 +182,7 @@ class GameService(
                 sid = shipId,
                 getShipInfo = transaction.shipRepo::getShipInfo,
                 getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
-            )
-                ?: return@run left(GetShipError.ShipNotFound)
+            ) ?: return@run left(GetShipError.ShipNotFound)
 
             return@run right(
                 value = gameLogic.buildShip(builder = builder)
@@ -210,8 +216,7 @@ class GameService(
                 ?: return@run left(CreateShipError.PlayerStatisticsNotFound)
             val game = transaction.gameRepo.get(tag) ?: return@run left(CreateShipError.GameNotFound)
 
-            // TODO create a good way to get ship costs
-            val canBuy = gameLogic.makeTransaction(playerStatistics, 50) { newCurrency, instant ->
+            val canBuy = gameLogic.makeTransaction(playerStatistics, shipCost) { newCurrency, instant ->
                 transaction.statsRepo.updatePlayerCurrency(
                     tag = tag,
                     uid = uid,
@@ -279,31 +284,4 @@ class GameService(
             )
         }
     }
-}
-
-fun validateNavigationPath(spline: BezierSpline): Boolean {
-    //validate path
-    return true
-}
-
-fun buildSpline(points: List<Vector2>): BezierSpline? {
-    if (points.size % 4 != 0) return null
-
-    return BezierSpline(segments = List(points.size / 4) { index ->
-        CubicBezier(
-            p0 = points[index * 4],
-            p1 = points[(index * 4) + 1],
-            p2 = points[(index * 4) + 2],
-            p3 = points[(index * 4) + 3]
-        )
-    })
-}
-
-fun formatDuration(durationString: Duration): String {
-    val durationMillis = durationString.toMillis()
-
-    val dateFormat = SimpleDateFormat("mm:ss.SSS")
-    dateFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-    return dateFormat.format(Date(durationMillis))
 }

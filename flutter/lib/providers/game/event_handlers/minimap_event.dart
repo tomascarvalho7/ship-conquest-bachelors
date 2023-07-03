@@ -74,15 +74,24 @@ class MinimapEvent {
     final services = context.read<ShipServices>();
     final shipController = context.read<ShipController>();
     final gameController = context.read<GameController>();
+    final minimapController = context.read<MinimapController>();
     final feedbackController = context.read<FeedbackController>();
-    final landmarks = routeController.routePoints;
+    final points = routeController.pathPoints;
+    final invScale = minimapController.minimap.length / minimapSize;
     routeController.confirm();
-    if (landmarks.isNotEmpty) {
+    if (points != null) {
       // get old ship and delete it's events
       final oldShip = shipController.getShip(routeController.selectedShipIndex);
       gameController.deleteShipEvent(oldShip);
+      invertScale(Position pos) => Coord2D(x: (pos.x * invScale).round(), y: (pos.y * invScale).round());
+      shipController.updateShip();
       // post & fetch sailing ship, then schedule new ship tasks and update ship
-      services.navigateTo(oldShip.sid, landmarks).either(
+      services.navigateTo(
+          oldShip.sid,
+          invertScale(points.start),
+          invertScale(points.mid),
+          invertScale(points.end)
+      ).either(
           (left) => feedbackController.setError(left),
           (ship) { // build ship notification's
             feedbackController.setSuccessful(travelling);

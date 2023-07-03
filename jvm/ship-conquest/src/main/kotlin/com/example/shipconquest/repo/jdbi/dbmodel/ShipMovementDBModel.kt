@@ -1,11 +1,10 @@
 package com.example.shipconquest.repo.jdbi.dbmodel
 
-
+import com.example.shipconquest.domain.bezier.utils.buildSpline
 import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement
 import com.example.shipconquest.domain.ship.movement.Stationary
 import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.service.buildSpline
 import java.time.Duration
 import java.time.Instant
 

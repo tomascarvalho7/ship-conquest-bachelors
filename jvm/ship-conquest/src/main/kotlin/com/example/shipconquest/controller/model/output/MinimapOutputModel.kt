@@ -1,6 +1,6 @@
 package com.example.shipconquest.controller.model.output
 
-import com.example.shipconquest.domain.Minimap
+import com.example.shipconquest.domain.minimap.Minimap
 
 data class MinimapOutputModel(val paths: List<Vector2OutputModel>, val islands: List<Vector3OutputModel>, val size: Int)
 

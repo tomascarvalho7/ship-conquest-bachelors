@@ -1,4 +1,4 @@
-package com.example.shipconquest.unitTests
+package com.example.shipconquest.domain.logic
 
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.event.logic.utils.comparePoints

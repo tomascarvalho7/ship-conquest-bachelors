@@ -45,7 +45,9 @@ import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart'
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 
-const baseUri = "1060-2001-8a0-6e2e-ba00-e5f3-dd3d-d86-3db0.ngrok-free.app";
+import '../output_models/navigation_path_output_model.dart';
+
+const baseUri = "6547-46-189-174-32.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;
@@ -127,16 +129,12 @@ class RealShipServices extends ShipServices {
   }
 
   @override
-  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Sequence<Coord2D> landmarks) async {
+  FutureEither<ErrorFeedback, Ship> navigateTo(int sId, Coord2D start, Coord2D mid, Coord2D end) async {
     final res = await getStorageVariables();
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
 
-    Map<String, dynamic> jsonBody = {
-      'points': landmarks
-          .map((coord) => Coord2DOutputModel(x: coord.x, y: coord.y).toJson())
-          .data,
-    };
+    final json = NavigationPathOutputModel(start: start, mid: mid, end: end).toJson();
 
     final response = await http.post(
         Uri.https(baseUri, "$lobbyId/navigate", {'shipId': sId.toString()}),
@@ -144,7 +142,7 @@ class RealShipServices extends ShipServices {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
         },
-        body: jsonEncode(jsonBody));
+        body: jsonEncode(json));
 
     return handleResponse(response, (json) =>
       ShipInputModel.fromJson(json).toShip()
