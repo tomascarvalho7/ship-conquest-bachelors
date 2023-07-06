@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
+import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
+import 'package:ship_conquest/domain/feedback/error/error_type.dart';
 import 'package:ship_conquest/domain/immutable_collections/sequence.dart';
 import 'package:ship_conquest/domain/lobby/lobby_info.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_notes.dart';
@@ -102,6 +104,36 @@ class GeneralEvent {
     // get controller's
     final services = context.read<ShipServices>();
     final feedbackController = context.read<FeedbackController>();
+    if(username.isEmpty) {
+      feedbackController.setError(
+          const ErrorFeedback(
+              type: ErrorType.info,
+              title: "Username empty",
+              details: "You have to choose a username to sign-in."
+          )
+      );
+      return;
+    }
+    if(username.length > 16) {
+      feedbackController.setError(
+          const ErrorFeedback(
+              type: ErrorType.info,
+              title: "Username too big",
+              details: "Your username needs to have less than 16 characters."
+          )
+      );
+      return;
+    }
+    if(description.length > 100) {
+      feedbackController.setError(
+          const ErrorFeedback(
+              type: ErrorType.info,
+              title: "Description too big",
+              details: "Your description needs to have less than 100 characters."
+          )
+      );
+      return;
+    }
     // make authentication requests
     final account = await GoogleSignInApi.login();
     final userInfo = await GoogleSignInApi.getUserInfo(account!);

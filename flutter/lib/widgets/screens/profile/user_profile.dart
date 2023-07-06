@@ -44,31 +44,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   .then((value) => context.go("/signIn"));
             },
             firstName),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: FractionallySizedBox(
-            heightFactor: 0.3,
-            widthFactor: 1,
-            child: Container(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: Align(
-                alignment: const Alignment(0.0, 0.0),
-                child: Text(
-                  user?.description != null
-                      ? "${user?.description}"
-                      : "Add a description to your profile!",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ),
-            ),
-          ),
-        ),
         Stack(
           children: [
             buildGreenBackgroundWidget(context),
+            buildMountainsBackgroundWidget(context, 'assets/images/profile_back_mountain.png'),
             Align(
               alignment: const Alignment(0.0, 0.0),
               child: ClipOval(
@@ -109,6 +88,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             buildMountainsBackgroundWidget(context, 'assets/images/profile_front_mountains.png'),
+            Align(
+              alignment: Alignment.topCenter,
+              child: FractionallySizedBox(
+                heightFactor: 0.6,
+                widthFactor: 1,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 30, right: 30),
+                  child: Align(
+                    alignment: const Alignment(0.0, 0.0),
+                    child: Text(
+                      user?.description != null
+                          ? "${user?.description}"
+                          : "Add a description to your profile!",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.secondary),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ] else ...[

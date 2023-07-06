@@ -18,6 +18,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -102,7 +103,6 @@ class UserController(val service: UserService) {
         }
     }
 
-    //ta repetido em varios controllers, melhorar
     private fun <T> response(content: T) = ResponseEntity
         .status(200)
         .header("Content-Type", "application/json")
@@ -110,9 +110,10 @@ class UserController(val service: UserService) {
 }
 
 fun decodeJWT(jwt: String): Payload? {
+    val clientId = System.getenv("SCONQUEST_CLIENT_ID")
     val verifier =
         GoogleIdTokenVerifier.Builder(NetHttpTransport(), GsonFactory())
-            .setAudience(listOf("48002922994-37rvess4o1fgim6mta4tmvefrmf1gu8b.apps.googleusercontent.com"))
+            .setAudience(listOf(clientId))
             .build()
     val idToken = verifier.verify(jwt)
     return if (idToken != null) {

@@ -90,6 +90,9 @@ flutter:
     - assets/images/default_user_image.png
     - assets/sounds/notification.wav
     - assets/sounds/dreamland.mp3
+    - assets/images/thumbnail_fight_ilustration.png
+    - assets/images/thumbnail_ilustration.png
+    - assets/images/thumbnail_conquest_ilustration.png
 
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware

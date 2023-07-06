@@ -24,7 +24,18 @@ class _InitialLoadingScreenState extends State<InitialLoadingScreen> {
   @override
   void initState() {
     super.initState();
-    _checkToken();
+    _checkFirstTime();
+  }
+
+  Future<void> _checkFirstTime() async {
+    final userStorage = context.read<UserStorage>();
+    final firstTime = await userStorage.getFirstTime();
+
+    if (firstTime && mounted) {
+      context.go("/onBoarding");
+    } else {
+      await _checkToken();
+    }
   }
 
   Future<void> _checkToken() async {

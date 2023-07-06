@@ -54,6 +54,9 @@ class LobbyScreenState extends State<LobbyScreen> {
         _dateFilter.toRequestOrder, searchedLobby, _selectedFilterType.name);
     setState(() {
       final lobbyList = lobbies;
+      if(queryResult.isEmpty) {
+        _skip -= _limit;
+      }
       if (lobbyList != null) {
         lobbies = lobbyList.plus(queryResult);
       } else {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
+import 'package:ship_conquest/config.dart';
 import 'package:ship_conquest/domain/either/either.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/event/unknown_event.dart';
@@ -47,8 +48,6 @@ import 'package:http/http.dart' as http;
 import 'package:ship_conquest/services/utils/event_model.dart';
 
 import '../output_models/navigation_path_output_model.dart';
-
-const baseUri = "b1d5-2001-8a0-6e2e-ba00-c82e-824d-5ecf-9f6b.ngrok-free.app";
 
 class RealShipServices extends ShipServices {
   final UserStorage userStorage;

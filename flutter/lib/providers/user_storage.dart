@@ -27,6 +27,11 @@ class UserStorage {
     return await _storage.read(key: _tokenStorageName);
   }
 
+  /// Retrieves "true" if the user has already logged-in.
+  Future<bool> getFirstTime() async {
+    return await _storage.read(key: _firstTimeStorageName) == null ? true : false;
+  }
+
   /// Stores the user information as a JSON string.
   /// Expiry time is important because we want to have a validity timeout for the stored information.
   void setUser(UserInfo user, Duration validDuration) async {
@@ -39,6 +44,11 @@ class UserStorage {
         expiryTime: DateTime.now().add(validDuration));
 
     await _storage.write(key: _userStorageName, value: userInfoToJson(userInfo));
+  }
+
+  /// Sets the firstTime String.
+  void setFirstTime() async {
+    await _storage.write(key: _firstTimeStorageName, value: "true");
   }
 
   /// Sets the token as a String.
@@ -59,6 +69,7 @@ class UserStorage {
   // storage name constant values
   static const String _userStorageName = "user";
   static const String _tokenStorageName = "token";
+  static const String _firstTimeStorageName = "firstTime";
 }
 
 /// Converts a [UserInfoCache] object to a JSON string.

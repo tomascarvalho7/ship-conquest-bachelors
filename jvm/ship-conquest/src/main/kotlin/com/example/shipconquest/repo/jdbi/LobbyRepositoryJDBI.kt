@@ -151,17 +151,19 @@ class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
         return handle.createQuery(
             """
                WITH lobby_counts AS (
-                   SELECT tag, COUNT(*) AS lobbyCount
-                   FROM dbo.Lobby_User
-                   GROUP BY tag
-               )
-               SELECT lobby.*, lobbyCount,
-                      CASE WHEN favorite_lobbies.tag IS NOT NULL THEN true ELSE false END AS isFavorite
-               FROM dbo.Lobby lobby
-               LEFT JOIN lobby_counts lobby_user ON lobby.tag = lobby_user.tag
-               LEFT JOIN dbo.Favorite_Lobbies favorite_lobbies ON lobby.tag = favorite_lobbies.tag 
-               AND favorite_lobbies.uid = :uid ORDER BY lobby.creationTime ${order.toSQLOrder()}
-               LIMIT :limit OFFSET :skip;
+                    SELECT tag, COUNT(*) AS lobbyCount
+                    FROM dbo.Lobby_User
+                    WHERE uid = :uid
+                    GROUP BY tag
+                )
+                SELECT lobby.*, lobbyCount,
+                       CASE WHEN favorite_lobbies.tag IS NOT NULL THEN true ELSE false END AS isFavorite
+                FROM dbo.Lobby lobby
+                INNER JOIN lobby_counts lobby_user ON lobby.tag = lobby_user.tag
+                LEFT JOIN dbo.Favorite_Lobbies favorite_lobbies ON lobby.tag = favorite_lobbies.tag 
+                    AND favorite_lobbies.uid = :uid
+                ORDER BY lobby.creationTime ${order.toSQLOrder()}
+                LIMIT :limit OFFSET :skip;
             """
         )
             .bind("uid", uid)
@@ -186,12 +188,13 @@ class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
                WITH lobby_counts AS (
                    SELECT tag, COUNT(*) AS lobbyCount
                    FROM dbo.Lobby_User
+                   WHERE uid = :uid
                    GROUP BY tag
                )
                SELECT lobby.*, lobbyCount,
                       CASE WHEN favorite_lobbies.tag IS NOT NULL THEN true ELSE false END AS isFavorite
                FROM dbo.Lobby lobby
-               LEFT JOIN lobby_counts lobby_user ON lobby.tag = lobby_user.tag
+               INNER JOIN lobby_counts lobby_user ON lobby.tag = lobby_user.tag
                LEFT JOIN dbo.Favorite_Lobbies favorite_lobbies ON lobby.tag = favorite_lobbies.tag 
                AND favorite_lobbies.uid = :uid WHERE lobby.name ILIKE :name 
                ORDER BY lobby.creationTime ${order.toSQLOrder()}

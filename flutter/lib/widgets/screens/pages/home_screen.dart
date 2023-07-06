@@ -38,27 +38,26 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBody: true,
       resizeToAvoidBottomInset: false,
       bottomNavigationBar:
-      Container(
-        padding: const EdgeInsets.only(bottom: 30),
-        child: HomeBottomBar(
-          currentIndex: _currentIdx,
-          onTap: (index) {
-            // take the focus out of the keyboard
-            FocusManager.instance.primaryFocus?.unfocus();
-            if(index == 2 && globalState.gameData != null){
-              context.go("/game-home");
-            }
-            setState(() {
-              _pc.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.ease,
-              );
-            });
-          },
+        Container(
+          padding: const EdgeInsets.only(bottom: 30),
+          child: HomeBottomBar(
+            currentIndex: _currentIdx,
+            onTap: (index) {
+              // take the focus out of the keyboard
+              FocusManager.instance.primaryFocus?.unfocus();
+              if(index == 2 && globalState.gameData != null){
+                context.go("/game-home");
+              }
+              setState(() {
+                _pc.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.ease,
+                );
+              });
+            },
+          ),
         ),
-      )
-      ,
       body:
           PageView(
             controller: _pc,

@@ -7,6 +7,7 @@ import 'package:ship_conquest/widgets/screens/initial_loading/initial_loading_sc
 import 'package:ship_conquest/widgets/screens/minimap/minimap_screen.dart';
 import 'package:ship_conquest/widgets/screens/pages/game_ui.dart';
 import 'package:ship_conquest/widgets/screens/pages/home_screen.dart';
+import 'package:ship_conquest/widgets/screens/pages/onboarding.dart';
 
 
 /// Creates and returns a GoRouter instance with the specified
@@ -26,6 +27,10 @@ GoRouter createRouter() => GoRouter(
                 path: '/',
                 builder: (BuildContext context, GoRouterState state) =>
                 const InitialLoadingScreen()),
+            GoRoute(
+                path: '/onBoarding',
+                builder: (BuildContext context, GoRouterState state) =>
+                const OnboardingPage()),
             GoRoute(
                 path: '/signIn',
                 builder: (BuildContext context, GoRouterState state) =>
