@@ -44,9 +44,7 @@ class ShipElement extends StatelessWidget {
           SizedBox(
             width: 70,
             height: 70,
-            child: Image.asset(
-              'assets/images/ship_up.png',
-            ),
+            child: Image.asset('assets/images/ship/ship_90.png'),
           ),
           Text("Ship ${index + 1}",
               style: Theme.of(context).textTheme.bodyMedium),

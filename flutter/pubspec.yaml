@@ -73,12 +73,16 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/ship_dark.png
-    - assets/images/ship_up.png
-    - assets/images/ship_left.png
-    - assets/images/ship_down.png
-    - assets/images/ship_right.png
-    - assets/images/target.png
+    - assets/images/ship/ship_0.png
+    - assets/images/ship/ship_45.png
+    - assets/images/ship/ship_90.png
+    - assets/images/ship/ship_135.png
+    - assets/images/ship/ship_180.png
+    - assets/images/ship/ship_225.png
+    - assets/images/ship/ship_270.png
+    - assets/images/ship/ship_315.png
+    - assets/images/ship/target.png
+
     - assets/images/google_logo.png
     - assets/miscellaneous/fake_island.txt
     - assets/images/google-full-logo.png

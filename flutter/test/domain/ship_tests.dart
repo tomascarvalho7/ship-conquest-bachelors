@@ -22,10 +22,10 @@ void main() {
       final orientation3 = getOrientationFromAngle(angle3);
       final orientation4 = getOrientationFromAngle(angle4);
 
-      expect(orientation1, Direction.right);
-      expect(orientation2, Direction.down);
-      expect(orientation3, Direction.left);
-      expect(orientation4, Direction.up);
+      expect(orientation1, Direction.east);
+      expect(orientation2, Direction.south);
+      expect(orientation3, Direction.west);
+      expect(orientation4, Direction.north);
     });
   });
 

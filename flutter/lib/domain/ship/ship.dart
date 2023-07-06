@@ -54,5 +54,5 @@ class StaticShip extends Ship {
   Position getPosition(double scale) => coordinate * scale;
 
   @override
-  Direction getDirection() => Direction.up;
+  Direction getDirection() => Direction.northEast;
 }

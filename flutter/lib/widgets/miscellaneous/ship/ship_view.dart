@@ -29,7 +29,7 @@ class ShipView extends StatelessWidget {
   Widget target(Widget child) => Stack(
     children: [
       Image.asset(
-        'assets/images/target.png',
+        'assets/images/ship/target.png',
         width: scale,
         height: scale,
       ),
@@ -46,9 +46,13 @@ class ShipView extends StatelessWidget {
 
   /// Gets the correct ship asset according to its direction.
   String _getShipAsset() => switch(direction) {
-    Direction.up => 'assets/images/ship_up.png',
-    Direction.left => 'assets/images/ship_left.png',
-    Direction.down => 'assets/images/ship_down.png',
-    Direction.right => 'assets/images/ship_right.png'
+    Direction.north => 'assets/images/ship/ship_315.png',
+    Direction.northEast => 'assets/images/ship/ship_0.png',
+    Direction.east => 'assets/images/ship/ship_45.png',
+    Direction.southEast => 'assets/images/ship/ship_90.png',
+    Direction.south => 'assets/images/ship/ship_135.png',
+    Direction.southWest => 'assets/images/ship/ship_180.png',
+    Direction.west => 'assets/images/ship/ship_225.png',
+    Direction.northWest => 'assets/images/ship/ship_270.png',
   };
 }
