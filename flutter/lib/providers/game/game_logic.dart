@@ -108,7 +108,7 @@ class GameLogic {
   /// callback function to run on a [IslandEvent]
   void handleIsland(Ship ship, Island island) {
     feedbackController.setSuccessful(islandFound);
-    NotificationService.removeNotification(ship.sid); 
+    NotificationService.removeNotification(ship.sid);
     sceneController.discoverIsland(island);
     getScene(ship);
   }

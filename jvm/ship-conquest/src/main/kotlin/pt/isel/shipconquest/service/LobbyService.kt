@@ -17,7 +17,7 @@ import java.time.Instant
 @Service
 class LobbyService(
     override val transactionManager: TransactionManager,
-    val gameLogic: GameLogic // TODO check if this dependency is fine to have
+    val gameLogic: GameLogic
 ) : ServiceModule {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -103,7 +103,6 @@ class LobbyService(
         val newOrder = order.toOrderOrNull() ?: return pt.isel.shipconquest.left(GetLobbyListError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
-            // TODO check this goofy ass code
             val lobbies = if(name.isNullOrEmpty()) {
                     transaction.lobbyRepo.getFavoriteList(uid, newSkip, newLimit, newOrder)
             } else {

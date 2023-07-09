@@ -44,13 +44,6 @@ sealed class GetKnownIslandsError {
 
 typealias GetKnownIslandsResult = Either<GetKnownIslandsError, IslandList>
 
-sealed class GetUnknownIslandsError {
-    object GameNotFound: GetUnknownIslandsError()
-}
-
-typealias GetUnknownIslandsResult = Either<GetUnknownIslandsError, List<Int>> // TODO change this return type
-
-
 sealed class ConquestIslandError {
     object GameNotFound: ConquestIslandError()
     object NotEnoughCurrency: ConquestIslandError()

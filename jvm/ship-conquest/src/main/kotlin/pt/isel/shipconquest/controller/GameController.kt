@@ -199,17 +199,14 @@ class GameController(val service: GameService) {
     }
 
     @GetMapping("/{tag}/subscribe", MediaType.TEXT_EVENT_STREAM_VALUE)
-    fun subscribe(user: User, @PathVariable tag: String): SseEmitter {
+    fun subscribe(user: User, @PathVariable tag: String): SseEmitter? {
         val result = service.getShips(tag = tag, uid = user.id)
 
         return when (result) {
             is Either.Right -> {
                 return shipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
             }
-            is Either.Left -> TODO("testar")/*when(result.value) {
-                GetShipsError.GameNotFound ->
-                    Problem.response(status = 404, problem = Problem.gameNotFound())
-            }*/
+            is Either.Left -> return null
         }
     }
 

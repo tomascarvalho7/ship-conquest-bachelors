@@ -3,6 +3,7 @@ package pt.isel.shipconquest.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import pt.isel.shipconquest.Either
 import pt.isel.shipconquest.domain.event.event_details.IslandEvent
 import pt.isel.shipconquest.domain.game.Game
 import pt.isel.shipconquest.domain.game.logic.GameLogic
@@ -17,13 +18,12 @@ import pt.isel.shipconquest.domain.space.Vector2
 import pt.isel.shipconquest.domain.user.User
 import pt.isel.shipconquest.domain.user.statistics.getCurrency
 import pt.isel.shipconquest.domain.world.Horizon
-import pt.isel.shipconquest.domain.world.islands.Island
-import pt.isel.shipconquest.domain.world.islands.IslandList
-import pt.isel.shipconquest.domain.world.islands.getCost
-import pt.isel.shipconquest.domain.world.islands.getNearIslands
+import pt.isel.shipconquest.domain.world.islands.*
 import pt.isel.shipconquest.domain.world.islandsToHeightMap
 import pt.isel.shipconquest.domain.world.pulse
+import pt.isel.shipconquest.left
 import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.right
 import pt.isel.shipconquest.service.result.*
 import kotlin.math.roundToInt
 
@@ -45,20 +45,20 @@ class GameService(
                 sid = shipId,
                 getShipInfo = transaction.shipRepo::getShipInfo,
                 getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
-            ) ?: return@run pt.isel.shipconquest.left(GetChunksError.ShipPositionNotFound)
+            ) ?: return@run left(GetChunksError.ShipPositionNotFound)
             val coord = gameLogic.getCoordFromMovement(gameLogic.buildShip(shipBuilder).movement)
 
             val game = transaction.gameRepo.get(tag = tag)
             if (game != null) {
                 val islands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
                 val nearIslands = getNearIslands(coordinate = coord, islands = islands)
-                pt.isel.shipconquest.right(
+                right(
                     value = Horizon(
                         voxels = game.inspectIslands(nearIslands),
                         islands = nearIslands
                     )
                 )
-            } else pt.isel.shipconquest.left(GetChunksError.GameNotFound)
+            } else left(GetChunksError.GameNotFound)
         }
     }
 
@@ -77,15 +77,15 @@ class GameService(
         return transactionManager.run { transaction ->
             transaction.lobbyRepo.get(tag = tag) ?: return@run pt.isel.shipconquest.left(GetPlayerStatsError.GameNotFound)
             val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
-                ?: return@run pt.isel.shipconquest.left(GetPlayerStatsError.StatisticsNotFound)
+                ?: return@run left(GetPlayerStatsError.StatisticsNotFound)
 
-            return@run pt.isel.shipconquest.right(value = gameLogic.buildPlayerStatistics(playerStatistics))
+            return@run right(value = gameLogic.buildPlayerStatistics(playerStatistics))
         }
     }
 
     fun getMinimap(tag: String, uid: String): GetMinimapResult {
         return transactionManager.run { transaction ->
-            val game = transaction.gameRepo.get(tag) ?: return@run pt.isel.shipconquest.left(GetMinimapError.GameNotFound)
+            val game = transaction.gameRepo.get(tag) ?: return@run left(GetMinimapError.GameNotFound)
             // get user ships
             val userShips = transaction.shipRepo.getShipsInfo(tag, uid)
             val currInstant = gameLogic.getInstant()
@@ -111,15 +111,15 @@ class GameService(
                 game.map.pulse(origin = island.coordinate, radius = viewDistance, water = true)
             }.distinct()
 
-            pt.isel.shipconquest.right(value = Minimap(paths = pathPoints, islands = islands, size = game.map.size))
+            right(value = Minimap(paths = pathPoints, islands = islands, size = game.map.size))
         }
     }
 
     fun getKnownIslands(tag: String, uid: String): GetKnownIslandsResult {
         return transactionManager.run { transaction ->
-            transaction.gameRepo.get(tag) ?: return@run pt.isel.shipconquest.left(GetKnownIslandsError.GameNotFound)
+            transaction.gameRepo.get(tag) ?: return@run left(GetKnownIslandsError.GameNotFound)
 
-            pt.isel.shipconquest.right(
+            right(
                 value = IslandList(
                     islands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
                 )
@@ -130,7 +130,7 @@ class GameService(
     fun navigate(tag: String, uid: String, shipId: Int, points: PathPoints): NavigationResult {
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag) ?:
-                return@run pt.isel.shipconquest.left(NavigationError.GameNotFound)
+                return@run left(NavigationError.GameNotFound)
             val visitedIslands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
             // build a heightmap from only the visited islands
             val map = islandsToHeightMap(
@@ -141,10 +141,10 @@ class GameService(
             )
             // build a kinetic movement from path points
             val movement = gameLogic.buildMovementFromPoints(points, map) ?:
-                return@run pt.isel.shipconquest.left(NavigationError.InvalidNavigationPath)
+                return@run left(NavigationError.InvalidNavigationPath)
 
             val shipInfo = transaction.shipRepo.getShipInfo(tag = tag, shipId =  shipId, uid = uid)
-                ?.addMovement(movement) ?: return@run pt.isel.shipconquest.left(NavigationError.ShipNotFound)
+                ?.addMovement(movement) ?: return@run left(NavigationError.ShipNotFound)
             // delete future events since ship path has changed
             transaction.eventRepo.deleteShipEventsAfterInstant(tag = tag, sid = shipId, instant = movement.startTime)
             transaction.shipRepo.updateShipInfo(
@@ -169,23 +169,23 @@ class GameService(
             val fightEvents = gameLogic.buildFightEvents(shipBuilder, fleetBuilder) { instant, details ->
                 transaction.eventRepo.createFightingEvent(tag, instant, details)
             }
-            pt.isel.shipconquest.right(gameLogic.buildShip(shipBuilder.addEvents(newEvents = fightEvents)))
+            right(gameLogic.buildShip(shipBuilder.addEvents(newEvents = fightEvents)))
         }
     }
 
     fun getShip(tag: String, uid: String, shipId: Int): GetShipResult {
         return transactionManager.run { transaction ->
             // check if game exists
-            transaction.gameRepo.get(tag = tag) ?: return@run pt.isel.shipconquest.left(GetShipError.GameNotFound)
+            transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipError.GameNotFound)
             val builder = gameLogic.getShipBuilder(
                 tag = tag,
                 uid = uid,
                 sid = shipId,
                 getShipInfo = transaction.shipRepo::getShipInfo,
                 getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
-            ) ?: return@run pt.isel.shipconquest.left(GetShipError.ShipNotFound)
+            ) ?: return@run left(GetShipError.ShipNotFound)
 
-            return@run pt.isel.shipconquest.right(
+            return@run right(
                 value = gameLogic.buildShip(builder = builder)
             )
         }
@@ -194,7 +194,7 @@ class GameService(
     fun getShips(tag: String, uid: String): GetShipsResult {
         return transactionManager.run { transaction ->
             // check if game exists
-            transaction.gameRepo.get(tag = tag) ?: return@run pt.isel.shipconquest.left(GetShipsError.GameNotFound)
+            transaction.gameRepo.get(tag = tag) ?: return@run left(GetShipsError.GameNotFound)
             val fleetBuilder = gameLogic.getFleetBuilder(
                 tag = tag,
                 uid = uid,
@@ -203,7 +203,7 @@ class GameService(
 
             )
 
-            return@run pt.isel.shipconquest.right(
+            return@run right(
                 value = Fleet(
                     ships = fleetBuilder.map { builder -> gameLogic.buildShip(builder = builder) }
                 )
@@ -214,8 +214,8 @@ class GameService(
     fun addShip(tag: String, uid: String): CreateShipResult {
         return transactionManager.run { transaction ->
             val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
-                ?: return@run pt.isel.shipconquest.left(CreateShipError.PlayerStatisticsNotFound)
-            val game = transaction.gameRepo.get(tag) ?: return@run pt.isel.shipconquest.left(CreateShipError.GameNotFound)
+                ?: return@run left(CreateShipError.PlayerStatisticsNotFound)
+            val game = transaction.gameRepo.get(tag) ?: return@run left(CreateShipError.GameNotFound)
 
             val canBuy = gameLogic.makeTransaction(playerStatistics, shipCost) { newCurrency, instant ->
                 transaction.statsRepo.updatePlayerCurrency(
@@ -229,23 +229,30 @@ class GameService(
             return@run if(canBuy != null) {
                 val newShip = transaction.shipRepo.createShipInfo(tag, uid, gameLogic.generateRandomSpawnPoint(game.map), null, null)
 
-                pt.isel.shipconquest.right(gameLogic.buildShip(ShipBuilder(newShip, emptyList())))
+                right(gameLogic.buildShip(ShipBuilder(newShip, emptyList())))
             } else {
-                pt.isel.shipconquest.left(CreateShipError.NotEnoughCurrency)
+                left(CreateShipError.NotEnoughCurrency)
             }
         }
     }
 
-    fun conquestIsland(tag: String, user: User, shipId: String, islandId: Int): ConquestIslandResult {
+    fun conquestIsland(tag: String, user: User, shipId: Int, islandId: Int): ConquestIslandResult {
         return transactionManager.run { transaction ->
             transaction.gameRepo.get(tag = tag)
-                ?: return@run pt.isel.shipconquest.left(ConquestIslandError.GameNotFound)
+                ?: return@run left(ConquestIslandError.GameNotFound)
             val island = transaction.islandRepo.get(tag = tag, uid = user.id, islandId = islandId)
-                ?: return@run pt.isel.shipconquest.left(ConquestIslandError.IslandNotFound)
+                ?: return@run left(ConquestIslandError.IslandNotFound)
             val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = user.id)
-                ?: return@run pt.isel.shipconquest.left(ConquestIslandError.PlayerStatisticsNotFound)
-            // TODO: update with canSightIsland
-            if (false) return@run pt.isel.shipconquest.left(ConquestIslandError.ShipTooFarAway)
+                ?: return@run left(ConquestIslandError.PlayerStatisticsNotFound)
+            val shipBuilder = gameLogic.getShipBuilder(
+                tag = tag,
+                uid = user.id,
+                sid = shipId,
+                getShipInfo = transaction.shipRepo::getShipInfo,
+                getEventsAfterInstant = transaction.eventRepo::getShipEventsAfterInstant
+            ) ?: return@run left(ConquestIslandError.ShipNotFound)
+            val coord = gameLogic.getCoordFromMovement(gameLogic.buildShip(shipBuilder).movement)
+            if (!canSightIsland(coord, island)) return@run left(ConquestIslandError.ShipTooFarAway)
 
             // make currency transaction
             gameLogic.makeTransaction(playerStatistics, island.getCost()) { newCurrency, instant ->
@@ -255,7 +262,7 @@ class GameService(
                     instant = instant,
                     newStaticCurrency = newCurrency
                 )
-            } ?: return@run pt.isel.shipconquest.left(ConquestIslandError.NotEnoughCurrency)
+            } ?: return@run left(ConquestIslandError.NotEnoughCurrency)
 
             val newIsland = gameLogic.conquestIsland(
                 user = user,
@@ -278,9 +285,9 @@ class GameService(
                     // add ownership of island and take cost from currency
                     transaction.islandRepo.updateOwnedIsland(tag = tag, island = newIsland)
                 }
-            ) ?: return@run pt.isel.shipconquest.left(ConquestIslandError.AlreadyOwnedIsland)
+            ) ?: return@run left(ConquestIslandError.AlreadyOwnedIsland)
 
-            return@run pt.isel.shipconquest.right(
+            return@run right(
                 value = newIsland
             )
         }
