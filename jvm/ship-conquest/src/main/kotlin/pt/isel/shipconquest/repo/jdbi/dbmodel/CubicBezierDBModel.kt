@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.space.Vector2
+
 
 data class CubicBezierDBModel(val p0: Vector2, val p1: Vector2, val p2: Vector2, val p3: Vector2)
 

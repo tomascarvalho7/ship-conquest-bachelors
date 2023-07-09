@@ -1,21 +1,22 @@
 package pt.isel.shipconquest.sse
 
-import com.example.shipconquest.ClockStub
-import com.example.shipconquest.controller.sse.GameKey
-import com.example.shipconquest.controller.sse.GameSubscriptionKey
-import com.example.shipconquest.controller.sse.ShipEventsAPI
-import com.example.shipconquest.controller.sse.publisher.PublisherMock
-import com.example.shipconquest.controller.sse.toCode
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.FightInteraction
-import com.example.shipconquest.domain.event.FutureEvent
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.ship.Fleet
-import com.example.shipconquest.domain.ship.Ship
-import com.example.shipconquest.domain.ship.movement.Stationary
-import com.example.shipconquest.domain.space.Vector2
+
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.ClockStub
+import pt.isel.shipconquest.controller.sse.GameKey
+import pt.isel.shipconquest.controller.sse.GameSubscriptionKey
+import pt.isel.shipconquest.controller.sse.ShipEventsAPI
+import pt.isel.shipconquest.controller.sse.publisher.SubscriptionManagerMock
+import pt.isel.shipconquest.controller.sse.toCode
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.FightInteraction
+import pt.isel.shipconquest.domain.event.FutureEvent
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.ship.Fleet
+import pt.isel.shipconquest.domain.ship.Ship
+import pt.isel.shipconquest.domain.ship.movement.Stationary
+import pt.isel.shipconquest.domain.space.Vector2
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
@@ -36,7 +37,7 @@ class ShipEventsAPITests {
     fun `test publishing zero events`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
         val shipEventsAPI = ShipEventsAPI(mock, ships)
 
@@ -49,7 +50,7 @@ class ShipEventsAPITests {
     fun `test publishing two events when not subscribed`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
         val shipEventsAPI = ShipEventsAPI(mock, ships)
 
@@ -63,7 +64,7 @@ class ShipEventsAPITests {
     fun `test publishing two events when subscribed`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val uid = "FakeUID"
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>(
             mapOf(
@@ -82,7 +83,7 @@ class ShipEventsAPITests {
     fun `subscribe a new ship to fleet events`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         // fake identifiers
         val sid = 1
         val uid = "FakeUID"
@@ -102,7 +103,7 @@ class ShipEventsAPITests {
     fun `subscribe fleet to events`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val uid = "FakeUID"
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
         val shipEventsAPI = ShipEventsAPI(mock, ships)
@@ -125,7 +126,7 @@ class ShipEventsAPITests {
     fun `unsubscribe fleet to events`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val sid = 123
         val uid = "FakeUID"
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
@@ -146,7 +147,7 @@ class ShipEventsAPITests {
     fun `unsubscribe not subscribed fleet`() {
         // setup
         val data = mutableMapOf<String, Int>()
-        val mock = PublisherMock(data)
+        val mock = SubscriptionManagerMock(data)
         val sid = 123
         val uid = "FakeUID"
         val ships = ConcurrentHashMap<GameKey, GameSubscriptionKey>()

@@ -1,29 +1,30 @@
 package pt.isel.shipconquest.service
 
-import com.example.shipconquest.domain.event.event_details.IslandEvent
-import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.game.logic.GameLogic
-import com.example.shipconquest.domain.minimap.Minimap
-import com.example.shipconquest.domain.path_builder.PathPoints
-import com.example.shipconquest.domain.ship.*
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.statistics.getCurrency
-import com.example.shipconquest.domain.world.Horizon
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.IslandList
-import com.example.shipconquest.domain.world.islands.getCost
-import com.example.shipconquest.domain.world.islands.getNearIslands
-import com.example.shipconquest.domain.world.islandsToHeightMap
-import com.example.shipconquest.domain.world.pulse
-import pt.isel.shipconquest.left
-import com.example.shipconquest.repo.TransactionManager
-import pt.isel.shipconquest.right
-import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import pt.isel.shipconquest.domain.event.event_details.IslandEvent
+import pt.isel.shipconquest.domain.game.Game
+import pt.isel.shipconquest.domain.game.logic.GameLogic
+import pt.isel.shipconquest.domain.minimap.Minimap
+import pt.isel.shipconquest.domain.path_builder.PathPoints
+import pt.isel.shipconquest.domain.ship.Fleet
+import pt.isel.shipconquest.domain.ship.ShipBuilder
+import pt.isel.shipconquest.domain.ship.addMovement
+import pt.isel.shipconquest.domain.ship.buildMovementFromEvents
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.domain.user.statistics.getCurrency
+import pt.isel.shipconquest.domain.world.Horizon
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.world.islands.IslandList
+import pt.isel.shipconquest.domain.world.islands.getCost
+import pt.isel.shipconquest.domain.world.islands.getNearIslands
+import pt.isel.shipconquest.domain.world.islandsToHeightMap
+import pt.isel.shipconquest.domain.world.pulse
+import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.service.result.*
 import kotlin.math.roundToInt
 
 const val viewDistance = 15
@@ -74,7 +75,7 @@ class GameService(
 
     fun getPlayerStats(tag: String, uid: String): GetPlayerStatsResult {
         return transactionManager.run { transaction ->
-            val lobby = transaction.lobbyRepo.get(tag = tag) ?: return@run pt.isel.shipconquest.left(GetPlayerStatsError.GameNotFound)
+            transaction.lobbyRepo.get(tag = tag) ?: return@run pt.isel.shipconquest.left(GetPlayerStatsError.GameNotFound)
             val playerStatistics = transaction.statsRepo.getPlayerStats(tag = tag, uid = uid)
                 ?: return@run pt.isel.shipconquest.left(GetPlayerStatsError.StatisticsNotFound)
 
@@ -237,7 +238,7 @@ class GameService(
 
     fun conquestIsland(tag: String, user: User, shipId: String, islandId: Int): ConquestIslandResult {
         return transactionManager.run { transaction ->
-            val game = transaction.gameRepo.get(tag = tag)
+            transaction.gameRepo.get(tag = tag)
                 ?: return@run pt.isel.shipconquest.left(ConquestIslandError.GameNotFound)
             val island = transaction.islandRepo.get(tag = tag, uid = user.id, islandId = islandId)
                 ?: return@run pt.isel.shipconquest.left(ConquestIslandError.IslandNotFound)

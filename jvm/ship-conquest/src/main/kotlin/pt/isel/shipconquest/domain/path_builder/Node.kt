@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.domain.path_builder
 
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.Vector2
+
 
 /** Class holding the information of a [Node] to be used in A* algorithm.
  *

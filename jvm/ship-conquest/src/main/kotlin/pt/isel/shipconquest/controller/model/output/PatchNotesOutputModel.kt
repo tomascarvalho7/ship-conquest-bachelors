@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.controller.model.output
 
-import com.example.shipconquest.domain.path_notes.PatchNotes
+import pt.isel.shipconquest.domain.patch_notes.PatchNotes
+
 
 data class PatchNotesOutputModel(val list: List<PatchNoteOutputModel>)
 

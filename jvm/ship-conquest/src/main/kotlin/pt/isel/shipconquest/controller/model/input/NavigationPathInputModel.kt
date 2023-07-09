@@ -1,6 +1,6 @@
 package pt.isel.shipconquest.controller.model.input
 
-import com.example.shipconquest.domain.path_builder.PathPoints
+import pt.isel.shipconquest.domain.path_builder.PathPoints
 
 data class NavigationPathInputModel(
     val start: Vector2InputModel,

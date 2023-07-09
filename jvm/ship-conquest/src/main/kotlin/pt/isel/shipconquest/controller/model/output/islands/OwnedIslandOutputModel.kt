@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.controller.model.output.islands
 
-import com.example.shipconquest.controller.model.output.Vector2OutputModel
-import com.example.shipconquest.controller.model.output.toVector2OutputModel
-import com.example.shipconquest.domain.world.islands.OwnedIsland
+import pt.isel.shipconquest.controller.model.output.Vector2OutputModel
+import pt.isel.shipconquest.controller.model.output.toVector2OutputModel
+import pt.isel.shipconquest.domain.world.islands.OwnedIsland
+
 
 class OwnedIslandOutputModel(
     override val id: Int,

@@ -1,10 +1,9 @@
 package pt.isel.shipconquest.domain.bezier.utils
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.distanceTo
-import com.example.shipconquest.domain.event.logic.utils.LineIntersection
-import com.example.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.bezier.BezierSpline
+import pt.isel.shipconquest.domain.distanceTo
+import pt.isel.shipconquest.domain.event.logic.utils.LineIntersection
 import kotlin.math.sqrt
 
 /**

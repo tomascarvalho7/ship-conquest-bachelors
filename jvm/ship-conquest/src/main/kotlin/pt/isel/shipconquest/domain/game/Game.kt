@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.domain.game
 
-import com.example.shipconquest.domain.world.HeightMap
+import pt.isel.shipconquest.domain.world.HeightMap
+
 
 /**
  * The [Game] data class holds the data for the game world.

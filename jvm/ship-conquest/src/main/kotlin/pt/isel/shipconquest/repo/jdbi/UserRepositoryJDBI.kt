@@ -1,15 +1,15 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.user.Token
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.UserInfo
-import com.example.shipconquest.repo.UserRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.UserInfoDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toUserInfo
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.user.Token
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.domain.user.UserInfo
+import pt.isel.shipconquest.repo.UserRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.UserInfoDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toUserInfo
 
 class UserRepositoryJDBI(private val handle: Handle): UserRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)

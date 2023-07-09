@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.event.event_details.IslandEvent
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.event.event_details.IslandEvent
 import java.time.Instant
 
 interface EventRepository {

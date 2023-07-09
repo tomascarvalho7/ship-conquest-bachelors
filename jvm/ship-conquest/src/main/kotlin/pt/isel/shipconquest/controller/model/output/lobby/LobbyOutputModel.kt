@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.controller.model.output.lobby
 
-import com.example.shipconquest.domain.lobby.Lobby
+import pt.isel.shipconquest.domain.lobby.Lobby
+
 
 data class LobbyOutputModel(
     val tag: String,

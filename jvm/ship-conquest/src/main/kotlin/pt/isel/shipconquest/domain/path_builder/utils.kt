@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.domain.path_builder
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.HeightMap
-import com.example.shipconquest.domain.world.get
-import com.example.shipconquest.domain.world.pulse
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.HeightMap
+import pt.isel.shipconquest.domain.world.get
+import pt.isel.shipconquest.domain.world.pulse
 import kotlin.math.abs
 
 fun calculateHeuristic(currPoint: Vector2, end: Vector2, influencePoint: Vector2): Double {

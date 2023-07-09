@@ -1,7 +1,7 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.repo.*
 import org.jdbi.v3.core.Handle
+import pt.isel.shipconquest.repo.*
 
 class TransactionJDBI(private val handle: Handle): Transaction {
     override val gameRepo: GameRepository by lazy { GameRepositoryJDBI(handle = handle) }

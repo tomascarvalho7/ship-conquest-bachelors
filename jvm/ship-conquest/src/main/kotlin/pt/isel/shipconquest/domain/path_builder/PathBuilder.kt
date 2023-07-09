@@ -1,8 +1,8 @@
 package pt.isel.shipconquest.domain.path_builder
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.distanceTo
-import com.example.shipconquest.domain.world.HeightMap
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.distanceTo
+import pt.isel.shipconquest.domain.world.HeightMap
 import kotlin.math.floor
 import kotlin.math.roundToInt
 

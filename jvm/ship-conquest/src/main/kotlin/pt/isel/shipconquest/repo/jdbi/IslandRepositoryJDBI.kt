@@ -1,14 +1,15 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.OwnedIsland
-import com.example.shipconquest.repo.IslandRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.island.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.world.islands.OwnedIsland
+import pt.isel.shipconquest.repo.IslandRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.GenericIslandDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.toIsland
 
 class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)

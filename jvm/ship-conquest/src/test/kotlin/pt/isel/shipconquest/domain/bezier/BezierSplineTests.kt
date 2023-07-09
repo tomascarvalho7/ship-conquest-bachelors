@@ -1,11 +1,10 @@
 package pt.isel.shipconquest.domain.bezier
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.toPosition
-import com.example.shipconquest.domain.toVector2
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.toPosition
+import pt.isel.shipconquest.domain.toVector2
 
 class BezierSplineTests {
     private val cubicBezierA = CubicBezier(

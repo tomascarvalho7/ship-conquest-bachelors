@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.bezier.utils.buildSpline
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.ship.movement.Movement
-import com.example.shipconquest.domain.ship.movement.Stationary
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.bezier.utils.buildSpline
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.ship.movement.Movement
+import pt.isel.shipconquest.domain.ship.movement.Stationary
+import pt.isel.shipconquest.domain.space.Vector2
 import java.time.Duration
 import java.time.Instant
 

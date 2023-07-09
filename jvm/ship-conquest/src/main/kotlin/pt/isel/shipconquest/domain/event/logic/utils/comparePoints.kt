@@ -1,8 +1,7 @@
 package pt.isel.shipconquest.domain.event.logic.utils
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.distanceTo
-import com.example.shipconquest.domain.space.distanceTo
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.distanceTo
 
 
 fun comparePoints(points: List<Position>, otherPoints: List<Position>): Double {

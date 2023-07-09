@@ -1,6 +1,6 @@
 package pt.isel.shipconquest.domain.event.logic.utils.plane
 
-import com.example.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.Position
 
 fun Position.isInsidePlane(plane: Plane): Boolean {
     val (a, b, c, d) = plane

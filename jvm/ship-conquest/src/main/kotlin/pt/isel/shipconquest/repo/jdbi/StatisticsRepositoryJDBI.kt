@@ -1,16 +1,15 @@
 package pt.isel.shipconquest.repo.jdbi
 
-
-import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
-import com.example.shipconquest.repo.StatisticsRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.island.OwnedIslandDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.PlayerStatsDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.island.toIslandIncome
-import com.example.shipconquest.repo.jdbi.dbmodel.toPlayerStats
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.user.statistics.PlayerStatsBuilder
+import pt.isel.shipconquest.repo.StatisticsRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.PlayerStatsDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.OwnedIslandDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.toIslandIncome
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toPlayerStats
 import java.time.Instant
 
 class StatisticsRepositoryJDBI(private val handle: Handle): StatisticsRepository {

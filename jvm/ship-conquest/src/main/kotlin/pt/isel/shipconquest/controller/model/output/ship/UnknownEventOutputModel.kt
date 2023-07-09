@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.domain.event.FutureEvent
-import com.example.shipconquest.domain.utils.formatDuration
+import pt.isel.shipconquest.domain.event.FutureEvent
+import pt.isel.shipconquest.domain.utils.formatDuration
+
 
 data class UnknownEventOutputModel(val info: String, val eid: Int, val duration: String)
 

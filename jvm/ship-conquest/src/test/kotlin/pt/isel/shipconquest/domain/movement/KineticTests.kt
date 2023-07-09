@@ -1,13 +1,13 @@
 package pt.isel.shipconquest.domain.movement
 
-import com.example.shipconquest.ClockStub
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.space.Vector2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.ClockStub
+import pt.isel.shipconquest.domain.bezier.BezierSpline
+import pt.isel.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.space.Vector2
 import java.time.Duration
 
 class KineticTests {

@@ -1,8 +1,7 @@
 package pt.isel.shipconquest.domain.event.event_details
 
-import com.example.shipconquest.domain.event.FightInteraction
-import com.example.shipconquest.domain.ship.movement.Movement
-import java.time.Instant
+import pt.isel.shipconquest.domain.event.FightInteraction
+
 
 /**
  * The [FightEvent] data class holds the data for the details of a Fight event

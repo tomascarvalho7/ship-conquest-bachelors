@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.domain.bezier.utils
 
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.bezier.BezierSpline
+import pt.isel.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.space.Vector2
+
 
 fun buildSpline(points: List<Vector2>): BezierSpline? {
     if (points.size % 4 != 0) return null

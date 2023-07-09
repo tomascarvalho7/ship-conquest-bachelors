@@ -1,7 +1,7 @@
 package pt.isel.shipconquest.domain.world
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.Vector3
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.Vector3
 import kotlin.math.*
 
 /**

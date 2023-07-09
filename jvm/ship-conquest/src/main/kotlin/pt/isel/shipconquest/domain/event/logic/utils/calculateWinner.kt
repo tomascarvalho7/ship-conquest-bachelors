@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.domain.event.logic.utils
 
-import com.example.shipconquest.domain.event.FightInteraction
+import pt.isel.shipconquest.domain.event.FightInteraction
+
 
 fun calculateWinner(): FightInteraction {
     while(true) {

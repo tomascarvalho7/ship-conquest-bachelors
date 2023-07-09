@@ -1,13 +1,11 @@
 package pt.isel.shipconquest.service
 
-import pt.isel.shipconquest.left
-import com.example.shipconquest.repo.TransactionManager
-import pt.isel.shipconquest.right
-import com.example.shipconquest.service.result.GetPatchNotesError
-import com.example.shipconquest.service.result.GetPatchNotesResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.service.result.GetPatchNotesError
+import pt.isel.shipconquest.service.result.GetPatchNotesResult
 
 @Service
 class PatchNotesService(

@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel.island
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.OwnedIsland
-import com.example.shipconquest.domain.world.islands.OwnershipDetails
-import com.example.shipconquest.domain.world.islands.WildIsland
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.world.islands.OwnedIsland
+import pt.isel.shipconquest.domain.world.islands.OwnershipDetails
+import pt.isel.shipconquest.domain.world.islands.WildIsland
 import java.time.Instant
 
 data class GenericIslandDBModel(

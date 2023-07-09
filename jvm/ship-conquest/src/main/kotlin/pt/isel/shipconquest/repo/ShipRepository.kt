@@ -1,10 +1,9 @@
 package pt.isel.shipconquest.repo
 
-
-import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.space.Vector2
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.ship.ShipInfo
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.space.Vector2
 import java.time.Duration
 import java.time.Instant
 

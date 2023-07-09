@@ -1,6 +1,6 @@
 package pt.isel.shipconquest.domain.space
 
-import com.example.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.Position
 import kotlin.math.pow
 import kotlin.math.sqrt
 

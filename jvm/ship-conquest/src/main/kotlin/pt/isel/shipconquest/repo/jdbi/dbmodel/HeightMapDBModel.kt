@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.HeightMap
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.HeightMap
+
 
 data class HeightMapDBModel(val size: Int, val data: Map<Int, Int>)
 

@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.controller.model.output
 
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.Vector2
+
 
 data class Vector2OutputModel(val x: Int, val y: Int)
 

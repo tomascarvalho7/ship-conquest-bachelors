@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.domain.ship.Ship
+import pt.isel.shipconquest.domain.ship.Ship
+
 
 data class ShipOutputModel(
     val sid: Int,

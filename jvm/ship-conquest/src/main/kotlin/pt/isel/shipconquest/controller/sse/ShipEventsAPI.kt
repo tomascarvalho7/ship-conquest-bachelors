@@ -1,15 +1,16 @@
 package pt.isel.shipconquest.controller.sse
 
-import com.example.shipconquest.controller.model.output.notification.EventNotificationOutputModel
-import com.example.shipconquest.controller.model.output.notification.buildEventNotification
-import com.example.shipconquest.controller.model.output.ship.FleetOutputModel
-import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
-import com.example.shipconquest.controller.sse.publisher.PublisherAPI
-import com.example.shipconquest.domain.event.FutureEvent
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.ship.Fleet
-import com.example.shipconquest.domain.ship.Ship
+
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import pt.isel.shipconquest.controller.model.output.notification.EventNotificationOutputModel
+import pt.isel.shipconquest.controller.model.output.notification.buildEventNotification
+import pt.isel.shipconquest.controller.model.output.ship.FleetOutputModel
+import pt.isel.shipconquest.controller.model.output.ship.toFleetOutputModel
+import pt.isel.shipconquest.controller.sse.publisher.SubscriptionManagerAPI
+import pt.isel.shipconquest.domain.event.FutureEvent
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.ship.Fleet
+import pt.isel.shipconquest.domain.ship.Ship
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -17,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
  * on top of the PublisherAPI
  */
 class ShipEventsAPI(
-    private val publisherAPI: PublisherAPI,
+    private val publisherAPI: SubscriptionManagerAPI,
     private val ships: ConcurrentHashMap<GameKey, GameSubscriptionKey>
 ) {
     fun publishEvents(tag: String, futureEvents: List<FutureEvent>) {

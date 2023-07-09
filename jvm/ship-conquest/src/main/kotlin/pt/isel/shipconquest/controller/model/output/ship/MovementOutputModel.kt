@@ -1,11 +1,12 @@
 package pt.isel.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.controller.model.output.Vector2OutputModel
-import com.example.shipconquest.controller.model.output.toVector2OutputModel
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.ship.movement.Movement
-import com.example.shipconquest.domain.ship.movement.Stationary
-import com.example.shipconquest.domain.utils.formatDuration
+import pt.isel.shipconquest.controller.model.output.Vector2OutputModel
+import pt.isel.shipconquest.controller.model.output.toVector2OutputModel
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.ship.movement.Movement
+import pt.isel.shipconquest.domain.ship.movement.Stationary
+import pt.isel.shipconquest.domain.utils.formatDuration
+
 
 interface MovementOutputModel
 

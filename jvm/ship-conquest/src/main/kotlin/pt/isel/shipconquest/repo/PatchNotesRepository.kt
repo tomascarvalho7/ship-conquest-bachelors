@@ -1,7 +1,7 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.path_notes.PatchNotes
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.patch_notes.PatchNotes
 
 interface PatchNotesRepository {
     val logger: Logger

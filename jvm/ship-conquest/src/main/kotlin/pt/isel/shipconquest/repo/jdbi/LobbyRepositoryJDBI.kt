@@ -1,12 +1,15 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.lobby.*
-import com.example.shipconquest.repo.LobbyRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.*
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.lobby.*
+import pt.isel.shipconquest.repo.LobbyRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.LobbyDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.LobbyInfoDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toLobby
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toLobbyInfoList
 
 class LobbyRepositoryJDBI(private val handle: Handle) : LobbyRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)

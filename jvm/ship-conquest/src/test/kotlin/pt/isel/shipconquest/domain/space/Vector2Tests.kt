@@ -1,8 +1,8 @@
 package pt.isel.shipconquest.domain.space
 
-import com.example.shipconquest.domain.Position
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.Position
 import kotlin.math.sqrt
 
 class Vector2Tests {

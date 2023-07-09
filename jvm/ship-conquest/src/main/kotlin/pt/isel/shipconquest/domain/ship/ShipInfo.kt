@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.domain.ship
 
-import com.example.shipconquest.domain.ship.movement.Movement
+import pt.isel.shipconquest.domain.ship.movement.Movement
+
 
 /**
  * The [ShipInfo] data class holds only the data related to the ship and it's movements

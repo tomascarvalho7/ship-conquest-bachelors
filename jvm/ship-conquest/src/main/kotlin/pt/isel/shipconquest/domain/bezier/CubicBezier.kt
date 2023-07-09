@@ -1,8 +1,8 @@
 package pt.isel.shipconquest.domain.bezier
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.space.toPosition
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.toPosition
 import kotlin.math.pow
 
 /**

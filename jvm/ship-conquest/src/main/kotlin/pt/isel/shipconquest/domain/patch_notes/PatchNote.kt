@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.path_notes
+package pt.isel.shipconquest.domain.patch_notes
 
 /**
  * The [PatchNote] class holds the data for the patch note details

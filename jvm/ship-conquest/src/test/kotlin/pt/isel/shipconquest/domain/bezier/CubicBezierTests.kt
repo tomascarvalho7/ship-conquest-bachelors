@@ -1,13 +1,13 @@
 package pt.isel.shipconquest.domain.bezier
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.bezier.utils.sample
-import com.example.shipconquest.domain.bezier.utils.split
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.toPosition
-import com.example.shipconquest.domain.toVector2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.bezier.utils.sample
+import pt.isel.shipconquest.domain.bezier.utils.split
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.toPosition
+import pt.isel.shipconquest.domain.toVector2
 
 class CubicBezierTests {
     @Test

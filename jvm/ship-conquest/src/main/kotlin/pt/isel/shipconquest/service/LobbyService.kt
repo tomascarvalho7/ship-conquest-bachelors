@@ -1,19 +1,17 @@
 package pt.isel.shipconquest.service
 
-import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.game.logic.GameLogic
-import com.example.shipconquest.domain.generators.RandomString
-import com.example.shipconquest.domain.lobby.*
-import com.example.shipconquest.domain.world.WorldGenerator
-import pt.isel.shipconquest.left
-import com.example.shipconquest.repo.Transaction
-import com.example.shipconquest.repo.TransactionManager
-import pt.isel.shipconquest.right
-import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import pt.isel.shipconquest.domain.Factor
+import pt.isel.shipconquest.domain.game.Game
+import pt.isel.shipconquest.domain.game.logic.GameLogic
+import pt.isel.shipconquest.domain.generators.RandomString
+import pt.isel.shipconquest.domain.lobby.*
+import pt.isel.shipconquest.domain.world.WorldGenerator
+import pt.isel.shipconquest.repo.Transaction
+import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.service.result.*
 import java.time.Instant
 
 @Service
@@ -160,6 +158,4 @@ class LobbyService(
         transaction.shipRepo.createShipInfo(tag, uid, gameLogic.generateRandomSpawnPoint(game.map), null, null)
         transaction.statsRepo.createPlayerStats(tag = tag, uid = uid, initialCurrency = 125)
     }
-
-
 }

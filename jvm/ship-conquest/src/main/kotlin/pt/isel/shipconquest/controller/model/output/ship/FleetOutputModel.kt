@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.domain.ship.Fleet
+import pt.isel.shipconquest.domain.ship.Fleet
+
 
 data class FleetOutputModel(val ships: List<ShipOutputModel>)
 

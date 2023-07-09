@@ -1,11 +1,10 @@
 package pt.isel.shipconquest.domain.space
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.event.logic.utils.plane.Plane
-import com.example.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.event.logic.utils.plane.Plane
+import pt.isel.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
 
 class PlaneTests {
     @Test

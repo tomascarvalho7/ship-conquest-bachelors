@@ -1,6 +1,6 @@
 package pt.isel.shipconquest.domain.generators
 
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.Vector2
 import kotlin.math.sqrt
 
 /**

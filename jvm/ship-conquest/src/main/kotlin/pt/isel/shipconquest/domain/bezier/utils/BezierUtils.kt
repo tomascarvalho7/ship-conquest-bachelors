@@ -1,8 +1,10 @@
 package pt.isel.shipconquest.domain.bezier.utils
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.toVector2
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.toVector2
+
 
 /**
  * [CubicBezier] extension function to generate a list of points with length
@@ -37,5 +39,5 @@ fun CubicBezier.split(start: Double, end: Double): CubicBezier {
  * with four [Vector2] elements for every [CubicBezier] element.
  */
 fun List<CubicBezier>.toVector2List() = flatMap {
-    listOf(it.p0, it.p1, it.p2, it.p3)
+    listOf<Vector2>(it.p0, it.p1, it.p2, it.p3)
 }

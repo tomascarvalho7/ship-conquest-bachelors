@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.domain.world
 
-import com.example.shipconquest.domain.Factor
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.generators.Falloff
-import com.example.shipconquest.domain.generators.SimplexNoise
-import com.example.shipconquest.domain.generators.get
+import pt.isel.shipconquest.domain.Factor
+import pt.isel.shipconquest.domain.generators.Falloff
+import pt.isel.shipconquest.domain.generators.SimplexNoise
+import pt.isel.shipconquest.domain.generators.get
+import pt.isel.shipconquest.domain.space.Vector2
 import kotlin.math.max
 import kotlin.math.roundToInt
 

@@ -1,11 +1,5 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.ship.ShipInfo
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.ship.movement.Stationary
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.repo.ShipRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -14,6 +8,12 @@ import org.jdbi.v3.core.kotlin.mapTo
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.ship.ShipInfo
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.ship.movement.Stationary
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.repo.ShipRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.*
 import java.time.Duration
 import java.time.Instant
 

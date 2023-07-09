@@ -1,36 +1,36 @@
 package pt.isel.shipconquest.service.result
 
 import pt.isel.shipconquest.Either
-import com.example.shipconquest.domain.lobby.Lobby
-import com.example.shipconquest.domain.lobby.LobbyInfo
+import pt.isel.shipconquest.domain.lobby.Lobby
+import pt.isel.shipconquest.domain.lobby.LobbyInfo
 
 sealed class GetLobbyError {
     object LobbyNotFound: GetLobbyError()
 }
 
-typealias GetLobbyResult = pt.isel.shipconquest.Either<GetLobbyError, Lobby>
+typealias GetLobbyResult = Either<GetLobbyError, Lobby>
 
 sealed class CreateLobbyError {
     object InvalidServerName: CreateLobbyError()
 }
 
-typealias CreateLobbyResult = pt.isel.shipconquest.Either<CreateLobbyError, String>
+typealias CreateLobbyResult = Either<CreateLobbyError, String>
 
 
 sealed class JoinLobbyError {
     object LobbyNotFound: JoinLobbyError()
 }
 
-typealias JoinLobbyResult = pt.isel.shipconquest.Either<JoinLobbyError, String>
+typealias JoinLobbyResult = Either<JoinLobbyError, String>
 
 sealed class GetLobbyListError {
     object InvalidOrderParameter: GetLobbyListError()
 }
 
-typealias GetAllLobbiesResult = pt.isel.shipconquest.Either<GetLobbyListError, List<LobbyInfo>>
+typealias GetAllLobbiesResult = Either<GetLobbyListError, List<LobbyInfo>>
 
 sealed class SetFavoriteError {
     object LobbyNotFound: SetFavoriteError()
 }
 
-typealias FavoriteOperationResult = pt.isel.shipconquest.Either<SetFavoriteError, Boolean>
+typealias FavoriteOperationResult = Either<SetFavoriteError, Boolean>

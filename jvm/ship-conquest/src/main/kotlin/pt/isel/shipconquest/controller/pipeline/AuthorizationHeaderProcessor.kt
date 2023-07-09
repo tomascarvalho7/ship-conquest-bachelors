@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.controller.pipeline
 
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.service.UserService
+
 import org.springframework.stereotype.Component
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.service.UserService
 
 @Component
 class AuthorizationHeaderProcessor(

@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.domain.ship.movement
 
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.bezier.utils.toVector2List
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.toVector2
-import com.example.shipconquest.domain.utils.clamp
+import pt.isel.shipconquest.domain.bezier.BezierSpline
+import pt.isel.shipconquest.domain.bezier.utils.toVector2List
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.toVector2
+import pt.isel.shipconquest.domain.utils.clamp
 import java.time.Duration
 import java.time.Instant
 

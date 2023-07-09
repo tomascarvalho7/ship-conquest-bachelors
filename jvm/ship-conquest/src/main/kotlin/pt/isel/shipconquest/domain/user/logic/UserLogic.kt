@@ -1,6 +1,5 @@
 package pt.isel.shipconquest.domain.user.logic
 
-import com.example.shipconquest.domain.user.Token
 import org.springframework.stereotype.Component
 import java.security.SecureRandom
 import java.util.*

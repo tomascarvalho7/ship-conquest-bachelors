@@ -1,17 +1,15 @@
 package pt.isel.shipconquest.service
 
-import com.example.shipconquest.domain.user.Token
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.logic.UserLogic
-import com.example.shipconquest.domain.user.toToken
-import pt.isel.shipconquest.left
-import com.example.shipconquest.repo.Transaction
-import com.example.shipconquest.repo.TransactionManager
-import pt.isel.shipconquest.right
-import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import pt.isel.shipconquest.domain.user.Token
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.domain.user.logic.UserLogic
+import pt.isel.shipconquest.domain.user.toToken
+import pt.isel.shipconquest.repo.Transaction
+import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.service.result.*
 
 @Service
 class UserService(

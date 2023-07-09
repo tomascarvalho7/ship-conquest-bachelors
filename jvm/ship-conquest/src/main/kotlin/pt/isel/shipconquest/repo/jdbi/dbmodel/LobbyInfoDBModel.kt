@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.lobby.LobbyInfo
+import pt.isel.shipconquest.domain.lobby.LobbyInfo
+
 
 data class LobbyInfoDBModel(
     val tag: String,

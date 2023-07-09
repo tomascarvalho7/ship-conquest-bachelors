@@ -1,12 +1,12 @@
 package pt.isel.shipconquest.domain
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.distanceTo
-import com.example.shipconquest.domain.world.WorldGenerator
-import com.example.shipconquest.domain.world.get
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.distanceTo
+import pt.isel.shipconquest.domain.world.WorldGenerator
+import pt.isel.shipconquest.domain.world.get
 
 class WorldGeneratorTests {
     @Test

@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.domain.minimap
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.Vector3
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.space.Vector3
+
 
 /**
  * The [Minimap] data class holds the data of the travelled paths and visited islands.

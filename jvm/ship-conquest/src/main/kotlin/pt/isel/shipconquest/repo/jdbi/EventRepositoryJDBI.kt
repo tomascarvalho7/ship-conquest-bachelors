@@ -1,16 +1,20 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.event.event_details.IslandEvent
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.repo.EventRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.*
-import com.example.shipconquest.repo.jdbi.dbmodel.island.*
+
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.event.event_details.IslandEvent
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.repo.EventRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.FightEventDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.IslandEventDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.GenericIslandDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.island.toIsland
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toEvent
 import java.time.Instant
 
 class EventRepositoryJDBI(private val handle: Handle): EventRepository {

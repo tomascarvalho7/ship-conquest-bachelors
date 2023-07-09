@@ -1,6 +1,7 @@
 package pt.isel.shipconquest.domain.event.logic.utils.plane
 
-import com.example.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.Position
+
 
 fun Plane.isOverlapping(other: Plane): Boolean {
     val allNormals = getNormals() + other.getNormals()

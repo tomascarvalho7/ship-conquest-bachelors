@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.user.statistics.IslandIncome
-import com.example.shipconquest.domain.user.statistics.PlayerIncome
-import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
+import pt.isel.shipconquest.domain.user.statistics.IslandIncome
+import pt.isel.shipconquest.domain.user.statistics.PlayerIncome
+import pt.isel.shipconquest.domain.user.statistics.PlayerStatsBuilder
+
 
 data class PlayerStatsDBModel(val tag: String, val uid: String, val staticCurrency: Int)
 

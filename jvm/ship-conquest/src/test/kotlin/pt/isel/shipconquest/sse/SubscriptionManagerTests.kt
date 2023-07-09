@@ -1,6 +1,5 @@
 package pt.isel.shipconquest.sse
 
-import com.example.shipconquest.controller.sse.publisher.Publisher
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -8,9 +7,10 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import pt.isel.shipconquest.controller.sse.publisher.SubscriptionManager
 import java.util.concurrent.ConcurrentHashMap
 
-class PublisherTests {
+class SubscriptionManagerTests {
    @Test
     fun `publish should send message to subscribed emitter`() {
         // setup
@@ -19,7 +19,7 @@ class PublisherTests {
         // create a mock for the SsEmitter class
         val sseEmitter = mock(SseEmitter::class.java)
 
-        val publisher = Publisher(subscriptions = ConcurrentHashMap(mapOf(key to sseEmitter)))
+        val publisher = SubscriptionManager(subscriptions = ConcurrentHashMap(mapOf(key to sseEmitter)))
         publisher.publish(key, message)
         // verify that the method [send] was called once on a [sseEmitter] instance
         verify(sseEmitter).send(message)
@@ -30,7 +30,7 @@ class PublisherTests {
         // setup
         val key = "user1"
         val subscriptions = ConcurrentHashMap<String, SseEmitter>()
-        val publisher = Publisher(subscriptions = subscriptions)
+        val publisher = SubscriptionManager(subscriptions = subscriptions)
 
         // subscribe and create emitter
         val sseEmitter = publisher.subscribe(key)
@@ -43,7 +43,7 @@ class PublisherTests {
         // setup
         val key = "user1"
         val subscriptions = ConcurrentHashMap<String, SseEmitter>()
-        val publisher = Publisher(subscriptions = subscriptions)
+        val publisher = SubscriptionManager(subscriptions = subscriptions)
         // create and place mock on subscriptions
         val sseEmitter = mock(SseEmitter::class.java)
         subscriptions[key] = sseEmitter
@@ -60,7 +60,7 @@ class PublisherTests {
     fun `create a SseEmitter event`() {
         // setup
         val subscriptions = ConcurrentHashMap<String, SseEmitter>()
-        val publisher = Publisher(subscriptions = subscriptions)
+        val publisher = SubscriptionManager(subscriptions = subscriptions)
         val msg = "generic data"
         // create event
         val res = publisher.createEvent("id", "event", msg)

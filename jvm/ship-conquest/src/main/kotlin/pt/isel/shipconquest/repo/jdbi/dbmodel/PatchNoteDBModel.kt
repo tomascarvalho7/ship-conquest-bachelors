@@ -1,7 +1,7 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.path_notes.PatchNote
-import com.example.shipconquest.domain.path_notes.PatchNotes
+import pt.isel.shipconquest.domain.patch_notes.PatchNote
+import pt.isel.shipconquest.domain.patch_notes.PatchNotes
 
 data class PatchNoteDBModel(val title: String, val details: String)
 

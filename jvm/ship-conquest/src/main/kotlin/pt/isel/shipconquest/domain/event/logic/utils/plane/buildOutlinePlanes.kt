@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.domain.event.logic.utils.plane
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.space.Vector2
+
 
 fun buildOutlinePlanes(points: List<Vector2>, thickness: Double) = buildList {
     for (i in 0 until points.size - 1) {

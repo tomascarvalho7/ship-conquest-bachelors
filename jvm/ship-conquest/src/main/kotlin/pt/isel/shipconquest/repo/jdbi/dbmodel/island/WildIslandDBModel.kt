@@ -1,7 +1,8 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel.island
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.islands.WildIsland
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.islands.WildIsland
+
 
 data class WildIslandDBModel(
     val islandId: Int,

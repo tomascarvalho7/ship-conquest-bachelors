@@ -1,26 +1,29 @@
 package pt.isel.shipconquest.controller
 
-import pt.isel.shipconquest.Either
-import com.example.shipconquest.controller.model.Problem
-import com.example.shipconquest.controller.model.input.ConquestInputModel
-import com.example.shipconquest.controller.model.input.NavigationPathInputModel
-import com.example.shipconquest.controller.model.input.toPathPoints
-import com.example.shipconquest.controller.model.output.*
-import com.example.shipconquest.controller.model.output.islands.toOwnedIslandOutputModel
-import com.example.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
-import com.example.shipconquest.controller.model.output.ship.toFleetOutputModel
-import com.example.shipconquest.controller.model.output.ship.toShipOutputModel
-import com.example.shipconquest.controller.sse.GameKey
-import com.example.shipconquest.controller.sse.GameSubscriptionKey
-import com.example.shipconquest.controller.sse.publisher.Publisher
-import com.example.shipconquest.controller.sse.ShipEventsAPI
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.service.GameService
-import com.example.shipconquest.service.result.*
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import pt.isel.shipconquest.Either
+import pt.isel.shipconquest.controller.model.Problem
+import pt.isel.shipconquest.controller.model.input.ConquestInputModel
+import pt.isel.shipconquest.controller.model.input.NavigationPathInputModel
+import pt.isel.shipconquest.controller.model.input.toPathPoints
+import pt.isel.shipconquest.controller.model.output.islands.toOwnedIslandOutputModel
+import pt.isel.shipconquest.controller.model.output.notification.subscriptionKeyToUnsubscribedOutputModel
+import pt.isel.shipconquest.controller.model.output.ship.toFleetOutputModel
+import pt.isel.shipconquest.controller.model.output.ship.toShipOutputModel
+import pt.isel.shipconquest.controller.model.output.toHorizonOutputModel
+import pt.isel.shipconquest.controller.model.output.toIslandListOutputModel
+import pt.isel.shipconquest.controller.model.output.toOutputModel
+import pt.isel.shipconquest.controller.model.output.toPlayerStatisticsOutputModel
+import pt.isel.shipconquest.controller.sse.GameKey
+import pt.isel.shipconquest.controller.sse.GameSubscriptionKey
+import pt.isel.shipconquest.controller.sse.ShipEventsAPI
+import pt.isel.shipconquest.controller.sse.publisher.SubscriptionManager
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.service.GameService
+import pt.isel.shipconquest.service.result.*
 import java.util.concurrent.ConcurrentHashMap
 
 @RestController
@@ -30,7 +33,7 @@ class GameController(val service: GameService) {
     // (N) gameKey (Tag, Ship Identifier) -> gameSubscriptionKey(Tag, User identifier)
     val shipToSubscription = ConcurrentHashMap<GameKey, GameSubscriptionKey>()
     // Server Sent Events API
-    val publisherAPI = Publisher(subscriptions = subscriptions)
+    val publisherAPI = SubscriptionManager(subscriptions = subscriptions)
     val shipEventsAPI = ShipEventsAPI(publisherAPI = publisherAPI, ships = shipToSubscription)
 
     @GetMapping("/{tag}/view")
@@ -38,8 +41,8 @@ class GameController(val service: GameService) {
         val result = service.getChunks(tag = tag, shipId = shipId, uid = user.id)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toHorizonOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toHorizonOutputModel())
+            is Either.Left -> when (result.value) {
                 GetChunksError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 GetChunksError.ShipPositionNotFound ->
@@ -53,8 +56,8 @@ class GameController(val service: GameService) {
         val result = service.getPlayerStats(tag = tag, uid = user.id)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toPlayerStatisticsOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when(result.value) {
+            is Either.Right -> response(content = result.value.toPlayerStatisticsOutputModel())
+            is Either.Left -> when(result.value) {
                 GetPlayerStatsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 GetPlayerStatsError.StatisticsNotFound ->
@@ -68,8 +71,8 @@ class GameController(val service: GameService) {
         val result = service.conquestIsland(tag, user, input.shipId, input.islandId);
 
         return when(result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toOwnedIslandOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toOwnedIslandOutputModel())
+            is Either.Left -> when (result.value) {
                 ConquestIslandError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 ConquestIslandError.ShipNotFound ->
@@ -93,8 +96,8 @@ class GameController(val service: GameService) {
         val result = service.getMinimap(tag = tag, uid = user.id)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toOutputModel())
+            is Either.Left -> when (result.value) {
                 GetMinimapError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 GetMinimapError.NoTrackedRecord ->
@@ -113,13 +116,13 @@ class GameController(val service: GameService) {
         val result = service.navigate(tag, user.id, shipId, path.toPathPoints())
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> {
+            is Either.Right -> {
                 // publish and notify of new events
                 shipEventsAPI.publishEvents(tag = tag, futureEvents = result.value.futureEvents)
                 // return sailing ship
                 response(content = result.value.toShipOutputModel())
             }
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Left -> when (result.value) {
                 NavigationError.InvalidNavigationPath ->
                     Problem.response(status = 400, problem = Problem.invalidNavigation())
                 NavigationError.ShipNotFound ->
@@ -135,8 +138,8 @@ class GameController(val service: GameService) {
         val result = service.addShip(tag = tag, uid = user.id)
 
         return when(result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toShipOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toShipOutputModel())
+            is Either.Left -> when (result.value) {
                 CreateShipError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
                 CreateShipError.NotEnoughCurrency ->
@@ -156,8 +159,8 @@ class GameController(val service: GameService) {
         val result = service.getShip(tag = tag, uid = user.id, shipId = shipId)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toShipOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toShipOutputModel())
+            is Either.Left -> when (result.value) {
                 GetShipError.ShipNotFound ->
                     Problem.response(status = 404, problem = Problem.shipNotFound())
                 GetShipError.GameNotFound ->
@@ -171,8 +174,8 @@ class GameController(val service: GameService) {
         val result = service.getShips(tag = tag, uid = user.id)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toFleetOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when (result.value) {
+            is Either.Right -> response(content = result.value.toFleetOutputModel())
+            is Either.Left -> when (result.value) {
                 GetShipsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
             }
@@ -187,8 +190,8 @@ class GameController(val service: GameService) {
         val result = service.getKnownIslands(tag, user.id)
 
         return when(result) {
-            is pt.isel.shipconquest.Either.Right -> response(result.value.toIslandListOutputModel())
-            is pt.isel.shipconquest.Either.Left -> when(result.value) {
+            is Either.Right -> response(result.value.toIslandListOutputModel())
+            is Either.Left -> when(result.value) {
                 GetKnownIslandsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
             }
@@ -200,10 +203,10 @@ class GameController(val service: GameService) {
         val result = service.getShips(tag = tag, uid = user.id)
 
         return when (result) {
-            is pt.isel.shipconquest.Either.Right -> {
+            is Either.Right -> {
                 return shipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
             }
-            is pt.isel.shipconquest.Either.Left -> TODO("testar")/*when(result.value) {
+            is Either.Left -> TODO("testar")/*when(result.value) {
                 GetShipsError.GameNotFound ->
                     Problem.response(status = 404, problem = Problem.gameNotFound())
             }*/

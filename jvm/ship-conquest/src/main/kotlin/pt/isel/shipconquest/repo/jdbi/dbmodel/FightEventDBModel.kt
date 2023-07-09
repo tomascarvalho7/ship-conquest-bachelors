@@ -1,9 +1,8 @@
 package pt.isel.shipconquest.repo.jdbi.dbmodel
 
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.EventDetails
-import com.example.shipconquest.domain.event.FightInteraction
-import com.example.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.FightInteraction
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
 import java.time.Instant
 
 data class FightEventDBModel(

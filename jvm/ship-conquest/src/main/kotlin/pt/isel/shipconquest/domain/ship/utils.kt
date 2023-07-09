@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.domain.ship
 
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.IslandEvent
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.ship.movement.Movement
-import com.example.shipconquest.domain.utils.isBetween
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.event_details.IslandEvent
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.ship.movement.Movement
+import pt.isel.shipconquest.domain.utils.isBetween
 import java.time.Instant
 
 fun buildMovementFromEvents(movement: Movement, instant: Instant, events: List<Event>): Movement {

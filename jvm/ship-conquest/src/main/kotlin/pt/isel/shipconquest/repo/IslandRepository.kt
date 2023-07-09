@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.OwnedIsland
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.world.islands.OwnedIsland
 
 interface IslandRepository {
     val logger: Logger

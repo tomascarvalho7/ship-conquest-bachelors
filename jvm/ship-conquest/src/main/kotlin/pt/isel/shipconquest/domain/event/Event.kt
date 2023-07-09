@@ -1,8 +1,8 @@
 package pt.isel.shipconquest.domain.event
 
-import com.example.shipconquest.domain.event.event_details.EventDetails
-import java.time.Duration
+import pt.isel.shipconquest.domain.event.event_details.EventDetails
 import java.time.Instant
+
 
 /**
  * The [Event] data class holds the data for an event born from a player interaction

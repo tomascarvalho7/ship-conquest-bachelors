@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.repo.Transaction
-import com.example.shipconquest.repo.TransactionManager
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.transaction.TransactionIsolationLevel
 import org.springframework.context.annotation.Configuration
+import pt.isel.shipconquest.repo.Transaction
+import pt.isel.shipconquest.repo.TransactionManager
 
 @Configuration
 class TransactionManagerJDBI(private val jdbi: Jdbi): TransactionManager {

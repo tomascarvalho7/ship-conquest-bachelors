@@ -1,7 +1,7 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import java.time.Instant
 
 interface StatisticsRepository {

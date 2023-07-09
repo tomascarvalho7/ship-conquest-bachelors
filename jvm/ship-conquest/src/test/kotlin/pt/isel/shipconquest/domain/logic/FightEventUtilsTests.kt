@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.domain.logic
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.event.logic.utils.comparePoints
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.event.logic.utils.comparePoints
 
 class FightEventUtilsTests {
     @Test

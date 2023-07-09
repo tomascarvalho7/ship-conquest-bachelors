@@ -1,13 +1,13 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.path_notes.PatchNotes
-import com.example.shipconquest.repo.PatchNotesRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.PatchNoteDBModel
-import com.example.shipconquest.repo.jdbi.dbmodel.toPatchNotes
 import org.jdbi.v3.core.Handle
 import org.jdbi.v3.core.kotlin.mapTo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.patch_notes.PatchNotes
+import pt.isel.shipconquest.repo.PatchNotesRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.PatchNoteDBModel
+import pt.isel.shipconquest.repo.jdbi.dbmodel.toPatchNotes
 
 class PatchNotesRepositoryJDBI(private val handle: Handle): PatchNotesRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)

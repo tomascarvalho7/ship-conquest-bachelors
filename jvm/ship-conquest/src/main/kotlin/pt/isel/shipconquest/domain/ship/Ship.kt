@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.domain.ship
 
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.FutureEvent
-import com.example.shipconquest.domain.ship.movement.Movement
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.FutureEvent
+import pt.isel.shipconquest.domain.ship.movement.Movement
+
 
 /**
  * The [Ship] data class holds the static representation of a ship along a given

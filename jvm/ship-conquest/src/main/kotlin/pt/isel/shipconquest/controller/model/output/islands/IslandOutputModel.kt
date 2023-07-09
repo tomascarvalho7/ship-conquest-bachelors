@@ -1,9 +1,10 @@
 package pt.isel.shipconquest.controller.model.output.islands
 
-import com.example.shipconquest.controller.model.output.Vector2OutputModel
-import com.example.shipconquest.domain.world.islands.Island
-import com.example.shipconquest.domain.world.islands.OwnedIsland
-import com.example.shipconquest.domain.world.islands.WildIsland
+import pt.isel.shipconquest.controller.model.output.Vector2OutputModel
+import pt.isel.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.world.islands.OwnedIsland
+import pt.isel.shipconquest.domain.world.islands.WildIsland
+
 
 interface IslandOutputModel {
     val id: Int

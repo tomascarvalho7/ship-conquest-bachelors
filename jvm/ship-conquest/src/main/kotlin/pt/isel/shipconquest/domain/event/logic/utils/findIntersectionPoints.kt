@@ -1,11 +1,9 @@
 package pt.isel.shipconquest.domain.event.logic.utils
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.distanceTo
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.space.distanceTo
-import com.example.shipconquest.domain.space.toPosition
-import com.example.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.islands.Island
+
 
 data class LineIntersection(val position: Position, val lineIndex: Int, val island: Island)
 

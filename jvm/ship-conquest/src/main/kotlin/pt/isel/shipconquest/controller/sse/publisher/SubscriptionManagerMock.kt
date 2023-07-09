@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
  * Key          Value
  * "Method" =>  Nr of invocations
  */
-class PublisherMock(val data: MutableMap<String, Int>): PublisherAPI {
+class SubscriptionManagerMock(val data: MutableMap<String, Int>): SubscriptionManagerAPI {
     override fun publish(key: String, message: Any) = incrementMethod("publish")
 
     override fun subscribe(key: String): SseEmitter {

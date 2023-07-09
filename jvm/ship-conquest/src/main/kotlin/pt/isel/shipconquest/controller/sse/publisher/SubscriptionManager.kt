@@ -3,13 +3,12 @@ package pt.isel.shipconquest.controller.sse.publisher
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Pub/Sub model to implement SSE (Server Sent Events)
  */
-class Publisher(private val subscriptions: ConcurrentHashMap<String, SseEmitter>): PublisherAPI {
+class SubscriptionManager(private val subscriptions: ConcurrentHashMap<String, SseEmitter>): SubscriptionManagerAPI {
 
     override fun publish(key: String, message: Any) {
         subscriptions[key]?.send(message)

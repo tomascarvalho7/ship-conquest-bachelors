@@ -1,8 +1,8 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.game.Game
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.game.Game
+import pt.isel.shipconquest.domain.space.Vector2
 
 interface GameRepository {
     val logger: Logger

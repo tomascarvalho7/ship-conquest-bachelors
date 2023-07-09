@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.repo
 
-import com.example.shipconquest.domain.user.Token
-import com.example.shipconquest.domain.user.User
-import com.example.shipconquest.domain.user.UserInfo
 import org.slf4j.Logger
+import pt.isel.shipconquest.domain.user.Token
+import pt.isel.shipconquest.domain.user.User
+import pt.isel.shipconquest.domain.user.UserInfo
 
 interface UserRepository {
     val logger: Logger

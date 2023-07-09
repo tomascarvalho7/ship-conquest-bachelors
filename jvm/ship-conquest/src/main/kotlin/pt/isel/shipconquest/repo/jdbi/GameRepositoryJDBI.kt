@@ -1,11 +1,5 @@
 package pt.isel.shipconquest.repo.jdbi
 
-import com.example.shipconquest.domain.space.Vector2
-import com.example.shipconquest.domain.game.Game
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.world.HeightMap
-import com.example.shipconquest.repo.GameRepository
-import com.example.shipconquest.repo.jdbi.dbmodel.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -15,6 +9,12 @@ import org.jdbi.v3.core.statement.Update
 import org.postgresql.util.PGobject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import pt.isel.shipconquest.domain.bezier.CubicBezier
+import pt.isel.shipconquest.domain.game.Game
+import pt.isel.shipconquest.domain.space.Vector2
+import pt.isel.shipconquest.domain.world.HeightMap
+import pt.isel.shipconquest.repo.GameRepository
+import pt.isel.shipconquest.repo.jdbi.dbmodel.*
 
 class GameRepositoryJDBI(private val handle: Handle) : GameRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)

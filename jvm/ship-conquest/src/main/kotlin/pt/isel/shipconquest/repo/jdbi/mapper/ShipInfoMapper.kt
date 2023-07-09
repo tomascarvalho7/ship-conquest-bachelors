@@ -1,9 +1,9 @@
 package pt.isel.shipconquest.repo.jdbi.mapper
 
-import com.example.shipconquest.repo.jdbi.ShipRepositoryJDBI
-import com.example.shipconquest.repo.jdbi.dbmodel.ShipInfoDBModel
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext
+import pt.isel.shipconquest.repo.jdbi.ShipRepositoryJDBI
+import pt.isel.shipconquest.repo.jdbi.dbmodel.ShipInfoDBModel
 import java.sql.ResultSet
 import java.time.Duration
 

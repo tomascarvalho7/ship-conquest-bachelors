@@ -1,8 +1,9 @@
 package pt.isel.shipconquest.domain.bezier
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.bezier.utils.split
-import com.example.shipconquest.domain.space.toPosition
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.bezier.utils.split
+import pt.isel.shipconquest.domain.space.toPosition
+
 
 /**
  * The [BezierSpline] class represents a group of combined [CubicBezier]'s to form

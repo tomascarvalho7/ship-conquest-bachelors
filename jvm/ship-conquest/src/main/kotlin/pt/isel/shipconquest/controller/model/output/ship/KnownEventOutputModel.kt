@@ -1,11 +1,12 @@
 package pt.isel.shipconquest.controller.model.output.ship
 
-import com.example.shipconquest.controller.model.output.islands.IslandOutputModel
-import com.example.shipconquest.controller.model.output.islands.toIslandOutputModel
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.event.event_details.IslandEvent
-import com.example.shipconquest.domain.event.event_details.isWinner
+import pt.isel.shipconquest.controller.model.output.islands.IslandOutputModel
+import pt.isel.shipconquest.controller.model.output.islands.toIslandOutputModel
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.event.event_details.IslandEvent
+import pt.isel.shipconquest.domain.event.event_details.isWinner
+
 
 interface KnownEventOutputModel
 

@@ -1,22 +1,21 @@
 package pt.isel.shipconquest.domain.event.logic
 
-import pt.isel.shipconquest.Clock
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.bezier.BezierSpline
-import com.example.shipconquest.domain.event.Event
-import com.example.shipconquest.domain.event.event_details.FightEvent
-import com.example.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
-import com.example.shipconquest.domain.event.logic.utils.plane.isOverlapping
-import com.example.shipconquest.domain.bezier.CubicBezier
-import com.example.shipconquest.domain.ship.ShipBuilder
-import com.example.shipconquest.domain.ship.movement.Kinetic
-import com.example.shipconquest.domain.bezier.utils.*
-import com.example.shipconquest.domain.distanceTo
-import com.example.shipconquest.domain.event.logic.utils.calculateWinner
-import com.example.shipconquest.domain.event.logic.utils.comparePoints
-import com.example.shipconquest.domain.event.logic.utils.findIntersectionPoints
-import com.example.shipconquest.domain.space.toPosition
-import com.example.shipconquest.domain.world.islands.Island
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.bezier.BezierSpline
+import pt.isel.shipconquest.domain.bezier.utils.sample
+import pt.isel.shipconquest.domain.bezier.utils.split
+import pt.isel.shipconquest.domain.distanceTo
+import pt.isel.shipconquest.domain.event.Event
+import pt.isel.shipconquest.domain.event.event_details.FightEvent
+import pt.isel.shipconquest.domain.event.logic.utils.calculateWinner
+import pt.isel.shipconquest.domain.event.logic.utils.comparePoints
+import pt.isel.shipconquest.domain.event.logic.utils.findIntersectionPoints
+import pt.isel.shipconquest.domain.event.logic.utils.plane.buildOutlinePlanes
+import pt.isel.shipconquest.domain.event.logic.utils.plane.isOverlapping
+import pt.isel.shipconquest.domain.ship.ShipBuilder
+import pt.isel.shipconquest.domain.ship.movement.Kinetic
+import pt.isel.shipconquest.domain.space.toPosition
+import pt.isel.shipconquest.domain.world.islands.Island
 import java.time.Instant
 import kotlin.math.min
 
@@ -61,7 +60,7 @@ class EventLogic(private val clock: pt.isel.shipconquest.Clock) {
     }
 
     // find the closest point to the island without intersecting it
-    private fun findNearestPointToIsland(points: List<Position> , island: Island): Double {
+    private fun findNearestPointToIsland(points: List<Position>, island: Island): Double {
         var bestDistance = Double.MAX_VALUE
         var t = 0.0
         for ((index, point) in points.withIndex()) {

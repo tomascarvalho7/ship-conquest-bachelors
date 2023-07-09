@@ -1,10 +1,10 @@
 package pt.isel.shipconquest.domain.space
 
-import com.example.shipconquest.domain.Position
-import com.example.shipconquest.domain.distanceTo
-import com.example.shipconquest.domain.toVector2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import pt.isel.shipconquest.domain.Position
+import pt.isel.shipconquest.domain.distanceTo
+import pt.isel.shipconquest.domain.toVector2
 import kotlin.math.sqrt
 
 class PositionTests {
