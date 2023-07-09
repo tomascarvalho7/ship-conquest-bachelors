@@ -1,12 +1,14 @@
 # Ship Conquest
 
 <h1 align="center">
-    <img src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/main.jpg">
+    <img width="85" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/main.jpg">
 </h1>
 
 <p align="center">
   <i align="center">Multiplayer strategic sailing exploring game ⚓</i>
 </p>
+
+---
 
 ## Concept
 
@@ -27,9 +29,9 @@ Several technical concepts were worked on, namely *Procedural Generation* and ps
 ## Galery
 
 <p align="center">
-    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/ship.jpg" alt="game"/>
+    <img width="35%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/ship.jpg" alt="game"/>
 &nbsp;
-    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/minimap.jpg" alt="minimap"/>
+    <img width="35%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/minimap.jpg" alt="minimap"/>
 </p>
 
 ## Features
