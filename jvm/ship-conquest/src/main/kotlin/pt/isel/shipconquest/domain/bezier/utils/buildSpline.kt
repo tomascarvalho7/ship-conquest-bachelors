@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.bezier.utils
+package pt.isel.shipconquest.domain.bezier.utils
 
 import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.bezier.CubicBezier

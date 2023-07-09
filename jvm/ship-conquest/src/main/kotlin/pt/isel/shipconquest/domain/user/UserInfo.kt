@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.user
+package pt.isel.shipconquest.domain.user
 
 /**
  * The [UserInfo] data class holds the complete user data for presentation purposes

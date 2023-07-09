@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.space
+package pt.isel.shipconquest.domain.space
 
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.distanceTo

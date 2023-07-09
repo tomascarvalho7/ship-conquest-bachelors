@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.ship.movement
+package pt.isel.shipconquest.domain.ship.movement
 
 import com.example.shipconquest.domain.space.Vector2
 import java.time.Instant

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.event.logic.utils.plane
+package pt.isel.shipconquest.domain.event.logic.utils.plane
 
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.space.Vector2

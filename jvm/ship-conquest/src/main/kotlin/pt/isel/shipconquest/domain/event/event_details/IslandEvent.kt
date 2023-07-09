@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.event.event_details
+package pt.isel.shipconquest.domain.event.event_details
 
 import com.example.shipconquest.domain.ship.movement.Kinetic
 import com.example.shipconquest.domain.ship.movement.Movement

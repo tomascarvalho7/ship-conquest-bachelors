@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo
+package pt.isel.shipconquest.repo
 
 interface TransactionManager {
     // create and run a transaction

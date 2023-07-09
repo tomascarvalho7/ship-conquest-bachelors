@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output
+package pt.isel.shipconquest.controller.model.output
 
 data class UserInfoOutputModel(
     val username: String,

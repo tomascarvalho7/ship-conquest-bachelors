@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output.ship
+package pt.isel.shipconquest.controller.model.output.ship
 
 import com.example.shipconquest.controller.model.output.Vector2OutputModel
 import com.example.shipconquest.controller.model.output.toVector2OutputModel

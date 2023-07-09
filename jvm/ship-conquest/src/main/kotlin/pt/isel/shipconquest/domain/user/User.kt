@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.user
+package pt.isel.shipconquest.domain.user
 
 /**
  * The [User] data class holds only the authorization user data like

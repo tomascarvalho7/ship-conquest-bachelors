@@ -1,6 +1,6 @@
-package com.example.shipconquest.domain.logic
+package pt.isel.shipconquest.domain.logic
 
-import com.example.shipconquest.Clock
+import pt.isel.shipconquest.Clock
 import com.example.shipconquest.ClockStub
 import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.space.Vector2
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
 class GameLogicTests {
-    private val testClock: Clock = ClockStub()
+    private val testClock: pt.isel.shipconquest.Clock = ClockStub()
 
     @Test
     fun getInstant() {

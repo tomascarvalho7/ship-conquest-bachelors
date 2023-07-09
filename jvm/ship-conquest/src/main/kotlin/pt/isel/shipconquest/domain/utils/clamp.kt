@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.utils
+package pt.isel.shipconquest.domain.utils
 
 import kotlin.math.max
 import kotlin.math.min

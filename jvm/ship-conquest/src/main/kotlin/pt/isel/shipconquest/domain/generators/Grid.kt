@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.generators
+package pt.isel.shipconquest.domain.generators
 
 /**
  * The [Grid] data class is a wrapper class for the [MutableList] class, to

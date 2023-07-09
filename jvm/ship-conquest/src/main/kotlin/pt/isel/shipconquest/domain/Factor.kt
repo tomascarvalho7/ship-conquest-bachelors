@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain
+package pt.isel.shipconquest.domain
 
 /**
  * Factor data class holds a [value] that

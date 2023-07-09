@@ -1,6 +1,6 @@
-package com.example.shipconquest.service.result
+package pt.isel.shipconquest.service.result
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.domain.user.Token
 import com.example.shipconquest.domain.user.UserInfo
 
@@ -10,7 +10,7 @@ sealed class CreateUserError {
     object UserAlreadyExists: CreateUserError()
 }
 
-typealias CreateUserResult = Either<CreateUserError, Token>
+typealias CreateUserResult = pt.isel.shipconquest.Either<CreateUserError, Token>
 
 sealed class LoginUserError {
     object InvalidIDToken: LoginUserError()
@@ -18,11 +18,11 @@ sealed class LoginUserError {
     object UserNotFound: LoginUserError()
 }
 
-typealias LoginUserResult = Either<LoginUserError, Token>
+typealias LoginUserResult = pt.isel.shipconquest.Either<LoginUserError, Token>
 
 
 sealed class GetUserInfoError {
     object UserNotFound: GetUserInfoError()
 }
 
-typealias GetUserInfoResult = Either<GetUserInfoError, UserInfo>
+typealias GetUserInfoResult = pt.isel.shipconquest.Either<GetUserInfoError, UserInfo>

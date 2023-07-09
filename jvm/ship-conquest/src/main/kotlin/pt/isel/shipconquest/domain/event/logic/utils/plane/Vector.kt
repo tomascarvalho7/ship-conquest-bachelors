@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.event.logic.utils.plane
+package pt.isel.shipconquest.domain.event.logic.utils.plane
 
 data class Vector(val x: Double, val y: Double)
 

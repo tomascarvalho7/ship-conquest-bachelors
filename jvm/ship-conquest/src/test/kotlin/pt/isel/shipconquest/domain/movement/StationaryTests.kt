@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.movement
+package pt.isel.shipconquest.domain.movement
 
 import com.example.shipconquest.ClockStub
 import com.example.shipconquest.domain.ship.movement.Stationary

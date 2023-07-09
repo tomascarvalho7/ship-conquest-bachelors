@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.generators
+package pt.isel.shipconquest.domain.generators
 
 import kotlin.math.floor
 import kotlin.math.pow

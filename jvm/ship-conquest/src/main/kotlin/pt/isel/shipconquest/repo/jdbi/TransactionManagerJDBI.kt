@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi
+package pt.isel.shipconquest.repo.jdbi
 
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager

@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.pipeline
+package pt.isel.shipconquest.controller.pipeline
 
 import com.example.shipconquest.domain.user.User
 import jakarta.servlet.http.HttpServletRequest

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.utils
+package pt.isel.shipconquest.domain.utils
 
 import java.text.SimpleDateFormat
 import java.time.Duration

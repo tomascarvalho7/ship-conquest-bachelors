@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo
+package pt.isel.shipconquest.repo
 
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.world.islands.Island

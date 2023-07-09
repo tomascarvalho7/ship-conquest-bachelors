@@ -1,4 +1,4 @@
-package com.example.shipconquest
+package pt.isel.shipconquest
 
 import com.example.shipconquest.controller.pipeline.AuthenticationInterceptor
 import com.example.shipconquest.controller.pipeline.UserArgumentResolver

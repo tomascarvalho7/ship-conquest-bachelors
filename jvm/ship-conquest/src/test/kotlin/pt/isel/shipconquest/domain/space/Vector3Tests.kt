@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.space
+package pt.isel.shipconquest.domain.space
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals

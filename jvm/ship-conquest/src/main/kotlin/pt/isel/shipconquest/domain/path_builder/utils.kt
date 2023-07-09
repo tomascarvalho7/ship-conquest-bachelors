@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.path_builder
+package pt.isel.shipconquest.domain.path_builder
 
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.world.HeightMap

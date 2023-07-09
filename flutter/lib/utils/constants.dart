@@ -8,10 +8,10 @@ import 'package:ship_conquest/providers/game/event_handlers/minimap_event.dart';
 
 
 // defaults
-const tileSize = 32.0;
+const tileSize = 48.0;
 const tileSizeWidthHalf = tileSize / 2;
 const tileSizeHeightHalf = tileSize / 4;
-const chunkSize = 10;
+const chunkSize = 8;
 const waterColor = Color.fromRGBO(60, 151, 207, 1.0);
 const fightDuration = Duration(seconds: 10);
 // cost

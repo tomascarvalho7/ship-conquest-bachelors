@@ -1,8 +1,8 @@
-package com.example.shipconquest.service
+package pt.isel.shipconquest.service
 
-import com.example.shipconquest.left
+import pt.isel.shipconquest.left
 import com.example.shipconquest.repo.TransactionManager
-import com.example.shipconquest.right
+import pt.isel.shipconquest.right
 import com.example.shipconquest.service.result.GetPatchNotesError
 import com.example.shipconquest.service.result.GetPatchNotesResult
 import org.slf4j.Logger
@@ -17,8 +17,10 @@ class PatchNotesService(
 
     fun getPatchNotes(): GetPatchNotesResult {
         return transactionManager.run { transaction ->
-            val patchNotes = transaction.patchNotesRepo.getPatchNotes() ?: return@run left(GetPatchNotesError.PatchNotesNotFound)
-            return@run right(patchNotes)
+            val patchNotes = transaction.patchNotesRepo.getPatchNotes() ?: return@run pt.isel.shipconquest.left(
+                GetPatchNotesError.PatchNotesNotFound
+            )
+            return@run pt.isel.shipconquest.right(patchNotes)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model
+package pt.isel.shipconquest.controller.model
 
 import org.springframework.http.ResponseEntity
 

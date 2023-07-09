@@ -1,6 +1,6 @@
-package com.example.shipconquest.controller
+package pt.isel.shipconquest.controller
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.output.toPatchNotesOutputModel
 import com.example.shipconquest.domain.user.User
@@ -18,8 +18,8 @@ class PatchNotesController(val service: PatchNotesService) {
         val result =  service.getPatchNotes()
 
         return when (result) {
-            is Either.Right -> response(content = result.value.toPatchNotesOutputModel())
-            is Either.Left -> when(result.value) {
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toPatchNotesOutputModel())
+            is pt.isel.shipconquest.Either.Left -> when(result.value) {
                 GetPatchNotesError.PatchNotesNotFound ->
                     Problem.response(status = 404, problem = Problem.patchNotesNotFound())
             }

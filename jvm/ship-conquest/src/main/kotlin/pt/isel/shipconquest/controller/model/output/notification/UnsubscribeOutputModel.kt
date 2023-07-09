@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output.notification
+package pt.isel.shipconquest.controller.model.output.notification
 
 data class UnsubscribedOutputModel(val key: String, val info: String)
 

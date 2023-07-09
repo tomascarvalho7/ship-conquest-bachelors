@@ -1,4 +1,4 @@
-package com.example.shipconquest
+package pt.isel.shipconquest
 
 import org.jdbi.v3.core.Jdbi
 import org.postgresql.PGProperty
@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 
-private val logger = LoggerFactory.getLogger(ShipConquestApplication::class.java)
+private val logger = LoggerFactory.getLogger(pt.isel.shipconquest.ShipConquestApplication::class.java)
 
 /**
  * Bean definitions for the application
@@ -22,7 +22,7 @@ class ShipConquestApplication {
 			setURL(postgresUri)
 		}
 
-		logger.info(
+		pt.isel.shipconquest.logger.info(
 			"Using PostgreSQL located at '{}:{}'",
 			dataSource.getProperty(PGProperty.PG_HOST),
 			dataSource.getProperty(PGProperty.PG_PORT)
@@ -32,9 +32,9 @@ class ShipConquestApplication {
 	}
 
 	@Bean
-	fun getClock() = RealClock
+	fun getClock() = pt.isel.shipconquest.RealClock
 }
 
 fun main(args: Array<String>) {
-	runApplication<ShipConquestApplication>(*args)
+	runApplication<pt.isel.shipconquest.ShipConquestApplication>(*args)
 }

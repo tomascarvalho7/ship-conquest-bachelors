@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi
+package pt.isel.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.event.Event
 import com.example.shipconquest.domain.event.event_details.FightEvent

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain
+package pt.isel.shipconquest.domain
 
 import com.example.shipconquest.domain.space.Vector2
 import kotlin.math.pow

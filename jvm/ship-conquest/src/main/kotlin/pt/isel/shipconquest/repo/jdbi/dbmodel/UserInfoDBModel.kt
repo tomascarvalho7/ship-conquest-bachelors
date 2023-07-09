@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi.dbmodel
+package pt.isel.shipconquest.repo.jdbi.dbmodel
 
 import com.example.shipconquest.domain.user.UserInfo
 

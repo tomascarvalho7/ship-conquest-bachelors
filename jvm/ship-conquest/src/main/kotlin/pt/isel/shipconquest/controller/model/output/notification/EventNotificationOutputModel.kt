@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output.notification
+package pt.isel.shipconquest.controller.model.output.notification
 
 import com.example.shipconquest.controller.model.output.ship.UnknownEventOutputModel
 import com.example.shipconquest.controller.model.output.ship.toUnknownEventOutputModel

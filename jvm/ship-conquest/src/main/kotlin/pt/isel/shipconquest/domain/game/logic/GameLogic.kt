@@ -1,6 +1,6 @@
-package com.example.shipconquest.domain.game.logic
+package pt.isel.shipconquest.domain.game.logic
 
-import com.example.shipconquest.Clock
+import pt.isel.shipconquest.Clock
 import com.example.shipconquest.domain.bezier.utils.buildSpline
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.event.Event
@@ -43,7 +43,7 @@ const val incomePerHour = 25
  * This class is aware of the concept of time through the [clock] value.
  */
 @Component
-class GameLogic(private val clock: Clock) {
+class GameLogic(private val clock: pt.isel.shipconquest.Clock) {
     val eventLogic = EventLogic(clock)
 
     // get current instant

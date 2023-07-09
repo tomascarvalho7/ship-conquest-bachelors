@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output.lobby
+package pt.isel.shipconquest.controller.model.output.lobby
 
 import com.example.shipconquest.domain.lobby.LobbyInfo
 

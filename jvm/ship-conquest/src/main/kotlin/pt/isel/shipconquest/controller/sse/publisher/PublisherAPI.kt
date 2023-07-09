@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.sse.publisher
+package pt.isel.shipconquest.controller.sse.publisher
 
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter

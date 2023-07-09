@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.user.statistics
+package pt.isel.shipconquest.domain.user.statistics
 
 import java.time.Instant
 

@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi.mapper
+package pt.isel.shipconquest.repo.jdbi.mapper
 
 import org.jdbi.v3.core.mapper.ColumnMapper
 import org.jdbi.v3.core.statement.StatementContext

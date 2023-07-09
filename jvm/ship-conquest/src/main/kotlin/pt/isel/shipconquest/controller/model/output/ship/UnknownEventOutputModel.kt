@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.output.ship
+package pt.isel.shipconquest.controller.model.output.ship
 
 import com.example.shipconquest.domain.event.FutureEvent
 import com.example.shipconquest.domain.utils.formatDuration

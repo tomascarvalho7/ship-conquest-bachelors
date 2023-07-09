@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.event
+package pt.isel.shipconquest.domain.event
 
 import java.time.Duration
 

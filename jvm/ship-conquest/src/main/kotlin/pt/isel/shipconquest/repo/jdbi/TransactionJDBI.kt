@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi
+package pt.isel.shipconquest.repo.jdbi
 
 import com.example.shipconquest.repo.*
 import org.jdbi.v3.core.Handle

@@ -1,3 +1,3 @@
-package com.example.shipconquest.controller.model.input
+package pt.isel.shipconquest.controller.model.input
 
 data class LobbyInputModel(val name: String)

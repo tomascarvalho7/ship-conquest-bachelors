@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.user
+package pt.isel.shipconquest.domain.user
 
 /**
  * The [Token] data class holds the user bearer token data.

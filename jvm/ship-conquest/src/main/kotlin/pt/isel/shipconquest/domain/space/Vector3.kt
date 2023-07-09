@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.space
+package pt.isel.shipconquest.domain.space
 
 /**
  * The Vector3 class represents a space in a 3D Grid with

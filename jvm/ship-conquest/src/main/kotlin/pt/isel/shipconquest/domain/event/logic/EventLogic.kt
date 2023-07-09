@@ -1,6 +1,6 @@
-package com.example.shipconquest.domain.event.logic
+package pt.isel.shipconquest.domain.event.logic
 
-import com.example.shipconquest.Clock
+import pt.isel.shipconquest.Clock
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.event.Event
@@ -27,7 +27,7 @@ import kotlin.math.min
  *
  * This class is aware of the concept of time through the [clock] value.
  */
-class EventLogic(private val clock: Clock) {
+class EventLogic(private val clock: pt.isel.shipconquest.Clock) {
     // find the first intersection between two ships to build a fight event
     fun buildFightEventsBetweenShips(
         current: ShipBuilder,

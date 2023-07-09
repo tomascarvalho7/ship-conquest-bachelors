@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.event.logic.utils
+package pt.isel.shipconquest.domain.event.logic.utils
 
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.distanceTo

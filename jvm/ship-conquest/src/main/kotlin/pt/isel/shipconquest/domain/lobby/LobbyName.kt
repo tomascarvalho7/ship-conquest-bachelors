@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.lobby
+package pt.isel.shipconquest.domain.lobby
 
 /**
  * LobbyName is a string containing a name for a lobby that

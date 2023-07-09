@@ -1,4 +1,4 @@
-package com.example.shipconquest.service
+package pt.isel.shipconquest.service
 
 import com.example.shipconquest.domain.Factor
 import com.example.shipconquest.domain.game.Game
@@ -6,10 +6,10 @@ import com.example.shipconquest.domain.game.logic.GameLogic
 import com.example.shipconquest.domain.generators.RandomString
 import com.example.shipconquest.domain.lobby.*
 import com.example.shipconquest.domain.world.WorldGenerator
-import com.example.shipconquest.left
+import pt.isel.shipconquest.left
 import com.example.shipconquest.repo.Transaction
 import com.example.shipconquest.repo.TransactionManager
-import com.example.shipconquest.right
+import pt.isel.shipconquest.right
 import com.example.shipconquest.service.result.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,7 +24,7 @@ class LobbyService(
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun createLobby(name: String, uid: String): CreateLobbyResult {
-        val lobbyName = name.toLobbyName() ?: return left(CreateLobbyError.InvalidServerName)
+        val lobbyName = name.toLobbyName() ?: return pt.isel.shipconquest.left(CreateLobbyError.InvalidServerName)
         // generate world
         val generator = WorldGenerator(300)
         val origins = generator.generateIslandCoordinates(Factor(70))
@@ -58,7 +58,7 @@ class LobbyService(
             // add player to the lobby
             addPlayerToLobby(transaction, game, tag, uid)
             // return
-            right(value = tag)
+            pt.isel.shipconquest.right(value = tag)
         }
     }
 
@@ -66,28 +66,28 @@ class LobbyService(
         return transactionManager.run { transaction ->
             val lobby = transaction.lobbyRepo.get(tag)
             // return
-            if (lobby != null) right(lobby)
-            else left(GetLobbyError.LobbyNotFound)
+            if (lobby != null) pt.isel.shipconquest.right(lobby)
+            else pt.isel.shipconquest.left(GetLobbyError.LobbyNotFound)
         }
     }
 
     fun joinLobby(uid: String, tag: String): JoinLobbyResult {
         return transactionManager.run { transaction ->
             val game = transaction.gameRepo.get(tag = tag)
-                ?: return@run left(JoinLobbyError.LobbyNotFound)
+                ?: return@run pt.isel.shipconquest.left(JoinLobbyError.LobbyNotFound)
 
             if (transaction.lobbyRepo.checkUserInLobby(uid, tag))
-                return@run right(tag)
+                return@run pt.isel.shipconquest.right(tag)
 
             addPlayerToLobby(transaction, game, tag, uid)
-            right(tag)
+            pt.isel.shipconquest.right(tag)
         }
     }
 
     fun getLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
         val newSkip = skip.toSkip()
         val newLimit = limit.toLimit()
-        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
+        val newOrder = order.toOrderOrNull() ?: return pt.isel.shipconquest.left(GetLobbyListError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
             val lobbies = if(name.isNullOrEmpty()) {
@@ -95,14 +95,14 @@ class LobbyService(
             } else {
                     transaction.lobbyRepo.getListByName(uid, newSkip, newLimit, newOrder, name)
             }
-            right(lobbies)
+            pt.isel.shipconquest.right(lobbies)
         }
     }
 
     fun getFavoriteLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
         val newSkip = skip.toSkip()
         val newLimit = limit.toLimit()
-        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
+        val newOrder = order.toOrderOrNull() ?: return pt.isel.shipconquest.left(GetLobbyListError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
             // TODO check this goofy ass code
@@ -111,14 +111,14 @@ class LobbyService(
             } else {
                     transaction.lobbyRepo.getFavoriteListByName(uid, newSkip, newLimit, newOrder, name)
             }
-            right(lobbies)
+            pt.isel.shipconquest.right(lobbies)
         }
     }
 
     fun getRecentLobbies(uid: String, skip: Int?, limit: Int?, order: String?, name: String?): GetAllLobbiesResult {
         val newSkip = skip.toSkip()
         val newLimit = limit.toLimit()
-        val newOrder = order.toOrderOrNull() ?: return left(GetLobbyListError.InvalidOrderParameter)
+        val newOrder = order.toOrderOrNull() ?: return pt.isel.shipconquest.left(GetLobbyListError.InvalidOrderParameter)
 
         return transactionManager.run { transaction ->
             val lobbies = if(name.isNullOrEmpty()) {
@@ -126,25 +126,25 @@ class LobbyService(
             } else {
                     transaction.lobbyRepo.getRecentListByName(uid, newSkip, newLimit, newOrder, name)
             }
-            right(lobbies)
+            pt.isel.shipconquest.right(lobbies)
         }
     }
 
     fun setFavoriteLobby(uid: String, tag: String): FavoriteOperationResult {
         return transactionManager.run { transaction ->
-            transaction.lobbyRepo.get(tag) ?: return@run left(SetFavoriteError.LobbyNotFound)
+            transaction.lobbyRepo.get(tag) ?: return@run pt.isel.shipconquest.left(SetFavoriteError.LobbyNotFound)
             transaction.lobbyRepo.setFavorite(uid, tag)
 
-            right(true)
+            pt.isel.shipconquest.right(true)
         }
     }
 
     fun removeFavoriteLobby(uid: String, tag: String): FavoriteOperationResult {
         return transactionManager.run { transaction ->
-            transaction.lobbyRepo.get(tag) ?: return@run left(SetFavoriteError.LobbyNotFound)
+            transaction.lobbyRepo.get(tag) ?: return@run pt.isel.shipconquest.left(SetFavoriteError.LobbyNotFound)
             transaction.lobbyRepo.removeFavorite(uid, tag)
 
-            right(false)
+            pt.isel.shipconquest.right(false)
         }
     }
 

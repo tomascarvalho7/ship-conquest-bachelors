@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.model.input
+package pt.isel.shipconquest.controller.model.input
 
 import com.example.shipconquest.domain.space.Vector2
 

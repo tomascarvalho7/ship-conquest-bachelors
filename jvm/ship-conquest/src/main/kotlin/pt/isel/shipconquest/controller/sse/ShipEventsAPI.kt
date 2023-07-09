@@ -1,4 +1,4 @@
-package com.example.shipconquest.controller.sse
+package pt.isel.shipconquest.controller.sse
 
 import com.example.shipconquest.controller.model.output.notification.EventNotificationOutputModel
 import com.example.shipconquest.controller.model.output.notification.buildEventNotification

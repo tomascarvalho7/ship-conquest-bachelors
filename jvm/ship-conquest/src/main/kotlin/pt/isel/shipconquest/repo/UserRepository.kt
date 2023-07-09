@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo
+package pt.isel.shipconquest.repo
 
 import com.example.shipconquest.domain.user.Token
 import com.example.shipconquest.domain.user.User

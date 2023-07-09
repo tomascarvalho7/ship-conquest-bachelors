@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi.dbmodel.island
+package pt.isel.shipconquest.repo.jdbi.dbmodel.island
 
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.user.statistics.IslandIncome

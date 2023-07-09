@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi.serialization
+package pt.isel.shipconquest.repo.jdbi.serialization
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer

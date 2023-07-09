@@ -1,4 +1,4 @@
-package com.example.shipconquest.sse
+package pt.isel.shipconquest.sse
 
 import com.example.shipconquest.ClockStub
 import com.example.shipconquest.controller.sse.GameKey

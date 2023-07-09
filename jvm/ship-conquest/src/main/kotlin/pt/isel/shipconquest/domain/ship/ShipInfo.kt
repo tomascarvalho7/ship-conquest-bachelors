@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.ship
+package pt.isel.shipconquest.domain.ship
 
 import com.example.shipconquest.domain.ship.movement.Movement
 

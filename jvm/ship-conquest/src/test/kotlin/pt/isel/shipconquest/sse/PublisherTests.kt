@@ -1,4 +1,4 @@
-package com.example.shipconquest.sse
+package pt.isel.shipconquest.sse
 
 import com.example.shipconquest.controller.sse.publisher.Publisher
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.world.islands
+package pt.isel.shipconquest.domain.world.islands
 
 const val WildIslandCost = 100
 const val OwnedIslandCost = 200

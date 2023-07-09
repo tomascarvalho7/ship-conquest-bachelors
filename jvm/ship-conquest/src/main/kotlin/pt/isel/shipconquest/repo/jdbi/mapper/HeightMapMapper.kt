@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi.mapper
+package pt.isel.shipconquest.repo.jdbi.mapper
 
 import com.example.shipconquest.domain.world.HeightMap
 import com.example.shipconquest.repo.GameRepository

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.minimap
+package pt.isel.shipconquest.domain.minimap
 
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.space.Vector3

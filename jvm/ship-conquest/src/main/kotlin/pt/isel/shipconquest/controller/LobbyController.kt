@@ -1,6 +1,6 @@
-package com.example.shipconquest.controller
+package pt.isel.shipconquest.controller
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.LobbyInputModel
 import com.example.shipconquest.controller.model.input.LobbyTagInputModel
@@ -23,8 +23,8 @@ class LobbyController(val service: LobbyService) {
     fun createLobby(user: User, @RequestBody lobby: LobbyInputModel): ResponseEntity<*> {
         val result = service.createLobby(name = lobby.name, user.id)
         return when (result) {
-            is Either.Right -> response(content = CreateLobbyOutputModel(tag = result.value))
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Right -> response(content = CreateLobbyOutputModel(tag = result.value))
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 CreateLobbyError.InvalidServerName ->
                     Problem.response(status = 400, problem = Problem.invalidLobbyName())
             }
@@ -35,8 +35,8 @@ class LobbyController(val service: LobbyService) {
     fun getLobby(user: User, @RequestParam tag: String): ResponseEntity<*> {
         val result = service.getLobby(tag)
         return when (result) {
-            is Either.Right -> response(content = result.value.toLobbyOutputModel())
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toLobbyOutputModel())
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 GetLobbyError.LobbyNotFound ->
                     Problem.response(status = 404, problem = Problem.lobbyNotFound())
             }
@@ -48,8 +48,8 @@ class LobbyController(val service: LobbyService) {
         val result = service.joinLobby(user.id, tag)
 
         return when (result) {
-            is Either.Right -> response(content = JoinLobbyOutputModel(tag))
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Right -> response(content = JoinLobbyOutputModel(tag))
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 JoinLobbyError.LobbyNotFound ->
                     Problem.response(status = 404, problem = Problem.lobbyNotFound())
             }
@@ -67,11 +67,11 @@ class LobbyController(val service: LobbyService) {
         val result = service.getLobbies(user.id, skip, limit, order, name)
 
         return when (result) {
-            is Either.Right -> response(content = result.value.map { lobby ->
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.map { lobby ->
                 lobby.toLobbyInfoOutputModel()
             }.toLobbyInfoListOutputModel())
 
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->
                     Problem.response(status = 400, problem = Problem.invalidOrderParameter())
 
@@ -90,11 +90,11 @@ class LobbyController(val service: LobbyService) {
         val result = service.getFavoriteLobbies(user.id, skip, limit, order, name)
 
         return when (result) {
-            is Either.Right -> response(content = result.value.map { lobby ->
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.map { lobby ->
                 lobby.toLobbyInfoOutputModel()
             }.toLobbyInfoListOutputModel())
 
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->
                     Problem.response(status = 400, problem = Problem.invalidOrderParameter())
 
@@ -113,11 +113,11 @@ class LobbyController(val service: LobbyService) {
         val result = service.getRecentLobbies(user.id, skip, limit, order, name)
 
         return when (result) {
-            is Either.Right -> response(content = result.value.map { lobby ->
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.map { lobby ->
                 lobby.toLobbyInfoOutputModel()
             }.toLobbyInfoListOutputModel())
 
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 GetLobbyListError.InvalidOrderParameter ->
                     Problem.response(status = 400, problem = Problem.invalidOrderParameter())
 
@@ -129,9 +129,9 @@ class LobbyController(val service: LobbyService) {
     fun setLobbyFavorite(user: User, @RequestBody lobby: LobbyTagInputModel): ResponseEntity<*> {
         val result = service.setFavoriteLobby(user.id, lobby.tag)
         return when (result) {
-            is Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
 
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 SetFavoriteError.LobbyNotFound ->
                     Problem.response(status = 404, problem = Problem.lobbyNotFound())
             }
@@ -142,9 +142,9 @@ class LobbyController(val service: LobbyService) {
     fun removeLobbyFavorite(user: User, @RequestBody lobby: LobbyTagInputModel): ResponseEntity<*> {
         val result = service.removeFavoriteLobby(user.id, lobby.tag)
         return when (result) {
-            is Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
+            is pt.isel.shipconquest.Either.Right -> response(content = result.value.toFavoriteLobbyOutputModel())
 
-            is Either.Left -> when (result.value) {
+            is pt.isel.shipconquest.Either.Left -> when (result.value) {
                 SetFavoriteError.LobbyNotFound ->
                     Problem.response(status = 404, problem = Problem.lobbyNotFound())
             }

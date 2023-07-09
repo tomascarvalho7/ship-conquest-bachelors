@@ -1,4 +1,4 @@
-package com.example.shipconquest
+package pt.isel.shipconquest
 
 import java.time.Instant
 

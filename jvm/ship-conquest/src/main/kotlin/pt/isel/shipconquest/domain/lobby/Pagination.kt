@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.lobby
+package pt.isel.shipconquest.domain.lobby
 
 /**
  * [Limit] data class holds the data for a limit with default parameter

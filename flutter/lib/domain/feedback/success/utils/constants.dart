@@ -10,6 +10,11 @@ const travelling = SuccessFeedback(
 );
 
 const fighting = SuccessFeedback(
-    title: "Fighting",
+    title: "Fighting!",
     details: "Your ship has entered a battle with an opponent."
+);
+
+const islandFound = SuccessFeedback(
+    title: "Island found!",
+    details: "Your journey led to a newly discovered island."
 );

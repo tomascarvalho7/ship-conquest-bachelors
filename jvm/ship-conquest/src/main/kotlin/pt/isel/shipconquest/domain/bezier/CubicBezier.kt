@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.bezier
+package pt.isel.shipconquest.domain.bezier
 
 import com.example.shipconquest.domain.space.Vector2
 import com.example.shipconquest.domain.Position

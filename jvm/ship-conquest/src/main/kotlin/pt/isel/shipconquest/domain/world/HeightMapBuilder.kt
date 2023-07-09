@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.world
+package pt.isel.shipconquest.domain.world
 
 import com.example.shipconquest.domain.space.Vector2
 import java.util.HashMap

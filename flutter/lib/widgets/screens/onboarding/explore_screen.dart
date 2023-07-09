@@ -12,6 +12,6 @@ class ExploreOnBoardingScreen extends StatelessWidget {
             onSkip,
         "assets/images/thumbnail_ilustration.png",
         "Explore The World",
-        "Explore unique worlds and find amazing islands!");
+        "Set sail on your ships and explore unique worlds with unknown land to be found!");
   }
 }

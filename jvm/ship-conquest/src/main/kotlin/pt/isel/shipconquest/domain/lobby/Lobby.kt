@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.lobby
+package pt.isel.shipconquest.domain.lobby
 
 /**
  * The [Lobby] data class holds the data for the generic information

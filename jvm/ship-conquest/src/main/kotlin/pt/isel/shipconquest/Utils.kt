@@ -1,9 +1,9 @@
-package com.example.shipconquest
+package pt.isel.shipconquest
 
-import com.example.shipconquest.repo.jdbi.mapper.*
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
 import org.jdbi.v3.postgres.PostgresPlugin
+import pt.isel.shipconquest.repo.jdbi.mapper.*
 
 // configure JDBI
 fun Jdbi.configure(): Jdbi {

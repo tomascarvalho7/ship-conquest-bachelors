@@ -1,3 +1,4 @@
+import 'package:ship_conquest/config/notification/notification_service.dart';
 import 'package:ship_conquest/domain/either/future_either.dart';
 import 'package:ship_conquest/domain/event/unknown_event.dart';
 import 'package:ship_conquest/domain/feedback/error/error_feedback.dart';
@@ -76,7 +77,6 @@ class GameLogic {
 
   /// callback function to run when the server-sent-events send a [UnknownEvent]
   void onEvent(int sid, UnknownEvent event) {
-    print("SSE sent an event");
     scheduleController.scheduleEvent(event.eid, event.duration,
         () => discoverEvent(event.eid, sid)
     );
@@ -84,7 +84,6 @@ class GameLogic {
 
   /// callback function to run when the server-sent-events send a [Fleet]
   void onFleet(Sequence<Ship> fleet) {
-    print("SSE sent an event");
     shipController.setFleet(fleet);
   }
 
@@ -108,6 +107,8 @@ class GameLogic {
 
   /// callback function to run on a [IslandEvent]
   void handleIsland(Ship ship, Island island) {
+    feedbackController.setSuccessful(islandFound);
+    NotificationService.removeNotification(ship.sid); 
     sceneController.discoverIsland(island);
     getScene(ship);
   }

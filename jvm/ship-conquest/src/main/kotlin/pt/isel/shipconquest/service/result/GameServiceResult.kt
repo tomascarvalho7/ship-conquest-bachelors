@@ -1,6 +1,6 @@
-package com.example.shipconquest.service.result
+package pt.isel.shipconquest.service.result
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.domain.minimap.Minimap
 import com.example.shipconquest.domain.ship.Fleet
 import com.example.shipconquest.domain.ship.Ship
@@ -14,21 +14,21 @@ sealed class GetChunksError {
     object ShipPositionNotFound: GetChunksError()
 }
 
-typealias GetChunksResult = Either<GetChunksError, Horizon>
+typealias GetChunksResult = pt.isel.shipconquest.Either<GetChunksError, Horizon>
 
 sealed class GetPlayerStatsError {
     object StatisticsNotFound: GetPlayerStatsError()
     object GameNotFound: GetPlayerStatsError()
 }
 
-typealias GetPlayerStatsResult = Either<GetPlayerStatsError, PlayerStatistics>
+typealias GetPlayerStatsResult = pt.isel.shipconquest.Either<GetPlayerStatsError, PlayerStatistics>
 
 sealed class GetMinimapError {
     object GameNotFound: GetMinimapError()
     object NoTrackedRecord: GetMinimapError()
 }
 
-typealias GetMinimapResult = Either<GetMinimapError, Minimap>
+typealias GetMinimapResult = pt.isel.shipconquest.Either<GetMinimapError, Minimap>
 
 sealed class NavigationError {
     object GameNotFound: NavigationError()
@@ -36,19 +36,19 @@ sealed class NavigationError {
     object ShipNotFound: NavigationError()
 }
 
-typealias NavigationResult = Either<NavigationError, Ship>
+typealias NavigationResult = pt.isel.shipconquest.Either<NavigationError, Ship>
 
 sealed class GetKnownIslandsError {
     object GameNotFound: GetKnownIslandsError()
 }
 
-typealias GetKnownIslandsResult = Either<GetKnownIslandsError, IslandList>
+typealias GetKnownIslandsResult = pt.isel.shipconquest.Either<GetKnownIslandsError, IslandList>
 
 sealed class GetUnknownIslandsError {
     object GameNotFound: GetUnknownIslandsError()
 }
 
-typealias GetUnknownIslandsResult = Either<GetUnknownIslandsError, List<Int>> // TODO change this return type
+typealias GetUnknownIslandsResult = pt.isel.shipconquest.Either<GetUnknownIslandsError, List<Int>> // TODO change this return type
 
 
 sealed class ConquestIslandError {
@@ -61,20 +61,20 @@ sealed class ConquestIslandError {
     object PlayerStatisticsNotFound: ConquestIslandError()
 }
 
-typealias ConquestIslandResult = Either<ConquestIslandError, OwnedIsland>
+typealias ConquestIslandResult = pt.isel.shipconquest.Either<ConquestIslandError, OwnedIsland>
 
 sealed class GetShipError {
     object GameNotFound: GetShipError()
     object ShipNotFound: GetShipError()
 }
 
-typealias GetShipResult = Either<GetShipError, Ship>
+typealias GetShipResult = pt.isel.shipconquest.Either<GetShipError, Ship>
 
 sealed class GetShipsError {
     object GameNotFound: GetShipsError()
 }
 
-typealias GetShipsResult = Either<GetShipsError, Fleet>
+typealias GetShipsResult = pt.isel.shipconquest.Either<GetShipsError, Fleet>
 
 sealed class CreateShipError {
     object NotEnoughCurrency: CreateShipError()
@@ -84,4 +84,4 @@ sealed class CreateShipError {
     object GameNotFound: CreateShipError()
 }
 
-typealias CreateShipResult = Either<CreateShipError, Ship>
+typealias CreateShipResult = pt.isel.shipconquest.Either<CreateShipError, Ship>

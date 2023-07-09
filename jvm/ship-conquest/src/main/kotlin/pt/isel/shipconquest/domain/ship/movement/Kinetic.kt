@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.ship.movement
+package pt.isel.shipconquest.domain.ship.movement
 
 import com.example.shipconquest.domain.bezier.BezierSpline
 import com.example.shipconquest.domain.bezier.utils.toVector2List

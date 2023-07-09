@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo
+package pt.isel.shipconquest.repo
 
 import com.example.shipconquest.domain.user.statistics.PlayerStatsBuilder
 import org.slf4j.Logger

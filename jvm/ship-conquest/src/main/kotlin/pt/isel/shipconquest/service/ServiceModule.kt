@@ -1,4 +1,4 @@
-package com.example.shipconquest.service
+package pt.isel.shipconquest.service
 
 import com.example.shipconquest.repo.TransactionManager
 import org.slf4j.Logger

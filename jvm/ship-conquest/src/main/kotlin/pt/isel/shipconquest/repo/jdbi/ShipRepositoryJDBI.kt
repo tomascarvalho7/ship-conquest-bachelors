@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi
+package pt.isel.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.ship.ShipInfo
 import com.example.shipconquest.domain.ship.movement.Kinetic

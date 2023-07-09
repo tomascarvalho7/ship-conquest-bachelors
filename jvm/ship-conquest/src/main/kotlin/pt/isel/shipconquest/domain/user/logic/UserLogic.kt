@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.user.logic
+package pt.isel.shipconquest.domain.user.logic
 
 import com.example.shipconquest.domain.user.Token
 import org.springframework.stereotype.Component

@@ -1,4 +1,4 @@
-package com.example.shipconquest.repo.jdbi
+package pt.isel.shipconquest.repo.jdbi
 
 import com.example.shipconquest.domain.path_notes.PatchNotes
 import com.example.shipconquest.repo.PatchNotesRepository

@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.lobby
+package pt.isel.shipconquest.domain.lobby
 
 /**
  * Enum class representing an Order

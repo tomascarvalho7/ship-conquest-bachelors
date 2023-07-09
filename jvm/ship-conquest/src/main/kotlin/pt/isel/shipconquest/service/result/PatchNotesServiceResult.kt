@@ -1,6 +1,6 @@
-package com.example.shipconquest.service.result
+package pt.isel.shipconquest.service.result
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.domain.path_notes.PatchNotes
 
 sealed class GetPatchNotesError {
@@ -8,4 +8,4 @@ sealed class GetPatchNotesError {
 }
 
 
-typealias GetPatchNotesResult = Either<GetPatchNotesError, PatchNotes>
+typealias GetPatchNotesResult = pt.isel.shipconquest.Either<GetPatchNotesError, PatchNotes>

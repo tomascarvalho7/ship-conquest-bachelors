@@ -1,4 +1,4 @@
-package com.example.shipconquest.domain.generators
+package pt.isel.shipconquest.domain.generators
 
 /**
  * Singleton generator to generate a random string with limited characters.

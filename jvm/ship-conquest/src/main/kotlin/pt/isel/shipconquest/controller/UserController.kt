@@ -1,6 +1,6 @@
-package com.example.shipconquest.controller
+package pt.isel.shipconquest.controller
 
-import com.example.shipconquest.Either
+import pt.isel.shipconquest.Either
 import com.example.shipconquest.controller.model.Problem
 import com.example.shipconquest.controller.model.input.CreateUserInputModel
 import com.example.shipconquest.controller.model.output.TokenOutputModel
@@ -40,8 +40,8 @@ class UserController(val service: UserService) {
                 )
 
             when (result) {
-                is Either.Right -> response(content = TokenOutputModel(token = result.value.value))
-                is Either.Left -> when (result.value) {
+                is pt.isel.shipconquest.Either.Right -> response(content = TokenOutputModel(token = result.value.value))
+                is pt.isel.shipconquest.Either.Left -> when (result.value) {
                     CreateUserError.InvalidIDToken ->
                         Problem.response(status = 401, problem = Problem.invalidIdToken())
                     CreateUserError.TokenCreationFailed -> Problem.response(status = 400, problem = Problem.tokenCreationFailed())
@@ -64,8 +64,8 @@ class UserController(val service: UserService) {
             )
 
             when (result) {
-                is Either.Right -> response(content = TokenOutputModel(token = result.value.value))
-                is Either.Left -> when (result.value) {
+                is pt.isel.shipconquest.Either.Right -> response(content = TokenOutputModel(token = result.value.value))
+                is pt.isel.shipconquest.Either.Left -> when (result.value) {
                     LoginUserError.InvalidIDToken ->
                         Problem.response(status = 401, problem = Problem.invalidIdToken())
                     LoginUserError.TokenCreationFailed -> Problem.response(status = 400, problem = Problem.tokenCreationFailed())
@@ -89,14 +89,14 @@ class UserController(val service: UserService) {
         val result =  service.getUserInfo(user.id)
 
         return when (result) {
-            is Either.Right -> response(content = UserInfoOutputModel(
+            is pt.isel.shipconquest.Either.Right -> response(content = UserInfoOutputModel(
                 username = result.value.username,
                 name = result.value.name,
                 email = result.value.email,
                 imageUrl = result.value.imageUrl,
                 description = result.value.description)
             )
-            is Either.Left -> when(result.value) {
+            is pt.isel.shipconquest.Either.Left -> when(result.value) {
                 GetUserInfoError.UserNotFound ->
                     Problem.response(status = 404, problem = Problem.userNotFound())
             }
