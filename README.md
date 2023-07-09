@@ -1,7 +1,7 @@
 # Ship Conquest
 
 <h1 align="center">
-    <img src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/main.png">
+    <img src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/main.jpg">
 </h1>
 
 <p align="center">
@@ -11,11 +11,11 @@
 ## Concept
 
 <p align="center">
-    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/explore.png" alt="explore"/>
+    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/explore.jpg" alt="explore"/>
 &nbsp;
-    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/conquest.png" alt="conquest"/>
+    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/conquest.jpg" alt="conquest"/>
 &nbsp;
-    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/fight.png" alt="fight"/>
+    <img width="30%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/fight.jpg" alt="fight"/>
 </p>
 
 The project consists of a multiplayer exploration RTS game (Real Time Strategy Game), that allows players to take control of a fleet of ships, explore a vast world, conquer islands, and engage in thrilling battles with other players.
@@ -27,9 +27,9 @@ Several technical concepts were worked on, namely *Procedural Generation* and ps
 ## Galery
 
 <p align="center">
-    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/ship.png" alt="game"/>
+    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/ship.jpg" alt="game"/>
 &nbsp;
-    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/minimap.png" alt="minimap"/>
+    <img width="49%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/minimap.jpg" alt="minimap"/>
 </p>
 
 ## Features
@@ -45,7 +45,7 @@ Several technical concepts were worked on, namely *Procedural Generation* and ps
 ## Architecture
 
 In the following figure, a representative scheme of the system architecture is presented, also showing the technologies used in each module.
-![System Architecture](https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/architecture.png)~
+![System Architecture](https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/architecture.png)
 
 ## Repository Structure
 
@@ -61,7 +61,7 @@ The `flutter` directory contains the source code for the client application deve
 
 - `README.md`: A README file specific to the client application, providing additional details and instructions for running the client.
 
-### Jvm
+### JVM
 
 The `jvm` directory contains the source code for the backend application developed with Spring. Here are some key files and directories within this directory:
 
@@ -73,7 +73,7 @@ The `jvm` directory contains the source code for the backend application develop
 
 ## Contact
 
-If you have any questions, issues, or suggestions regarding Ship Conquest, please feel free to contact the developers, Tomas Carvalho and Francisco Barreiras, via the GitHub repository or through other contact information provided in the repository's profile.
+If you have any questions, issues, or suggestions regarding Ship Conquest, please feel free to contact the developers, Tomás Carvalho & Francisco Barreiras, via the GitHub repository or through other contact information provided in the repository's profile.
 
 ## Version 2.0
 
