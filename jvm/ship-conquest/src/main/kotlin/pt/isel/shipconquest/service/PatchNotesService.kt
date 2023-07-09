@@ -4,6 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.right
 import pt.isel.shipconquest.service.result.GetPatchNotesError
 import pt.isel.shipconquest.service.result.GetPatchNotesResult
 
@@ -18,7 +19,7 @@ class PatchNotesService(
             val patchNotes = transaction.patchNotesRepo.getPatchNotes() ?: return@run pt.isel.shipconquest.left(
                 GetPatchNotesError.PatchNotesNotFound
             )
-            return@run pt.isel.shipconquest.right(patchNotes)
+            return@run right(patchNotes)
         }
     }
 }

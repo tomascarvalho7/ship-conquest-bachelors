@@ -7,8 +7,10 @@ import pt.isel.shipconquest.domain.user.Token
 import pt.isel.shipconquest.domain.user.User
 import pt.isel.shipconquest.domain.user.logic.UserLogic
 import pt.isel.shipconquest.domain.user.toToken
+import pt.isel.shipconquest.left
 import pt.isel.shipconquest.repo.Transaction
 import pt.isel.shipconquest.repo.TransactionManager
+import pt.isel.shipconquest.right
 import pt.isel.shipconquest.service.result.*
 
 @Service
@@ -30,14 +32,14 @@ class UserService(
             if(!transaction.userRepo.checkUserExists(googleId)) {
                 transaction.userRepo.createUser(username, googleId, name, email, imageUrl, description)
             } else {
-                return@run pt.isel.shipconquest.left(CreateUserError.UserAlreadyExists)
+                return@run left(CreateUserError.UserAlreadyExists)
             }
             val userToken = generateValidToken(googleId, transaction)
 
             if(userToken != null) {
-                return@run pt.isel.shipconquest.right(userToken)
+                return@run right(userToken)
             } else {
-                return@run pt.isel.shipconquest.left(CreateUserError.TokenCreationFailed)
+                return@run left(CreateUserError.TokenCreationFailed)
             }
         }
     }
@@ -46,24 +48,24 @@ class UserService(
         return transactionManager.run { transaction ->
 
             if(!transaction.userRepo.checkUserExists(googleId)) {
-                return@run pt.isel.shipconquest.left(LoginUserError.UserNotFound)
+                return@run left(LoginUserError.UserNotFound)
             }
             val userToken = generateValidToken(googleId, transaction)
 
             if(userToken != null) {
-                return@run pt.isel.shipconquest.right(userToken)
+                return@run right(userToken)
             } else {
-                return@run pt.isel.shipconquest.left(LoginUserError.TokenCreationFailed)
+                return@run left(LoginUserError.TokenCreationFailed)
             }
         }
     }
 
     fun getUserInfo(userId: String): GetUserInfoResult {
         return transactionManager.run { transaction ->
-            val userInfo = transaction.userRepo.getUserInfo(userId) ?: return@run pt.isel.shipconquest.left(
+            val userInfo = transaction.userRepo.getUserInfo(userId) ?: return@run left(
                 GetUserInfoError.UserNotFound
             )
-            pt.isel.shipconquest.right(userInfo)
+            right(userInfo)
         }
     }
 

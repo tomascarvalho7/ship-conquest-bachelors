@@ -22,7 +22,7 @@ class ShipConquestApplication {
 			setURL(postgresUri)
 		}
 
-		pt.isel.shipconquest.logger.info(
+		logger.info(
 			"Using PostgreSQL located at '{}:{}'",
 			dataSource.getProperty(PGProperty.PG_HOST),
 			dataSource.getProperty(PGProperty.PG_PORT)
@@ -32,9 +32,9 @@ class ShipConquestApplication {
 	}
 
 	@Bean
-	fun getClock() = pt.isel.shipconquest.RealClock
+	fun getClock() = RealClock
 }
 
 fun main(args: Array<String>) {
-	runApplication<pt.isel.shipconquest.ShipConquestApplication>(*args)
+	runApplication<ShipConquestApplication>(*args)
 }
