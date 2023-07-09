@@ -29,7 +29,7 @@ class IslandElement extends StatelessWidget {
                   content(context, island),
                 ],
               ),
-              if (!island.isOwnedByUser()) conquestButton(context, island),
+              if (!island.isOwnedByUser()) conquestButton(context, island, canConquest),
             ],
           )
       );
@@ -62,10 +62,10 @@ class IslandElement extends StatelessWidget {
       );
 
   /// island element button component
-  Widget conquestButton(BuildContext context, Island island) =>
+  Widget conquestButton(BuildContext context, Island island, bool canConquest) =>
       ElevatedButton(
         style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-            backgroundColor: MaterialStatePropertyAll(Theme.of(context).colorScheme.primary)
+            backgroundColor: MaterialStatePropertyAll(canConquest ? Theme.of(context).colorScheme.primary : Colors.grey)
         ),
         onPressed: () => canConquest ? GameEvent.conquestIsland(context, island) : null,
         child: const Text('Conquest'),

@@ -26,9 +26,7 @@ class ScheduleController {
   /// Schedules an event associated with [key] to run after passing [after]
   /// and executes the [callback] function.
   void scheduleEvent(int key, Duration after, Function callback) {
-    // check if event already exists
-    if (_scheduled.getOrNull(key) != null) return;
-    final timer = Timer(after, () => callback());
+    final timer = Timer(after + const Duration(seconds: 1), ()  { callback(); cancelEvent(key); });
     _scheduled = _scheduled.put(key, timer);
   }
 

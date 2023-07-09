@@ -12,6 +12,6 @@ class FightOnBoardingScreen extends StatelessWidget {
             onSkip,
         "assets/images/thumbnail_fight_ilustration.png",
         "Fight Other Players",
-        "ihfpisgfsfowfojwjf+oj+gfwj+pgj+pojp+fgj+posghisdfhog");
+        "Fight other players in your lobby and see who is the best sailor!");
   }
 }

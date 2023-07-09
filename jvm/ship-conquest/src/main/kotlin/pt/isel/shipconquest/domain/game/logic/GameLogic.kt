@@ -169,6 +169,8 @@ class GameLogic(private val clock: Clock) {
             points = pathPoints,
             settings = PathBuilder.defaultSettings()
         )
+        if(path.isEmpty()) return null
+
         val size = if (path.size > 10) path.size / 10 else 1
         val points = PathBuilder.normalize(path = path, size = size)
 

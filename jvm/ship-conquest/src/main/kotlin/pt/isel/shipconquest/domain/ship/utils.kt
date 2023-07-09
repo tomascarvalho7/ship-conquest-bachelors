@@ -12,7 +12,7 @@ fun buildMovementFromEvents(movement: Movement, instant: Instant, events: List<E
     for(event in events) {
         // if ship is currently not in an event, then return current movement
         if (instant.isAfter(event.instant) && event.details is IslandEvent && currentMovement is Kinetic)
-            currentMovement = shortenMovementUntilIsland(currentMovement, instant)
+            currentMovement = shortenMovementUntilIsland(currentMovement, event.instant)
     }
 
     return currentMovement

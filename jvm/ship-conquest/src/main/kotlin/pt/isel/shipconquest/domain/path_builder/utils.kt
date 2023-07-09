@@ -35,8 +35,12 @@ fun calculateNeighbours(
     val pos = node.position
     val resultList = mutableListOf<Node>()
 
-    for (i in pos.x - 1..pos.x + 1) {
-        for (j in pos.y - 1..pos.y + 1) {
+    val step = settings.step
+    val horizontal = listOf(pos.x - step, pos.x, pos.x + step)
+    val vertical = listOf(pos.y - step, pos.y, pos.y + step)
+
+    for (i in horizontal) {
+        for (j in vertical) {
             val currPos = Vector2(i, j)
             if (!checkMinimapCoordinate(map, currPos)) continue
             // check if there are any blocks around current coordinate

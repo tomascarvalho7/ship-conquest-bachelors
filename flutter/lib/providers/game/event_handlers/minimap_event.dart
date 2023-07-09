@@ -58,7 +58,7 @@ class MinimapEvent {
           invertScale(points.mid),
           invertScale(points.end),
           10,
-          20,
+          9,
           250
       );
       final nrOfBeziers = (path.length > 10) ? (path.length / 10).round() : 1;

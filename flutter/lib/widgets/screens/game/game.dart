@@ -13,8 +13,6 @@ import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:ship_conquest/utils/constants.dart';
 import 'package:ship_conquest/widgets/screens/game/game_interface.dart';
 import 'package:ship_conquest/widgets/screens/game/game_view.dart';
-import '../../../providers/game/global_controllers/scene_controller.dart';
-import '../../../providers/camera_controller.dart';
 
 /// Builds the game interface and holds the wave animation, which needs to be synchronized through all the elements.
 class Game extends StatefulWidget {

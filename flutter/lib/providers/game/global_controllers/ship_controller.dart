@@ -50,7 +50,7 @@ class ShipController with ChangeNotifier {
     shipIds = Sequence(data: fleet.map((ship) => ship.sid).data);
   }
 
-  /// Simply notifies the listeners to force the fighting sate update.
+  /// Simply notifies the listeners to force the fighting state update.
   void updateFightState() {
     // simply update widgets
     print("update");

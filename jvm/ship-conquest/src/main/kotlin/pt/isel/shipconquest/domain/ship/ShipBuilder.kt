@@ -25,7 +25,7 @@ class ShipBuilder(val info: ShipInfo, val events: List<Event>) {
             instant = instant,
             events = events
         ),
-        completedEvents = events.filter { it.instant.isBefore(instant) },
+        completedEvents = events.filter { it.instant.isBefore(instant) || it.instant.compareTo(instant) == 0 },
         futureEvents = events.filter { it.instant.isAfter(instant) }
             .map { event -> FutureEvent(event, Duration.between(instant, event.instant)) }
     )

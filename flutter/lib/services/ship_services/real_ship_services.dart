@@ -42,7 +42,6 @@ import 'package:ship_conquest/services/input_models/spring_error_input_model.dar
 import 'package:ship_conquest/services/input_models/user/token_input_model.dart';
 import 'package:ship_conquest/services/input_models/user/token_ping_input_model.dart';
 import 'package:ship_conquest/services/input_models/user/user_info_input_model.dart';
-import 'package:ship_conquest/services/output_models/coord_2d_output_model.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 import 'package:http/http.dart' as http;
 import 'package:ship_conquest/services/utils/event_model.dart';
@@ -425,11 +424,11 @@ class RealShipServices extends ShipServices {
       if (event == null) return;
 
       if (event.event == 'event') {
-        final (sid, unknownEvent) =
-            EventNotificationInputModel.fromJson(jsonDecode(data)).toDomain();
-        onEvent(sid, unknownEvent);
+      final (sid, unknownEvent) =
+      EventNotificationInputModel.fromJson(jsonDecode(event.data)).toDomain();
+      onEvent(sid, unknownEvent);
       } else if (event.event == 'fleet') {
-        onFleet(ShipsInputModel.fromJson(jsonDecode(event.data)).toSequenceOfShips());
+      onFleet(ShipsInputModel.fromJson(jsonDecode(event.data)).toSequenceOfShips());
       }
     });
   }

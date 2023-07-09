@@ -34,7 +34,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
   )..forward();
   late Animation<double> animation = Tween<double>(begin: path.getStartFromTime(), end: path.landmarks.length.toDouble()).animate(controller);
   late final scale = widget.tileSize * 4;
-  late final isFighting = widget.ship.isFighting(DateTime.now());
+  late bool isFighting = widget.ship.isFighting(DateTime.now());
 
   @override
   void didUpdateWidget(covariant DynamicShipWidget oldWidget) {
@@ -45,6 +45,7 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
       )..forward();
       animation = Tween<double>(begin: path.getStartFromTime(), end: path.landmarks.length.toDouble()).animate(controller);
     }
+    isFighting = widget.ship.isFighting(DateTime.now());
     super.didUpdateWidget(oldWidget);
   }
 

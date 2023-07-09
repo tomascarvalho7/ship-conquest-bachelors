@@ -77,7 +77,7 @@ object PathBuilder {
     /**
      * methods to build a [PathSettings] class instance
      */
-    fun defaultSettings() = PathSettings(10, 10, 250)
+    fun defaultSettings() = PathSettings(10, 9, 250)
     fun customSettings(step: Int, radius: Int, maxIterations: Int) =
         PathSettings(step, radius, maxIterations)
     data class PathSettings(val step: Int, val radius: Int, val maxIterations: Int)

@@ -12,6 +12,6 @@ class ConquestOnBoardingScreen extends StatelessWidget {
             onSkip,
         "assets/images/thumbnail_conquest_ilustration.png",
         "Explore The World",
-        "ihfpisgfsfowfojwjf+oj+gfwj+pgj+pojp+fgj+posghisdfhog");
+        "Conquest wonderful islands with your fleet and enjoy the ride!");
   }
 }

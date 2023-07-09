@@ -3,7 +3,6 @@ package com.example.shipconquest.domain.bezier
 import com.example.shipconquest.domain.Position
 import com.example.shipconquest.domain.bezier.utils.split
 import com.example.shipconquest.domain.space.toPosition
-import com.example.shipconquest.domain.toVector2
 
 /**
  * The [BezierSpline] class represents a group of combined [CubicBezier]'s to form
