@@ -1,7 +1,7 @@
 # Ship Conquest
 
 <h1 align="center">
-    <img width="85%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/landscape.jpg">
+    <img width="100%" src="https://github.com/tomascarvalho7/ship_conquest/blob/main/gallery/landscape.png">
 </h1>
 
 <p align="center">
