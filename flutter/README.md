@@ -13,8 +13,7 @@ arrived using the *Flutter Framework* with the use of different techniques that 
 tested technologies, but personally were less intuitive to reach.
 
 ## Setup
-> You can simply download on your mobile device the APK available on: *https://github.com/tomascarvalho7/ship_conquest/blob/main/flutter/build/app/outputs/apk/release/app-arm64-v8a-release.apk* to run the application with everything setup.
-
+> You can simply download on your mobile device the APK available on: *https://github.com/tomascarvalho7/ship_conquest/blob/main/flutter/apk* to run the application with everything setup.
 
 ### On a local machine
 > To run the application on a local machine it is required to have installed the *Flutter SDK* and use a mobile emulator or a physical mobile device.
@@ -40,6 +39,11 @@ After filled, copy this file to the https://github.com/tomascarvalho7/ship_conqu
 To run the mobile application do:
 ```shell
 flutter run
+```
+
+To generate an application APK do:
+```shell
+flutter build apk --split-per-abi
 ```
 
 
