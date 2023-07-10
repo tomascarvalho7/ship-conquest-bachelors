@@ -204,9 +204,9 @@ class GameController(val service: GameService) {
 
         return when (result) {
             is Either.Right -> {
-                return shipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
+                shipEventsAPI.subscribeToFleetEvents(tag = tag, uid = user.id, fleet = result.value)
             }
-            is Either.Left -> return null
+            is Either.Left -> null
         }
     }
 
