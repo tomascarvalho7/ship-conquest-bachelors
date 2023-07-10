@@ -65,7 +65,7 @@ class EventLogic(private val clock: pt.isel.shipconquest.Clock) {
         var t = 0.0
         for ((index, point) in points.withIndex()) {
             val distance = point.distanceTo(island.coordinate.toPosition())
-            if (distance <= island.radius * 0.6) return t
+            if (distance <= island.radius * 0.5) return t
             if (distance < bestDistance) {
                 bestDistance = distance
                 t = index / 10.0

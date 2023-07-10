@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS dbo.OwnedIsland;
 DROP TABLE IF EXISTS dbo.Island;
 DROP TABLE IF EXISTS dbo.PlayerStatistics;
+DROP TABLE IF EXISTS dbo.Event;
 DROP TABLE IF EXISTS dbo.FightEvent;
 DROP TABLE IF EXISTS dbo.IslandEvent;
 DROP TABLE IF EXISTS dbo.ShipPath;

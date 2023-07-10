@@ -10,6 +10,7 @@ import pt.isel.shipconquest.domain.world.islands.OwnedIsland
 import pt.isel.shipconquest.repo.IslandRepository
 import pt.isel.shipconquest.repo.jdbi.dbmodel.island.GenericIslandDBModel
 import pt.isel.shipconquest.repo.jdbi.dbmodel.island.toIsland
+import java.time.Instant
 
 class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
     override val logger: Logger = LoggerFactory.getLogger(this::class.java)
@@ -72,6 +73,31 @@ class IslandRepositoryJDBI(private val handle: Handle): IslandRepository {
         )
             .bind("tag", tag)
             .bind("uid", uid)
+            .mapTo<GenericIslandDBModel>()
+            .map { it.toIsland(uid) }
+            .list()
+    }
+
+    override fun getVisitedIslandsBeforeInstant(tag: String, uid: String, instant: Instant): List<Island> {
+        logger.info("Getting visited islands by user with uid = {} on game with tag = {}", uid, tag)
+
+        return handle.createQuery(
+            """
+                SELECT i.islandId, i.tag, i.x, i.y, i.radius, o.incomePerHour, o.instant,
+                o.uid, username
+                FROM dbo.Island i
+                LEFT JOIN dbo.OwnedIsland o ON i.islandId = o.islandId
+                LEFT JOIN dbo.User ON i.uid = id
+                WHERE i.tag = :tag AND i.islandId IN (
+                    SELECT e.islandId FROM dbo.IslandEvent e
+                    INNER JOIN dbo.Ship S ON e.sid = S.shipId
+                    WHERE e.tag = :tag AND S.uid = :uid AND e.instant <= :instant
+                )
+            """
+        )
+            .bind("tag", tag)
+            .bind("uid", uid)
+            .bind("instant", instant.epochSecond)
             .mapTo<GenericIslandDBModel>()
             .map { it.toIsland(uid) }
             .list()

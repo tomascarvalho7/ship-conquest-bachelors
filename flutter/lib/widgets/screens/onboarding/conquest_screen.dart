@@ -11,7 +11,7 @@ class ConquestOnBoardingScreen extends StatelessWidget {
         context,
             onSkip,
         "assets/images/thumbnail_conquest_ilustration.png",
-        "Conquest land",
+        "Conquest Islands",
         "Conquest wonderful islands with your fleet and enjoy the ride!");
   }
 }

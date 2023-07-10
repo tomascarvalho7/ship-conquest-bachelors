@@ -9,4 +9,4 @@ fun getNearIslands(coordinate: Vector2, islands: List<Island>) =
         .filter { island -> canSightIsland(coordinate, island) }
 
 fun canSightIsland(coordinate: Vector2, island: Island) =
-    coordinate.distanceTo(island.coordinate) <= island.radius
+    coordinate.distanceTo(island.coordinate) <= island.radius * 1.25

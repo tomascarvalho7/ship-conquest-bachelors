@@ -28,6 +28,7 @@ Widget buildOnBoardingScreen(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Text(
                           title,
+                          textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: Theme.of(context).colorScheme.secondary
                           ),
@@ -35,11 +36,11 @@ Widget buildOnBoardingScreen(
                       ),
                     ),
                     Align(
-                      alignment: const Alignment(0, 0.4),
+                      alignment: const Alignment(0, 0.43),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 50),
                         child: Text(
-                          description,
+                          description, textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.secondary
                           )

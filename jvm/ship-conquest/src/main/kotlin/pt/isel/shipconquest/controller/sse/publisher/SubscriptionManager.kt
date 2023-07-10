@@ -15,7 +15,7 @@ class SubscriptionManager(private val subscriptions: ConcurrentHashMap<String, S
     }
 
     override fun subscribe(key: String): SseEmitter {
-        val sse = SseEmitter(-1L) // set no timeout
+        val sse = SseEmitter(Long.MAX_VALUE) // set no timeout
         subscriptions.putIfAbsent(key, sse)
         return sse
     }

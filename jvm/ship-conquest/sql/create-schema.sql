@@ -82,28 +82,28 @@ CREATE TABLE dbo.ShipPath
 	FOREIGN KEY (sid, gameTag, uid) REFERENCES dbo.Ship(shipId, gameTag, uid)
 );
 
-CREATE TABLE dbo.FightEvent
+
+CREATE TABLE dbo.Event
 (
     tag varchar(6) NOT NULL,
-    eid int GENERATED ALWAYS AS IDENTITY,
+    eid serial,
     instant int NOT NULL,
-    sidA INT NOT NULL,
-    sidB INT NOT NULL,
-    winner INT NOT NULL,
     PRIMARY KEY (tag, eid),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
 
+CREATE TABLE dbo.FightEvent
+(
+    sidA INT NOT NULL,
+    sidB INT NOT NULL,
+    winner INT NOT NULL
+) INHERITS (dbo.Event);
+
 CREATE TABLE dbo.IslandEvent
 (
-    tag varchar(6) NOT NULL,
-    eid INT GENERATED ALWAYS AS IDENTITY,
-    instant INT NOT NULL,
     sid INT NOT NULL,
-    islandId INT NOT NULL,
-    PRIMARY KEY (tag, eid),
-    FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
-);
+    islandId INT NOT NULL
+) INHERITS (dbo.Event);
 
 CREATE TABLE dbo.Island
 (
@@ -119,7 +119,6 @@ CREATE TABLE dbo.Island
     PRIMARY KEY (tag, islandId),
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag)
 );
-
 CREATE TABLE dbo.OwnedIsland
 (
     incomePerHour INT NOT NULL,
@@ -136,4 +135,3 @@ CREATE TABLE dbo.PlayerStatistics(
     FOREIGN KEY (tag) REFERENCES dbo.Lobby(tag),
     FOREIGN KEY (uid) REFERENCES dbo.User(id)
 );
-

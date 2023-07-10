@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:ship_conquest/app_theme.dart';
 import 'package:ship_conquest/providers/feedback_controller.dart';
@@ -18,7 +19,11 @@ import 'package:ship_conquest/services/ship_services/real_ship_services.dart';
 import 'package:ship_conquest/services/ship_services/ship_services.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((value) => runApp(const MyApp()));
 }
 
 /// The root of the application.

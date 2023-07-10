@@ -50,7 +50,7 @@ class GameService(
 
             val game = transaction.gameRepo.get(tag = tag)
             if (game != null) {
-                val islands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
+                val islands = transaction.islandRepo.getVisitedIslandsBeforeInstant(tag = tag, uid = uid, instant = gameLogic.getInstant())
                 val nearIslands = getNearIslands(coordinate = coord, islands = islands)
                 right(
                     value = Horizon(
@@ -104,7 +104,7 @@ class GameService(
             }
 
             // get visited islands
-            val visitedIslands = transaction.islandRepo.getVisitedIslands(tag = tag, uid = uid)
+            val visitedIslands = transaction.islandRepo.getVisitedIslandsBeforeInstant(tag = tag, uid = uid, instant = gameLogic.getInstant())
 
             // get the voxels around the island's origins
             val islands = visitedIslands.flatMap { island ->

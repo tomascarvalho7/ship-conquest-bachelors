@@ -9,7 +9,7 @@ extension Utils on Island {
   /// Extension function to check if a [Position] is close to a [Island] entity,
   /// based on a defined criteria.
   bool isCloseTo(Position position) =>
-      distance(coordinate.toPosition(), position) <= radius;
+      distance(coordinate.toPosition(), position) <= radius * 1.25;
 
   /// Extension function to check if an island is owned by any user.
   bool isOwnedByUser() => switch(this) {

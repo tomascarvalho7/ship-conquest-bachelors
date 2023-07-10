@@ -14,7 +14,7 @@ fun findIntersectionPoints(points: List<Vector2>, islands: List<Island>): LineIn
             val p2 = points[i + 1]
 
             val closestPoint = distanceToLineSegment(island.coordinate, p1, p2)
-            if (closestPoint.distance <= island.radius / 1.5) {
+            if (closestPoint.distance <= island.radius / 1.15) {
                 return LineIntersection(
                     position = closestPoint.position,
                     lineIndex = i,
