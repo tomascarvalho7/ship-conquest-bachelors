@@ -69,7 +69,7 @@ The `jvm` directory contains the source code for the backend application develop
 
 - `src/`: This directory contains the main source code for the backend application. It includes controllers, services, and models used to handle API requests and manage game data.
 
-- `pom.xml`: This file is the Maven project object model file for managing dependencies and project configurations.
+- `build.gradle`: This file defines build settings and dependencies for the Gradle project.
 
 - `README.md`: A README file specific to the backend application, providing additional details and instructions for running the server.
 
