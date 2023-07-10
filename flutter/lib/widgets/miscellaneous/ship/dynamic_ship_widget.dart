@@ -27,7 +27,6 @@ class DynamicShipWidget extends StatefulWidget {
 
 class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProviderStateMixin {
   get path => widget.ship.path;
-  late final waveAnim = widget.waveAnim;
   late AnimationController controller = AnimationController(
       duration: path.getCurrentDuration(),
       vsync: this
@@ -60,13 +59,13 @@ class DynamicShipWidgetState extends State<DynamicShipWidget> with TickerProvide
       AnimatedBuilder(
           animation: animation,
           builder: (context, _) {
-            Position position = toIsometric(path.getPosition(animation.value));
+            Position position = toIsometric(path.getPosition(animation.value)) - Position(x: scale / 2, y: scale / 2);
             double angle = path.getAngle(animation.value);
             Direction direction = getOrientationFromAngle(angle);
-            double waveOffset = (position.x + position.y) / -3;
+            double waveOffset = (position.x + position.y) / -4;
             return Transform.translate(
                 offset: (
-                    addWaveHeightToPos(position, waveAnim.value + waveOffset) - Position(x: scale / 2, y: scale / 2)
+                    addWaveHeightToPosMoving(position, widget.waveAnim.value + waveOffset)
                 ).toOffset(),
                 child: ShipView(
                   isFighting: isFighting,

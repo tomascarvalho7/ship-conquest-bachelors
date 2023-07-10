@@ -12,6 +12,37 @@ Before arriving on *Flutter*, a couple of mobile frameworks were tested to devel
 arrived using the *Flutter Framework* with the use of different techniques that maximized performance. This techniques are also available in the previously
 tested technologies, but personally were less intuitive to reach.
 
+## Setup
+> You can simply download on your mobile device the APK available on: *https://github.com/tomascarvalho7/ship_conquest/blob/main/flutter/build/app/outputs/apk/release/app-arm64-v8a-release.apk* to run the application with everything setup.
+
+
+### On a local machine
+> To run the application on a local machine it is required to have installed the *Flutter SDK* and use a mobile emulator or a physical mobile device.
+
+For the client application to run correctly with the *Google Services* it is required to include a keystore (*.jks*). This file is not included in the github repo for security reasons.
+To request access to the keystore contact us.
+
+Check if the Flutter SDK is installed correctly:
+```shell
+flutter doctor
+```
+
+The https://github.com/tomascarvalho7/ship_conquest/blob/main/flutter/lib/example_config.dart file contains two required fields missing. 
+```flutter
+const clientId = <Google client id>
+const baseUri = <server application URI>
+```
+To request access to the *Google client id* contact us.
+
+After filled, copy this file to the https://github.com/tomascarvalho7/ship_conquest/blob/main/flutter/lib/config.dart file where they will be accessed.
+
+
+To run the mobile application do:
+```shell
+flutter run
+```
+
+
 ## Client Application Design
 > In this figure there are illustrated the main building layers of the application.
 

@@ -22,7 +22,7 @@ class ShipWidget extends StatelessWidget {
   // constructor
   ShipWidget({super.key, required this.ship, required this.tileSize, required this.waveAnim});
   // optimizations
-  late final position = toIsometric(ship.getPosition(globalScale));
+  late final position = toIsometric(ship.getPosition(globalScale)) - Position(x: scale / 2, y: scale / 2);
   late final orientation = ship.getDirection();
   late final scale = tileSize * 4;
   late final double waveOffset = (position.x + position.y) / -3;
@@ -39,7 +39,7 @@ class ShipWidget extends StatelessWidget {
           builder: (context, child) =>
               Transform.translate(
                   offset: (
-                      addWaveHeightToPos(position, waveAnim.value + waveOffset) - Position(x: scale / 2, y: scale / 2)
+                      addWaveHeightToPos(position, waveAnim.value + waveOffset)
                   ).toOffset(),
                   child: child
               )
