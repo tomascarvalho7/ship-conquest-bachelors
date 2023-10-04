@@ -17,7 +17,7 @@ private val logger = LoggerFactory.getLogger(pt.isel.shipconquest.ShipConquestAp
 class ShipConquestApplication {
 	@Bean
 	fun getJdbi(): Jdbi {
-		val postgresUri = System.getenv("POSTGRES_URI")
+		val postgresUri = System.getenv("SUPABASE_URI")
 		val dataSource = PGSimpleDataSource().apply {
 			setURL(postgresUri)
 		}

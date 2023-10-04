@@ -53,7 +53,7 @@ ThemeData shipConquestLightTheme = ThemeData(
         titleLarge: TextStyle(fontSize: 40.0, color: Colors.black),
         titleMedium: TextStyle(fontSize: 34.0, color: Colors.black),
       titleSmall: TextStyle(fontSize: 24.0, color: Colors.black),
-      bodyLarge: TextStyle(fontSize: 24.0, color: Colors.black),
+      bodyLarge: TextStyle(fontSize: 24.0, color: Colors.white),
       bodyMedium: TextStyle(fontSize: 18.0, color: Colors.white),
         bodySmall: TextStyle(color: Colors.white),),
     elevatedButtonTheme: ElevatedButtonThemeData(

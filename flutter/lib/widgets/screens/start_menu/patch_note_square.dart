@@ -44,7 +44,7 @@ Widget buildPatchNoteSquareWidget(
                       shrinkWrap: true,
                       itemCount: patchNotes.length,
                       itemBuilder: (context, index) => buildPatchNoteTextWidget(
-                          patchNotes[patchNotes.length - index - 1]),
+                          patchNotes[patchNotes.length - index - 1], context),
                     ),
                   ),
           ),

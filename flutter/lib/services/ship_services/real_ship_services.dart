@@ -61,7 +61,7 @@ class RealShipServices extends ShipServices {
     final (token, lobbyId) = res.right;
 
     final response = await http.get(
-        Uri.http(baseUri, "$lobbyId/view", {'shipId': sId.toString()}),
+        Uri.https(baseUri, "$lobbyId/view", {'shipId': sId.toString()}),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         });
@@ -79,7 +79,7 @@ class RealShipServices extends ShipServices {
       'description': description
     };
 
-    final response = await http.post(Uri.http(baseUri, "create-user"),
+    final response = await http.post(Uri.https(baseUri, "create-user"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(jsonBody));
 
@@ -90,7 +90,7 @@ class RealShipServices extends ShipServices {
 
   @override
   FutureEither<ErrorFeedback, Token> logIn(String idToken) async {
-    final response = await http.post(Uri.http(baseUri, "get-token"),
+    final response = await http.post(Uri.https(baseUri, "get-token"),
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: "idtoken=$idToken");
 
@@ -101,7 +101,7 @@ class RealShipServices extends ShipServices {
 
   @override
   FutureEither<ErrorFeedback, TokenPing> checkTokenValidity(String token) async {
-    final response = await http.post(Uri.http(baseUri, "check-token"),
+    final response = await http.post(Uri.https(baseUri, "check-token"),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         HttpHeaders.authorizationHeader: 'Bearer $token'
@@ -119,7 +119,7 @@ class RealShipServices extends ShipServices {
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
 
-    final response = await http.get(Uri.http(baseUri, "$lobbyId/minimap"),
+    final response = await http.get(Uri.https(baseUri, "$lobbyId/minimap"),
     headers: {HttpHeaders.authorizationHeader: 'Bearer $token'} );
 
     return handleResponse(response, (json) =>
@@ -136,7 +136,7 @@ class RealShipServices extends ShipServices {
     final json = NavigationPathOutputModel(start: start, mid: mid, end: end).toJson();
 
     final response = await http.post(
-        Uri.http(baseUri, "$lobbyId/navigate", {'shipId': sId.toString()}),
+        Uri.https(baseUri, "$lobbyId/navigate", {'shipId': sId.toString()}),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -155,7 +155,7 @@ class RealShipServices extends ShipServices {
     final (token, lobbyId) = res.right;
 
     final response = await http.get(
-        Uri.http(baseUri, "$lobbyId/ship", {'shipId': sId.toString()}),
+        Uri.https(baseUri, "$lobbyId/ship", {'shipId': sId.toString()}),
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
         });
@@ -172,7 +172,7 @@ class RealShipServices extends ShipServices {
     final (token, lobbyId) = res.right;
 
     final response =
-        await http.get(Uri.http(baseUri, "$lobbyId/ships"), headers: {
+        await http.get(Uri.https(baseUri, "$lobbyId/ships"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
@@ -188,7 +188,7 @@ class RealShipServices extends ShipServices {
     final (token, lobbyId) = res.right;
 
     final response = await http.post(
-      Uri.http(baseUri, "$lobbyId/ship/add"),
+      Uri.https(baseUri, "$lobbyId/ship/add"),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -218,7 +218,7 @@ class RealShipServices extends ShipServices {
       'name': searchedLobby
     };
 
-    final response = await http.get(Uri.http(baseUri, "lobbies/$filterType", queryParams),
+    final response = await http.get(Uri.https(baseUri, "lobbies/$filterType", queryParams),
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
 
     return handleResponse(response, (json) =>
@@ -232,7 +232,7 @@ class RealShipServices extends ShipServices {
     if (token == null) return const Left(tokenNotFound);
 
     final response = await http.post(
-      Uri.http(baseUri, "$tag/join"),
+      Uri.https(baseUri, "$tag/join"),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -249,7 +249,7 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
-    final response = await http.post(Uri.http(baseUri, "create-lobby"),
+    final response = await http.post(Uri.https(baseUri, "create-lobby"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -266,7 +266,7 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
-    final response = await http.post(Uri.http(baseUri, "lobby/favorite"),
+    final response = await http.post(Uri.https(baseUri, "lobby/favorite"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -283,7 +283,7 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
-    final response = await http.post(Uri.http(baseUri, "lobby/unfavorite"),
+    final response = await http.post(Uri.https(baseUri, "lobby/unfavorite"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -305,7 +305,7 @@ class RealShipServices extends ShipServices {
       return Right(user.toUserInfo());
     }
 
-    final response = await http.get(Uri.http(baseUri, "userinfo"), headers: {
+    final response = await http.get(Uri.https(baseUri, "userinfo"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
@@ -328,7 +328,7 @@ class RealShipServices extends ShipServices {
     final String? token = await userStorage.getToken();
     if (token == null) return const Left(tokenNotFound);
 
-    final response = await http.get(Uri.http(baseUri, "patch-notes"), headers: {
+    final response = await http.get(Uri.https(baseUri, "patch-notes"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
@@ -351,7 +351,7 @@ class RealShipServices extends ShipServices {
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
 
-    final response = await http.post(Uri.http(baseUri, "$lobbyId/conquest"),
+    final response = await http.post(Uri.https(baseUri, "$lobbyId/conquest"),
         headers: {
           HttpHeaders.contentTypeHeader: "application/json",
           HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -369,7 +369,7 @@ class RealShipServices extends ShipServices {
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
 
-    final response = await http.get(Uri.http(baseUri, "$lobbyId/statistics"), headers: {
+    final response = await http.get(Uri.https(baseUri, "$lobbyId/statistics"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
 
@@ -384,7 +384,7 @@ class RealShipServices extends ShipServices {
     if (res.isLeft) return Left(res.left);
     final (token, lobbyId) = res.right;
 
-    final response = await http.get(Uri.http(baseUri, '$lobbyId/islands/known'),
+    final response = await http.get(Uri.https(baseUri, '$lobbyId/islands/known'),
     headers: {HttpHeaders.authorizationHeader: 'Bearer $token'});
 
     return handleResponse(response, (json) =>
@@ -410,7 +410,7 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     SSEClient.subscribeToSSE(
-        url: Uri.http(baseUri, "$lobbyId/subscribe").toString(),
+        url: Uri.https(baseUri, "$lobbyId/subscribe").toString(),
         header: {
           HttpHeaders.authorizationHeader: 'Bearer $token',
           HttpHeaders.acceptHeader: "text/event-stream",
@@ -442,7 +442,7 @@ class RealShipServices extends ShipServices {
     if (lobbyId == null) throw Exception("couldn't find lobby");
 
     // fetch unsubscribe
-    await http.get(Uri.http(baseUri, "$lobbyId/unsubscribe"), headers: {
+    await http.get(Uri.https(baseUri, "$lobbyId/unsubscribe"), headers: {
       HttpHeaders.authorizationHeader: 'Bearer $token',
     });
     // unsubscribe from SSE
@@ -474,5 +474,9 @@ class RealShipServices extends ShipServices {
     } else {
       return Left(ProblemInputModel.fromJson(response.statusCode, json).toErrorFeedback()); // unsuccessful on status != 200
     }
+  }
+
+  String createURI(String uri) {
+    return Uri.http(uri).toString();
   }
 }

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:ship_conquest/domain/patch_notes/patch_note.dart';
 
 /// Builds the patch note's text to be put inside the square.
-Widget buildPatchNoteTextWidget(PatchNote note) => Column(
+Widget buildPatchNoteTextWidget(PatchNote note, BuildContext context) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     Text(
       note.title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 24,
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.secondary,
       ),
     ),
     const SizedBox(height: 8),
@@ -18,9 +18,9 @@ Widget buildPatchNoteTextWidget(PatchNote note) => Column(
       children: note.details.map((detail) {
         return Text(
           detail,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         );
       }).toList(),
